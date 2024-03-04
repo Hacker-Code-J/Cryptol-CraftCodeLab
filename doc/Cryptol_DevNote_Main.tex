@@ -1,0 +1,373 @@
+\documentclass[12pt,openany]{book}
+
+% Preamble with packages, custom commands, etc.
+\usepackage[utf8]{inputenc} % Allow input to be UTF-8
+\usepackage{commath, amsmath, amsthm}
+\usepackage{polynomial}
+\usepackage{enumerate}
+\usepackage{soul} % highlight
+\usepackage{lipsum}  % Just for generating text
+
+% Theorem
+\newtheorem{axiom}{Axiom}[chapter]
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{remark}{Remark}[chapter]
+\newtheorem{exercise}{Exercise}[chapter]
+\newtheorem{example}{Example}[chapter]
+\newtheorem*{note}{Note}
+
+% Colors
+\usepackage[dvipsnames,table]{xcolor}
+\definecolor{titleblue}{RGB}{0,53,128}
+\definecolor{chaptergray}{RGB}{140,140,140}
+\definecolor{sectiongray}{RGB}{180,180,180}
+
+\definecolor{thmcolor}{RGB}{231, 76, 60}
+\definecolor{defcolor}{RGB}{52, 152, 219}
+\definecolor{lemcolor}{RGB}{155, 89, 182}
+\definecolor{corcolor}{RGB}{46, 204, 113}
+\definecolor{procolor}{RGB}{241, 196, 15}
+\definecolor{execolor}{RGB}{90, 128, 127}
+
+\definecolor{comments}{HTML}{6A9955} % A kind of forest green.
+\definecolor{keyword}{HTML}{569CD6} % A medium blue..
+\definecolor{string}{HTML}{CE9178} % A reddish-brown or terra cotta.
+\definecolor{function}{HTML}{DCDCAA} % A beige or light khaki.
+\definecolor{number}{HTML}{B5CEA8} % A muted green.
+\definecolor{type}{HTML}{4EC9B0} %  A turquoise or teal.
+\definecolor{class}{HTML}{4EC9B0} % Similar to types, a turquoise or teal.
+
+% Define custom colors
+\definecolor{commentColor}{rgb}{0.25,0.5,0.35}
+\definecolor{keywordColor}{rgb}{0.6,0.1,0.1}
+\definecolor{stringColor}{rgb}{0.5,0.1,0.5}
+\definecolor{backColor}{rgb}{0,0,0} % Black background
+
+\definecolor{aesblue}{RGB}{30,144,255}
+\definecolor{aesgreen}{RGB}{0,128,0}
+\definecolor{aesred}{RGB}{255,69,0}
+\definecolor{aesgray}{RGB}{112,128,144}
+
+\definecolor{commentgreen}{rgb}{0,0.6,0}
+\definecolor{stringmagenta}{rgb}{0.58,0,0.82}
+\definecolor{keywordblue}{rgb}{0,0,1}
+\definecolor{backgroundgray}{rgb}{0.95,0.95,0.95}
+
+\definecolor{rustKeyword}{HTML}{6D65DD}
+\definecolor{rustMacro}{HTML}{D19A66}
+\definecolor{rustFunc}{HTML}{3986E9}
+\definecolor{rustBuild}{HTML}{A5BE5D}
+\definecolor{rustBack}{HTML}{282C34}
+\definecolor{rustCommand}{HTML}{8CAF54}
+
+% Define custom colors
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Fonts
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{newpxtext,newpxmath}
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\color{titleblue}\mdseries}
+
+% Page layout
+\usepackage{geometry}
+\geometry{a4paper,left=.8in,right=.6in,top=.75in,bottom=1in,heightrounded}
+\usepackage{fancyhdr}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[LO]{\nouppercase{\rightmark}}
+\fancyhead[RE]{\nouppercase{\leftmark}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Chapter formatting
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+{\normalfont\sffamily\Huge\bfseries\color{titleblue}}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titleformat{\section}
+{\normalfont\sffamily\Large\bfseries\color{titleblue!100!gray}}{\thesection}{1em}{}
+\titleformat{\subsection}
+{\normalfont\sffamily\large\bfseries\color{titleblue!75!gray}}{\thesubsection}{1em}{}
+
+% Table of contents formatting
+\usepackage{tocloft}
+\renewcommand{\cftchapfont}{\sffamily\color{titleblue}\bfseries}
+\renewcommand{\cftsecfont}{\sffamily\color{chaptergray}}
+\renewcommand{\cftsubsecfont}{\sffamily\color{sectiongray}}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+
+% TikZ
+\usepackage{tikz}
+\usepackage{tikz-cd}
+\usetikzlibrary{math} % for calculations
+\usetikzlibrary{matrix, positioning, arrows.meta, calc, shapes.geometric, shapes.multipart, chains}
+\usetikzlibrary{decorations.pathreplacing,calligraphy}
+
+\usepackage{pgfplots}
+\usepgfplotslibrary{fillbetween}
+\pgfplotsset{compat=1.15}
+
+% Pseudo-code
+\usepackage[linesnumbered,ruled]{algorithm2e}
+\usepackage{algpseudocode}
+\usepackage{setspace}
+\SetKwComment{Comment}{/* }{ */}
+\SetKwProg{Fn}{Function}{:}{end}
+\SetKw{End}{end}
+\SetKw{DownTo}{downto}
+
+% Define a new environment for algorithms without line numbers
+\newenvironment{algorithm2}[1][]{
+	% Save the current state of the algorithm counter
+	\newcounter{tempCounter}
+	\setcounter{tempCounter}{\value{algocf}}
+	% Redefine the algorithm numbering (remove prefix)
+	\renewcommand{\thealgocf}{}
+	\begin{algorithm}
+	}{
+	\end{algorithm}
+	% Restore the algorithm counter state
+	\setcounter{algocf}{\value{tempCounter}}
+}
+
+%Tcolorbox
+\usepackage[most]{tcolorbox}
+\tcbset{colback=white, arc=5pt}
+
+% Listings
+\usepackage{listings}
+\renewcommand{\lstlistingname}{Code}%
+% Define the style for Haskell
+\lstdefinestyle{haskell}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2,
+	language=Haskell
+}
+% Define custom Rust style
+\lstdefinestyle{rust}{
+	language=C,                   % Base the style on C language
+	backgroundcolor=\color{white}, % Set background color to white
+	commentstyle=\color{green!70!black},    % Set comment style to green
+	keywordstyle=\color{blue},     % Set keyword style to blue
+	numberstyle=\tiny\color{gray}, % Set the style for line numbers
+	stringstyle=\color{red},       % Set string literal style to red
+	keywordstyle={\bfseries\color{purple}},
+	keywordstyle=[2]{\bfseries\color{RoyalBlue}},
+	basicstyle=\ttfamily\small,    % Set basic style to small typewriter font
+	breakatwhitespace=false,       % Automatic breaks only at whitespace
+	breaklines=true,               % Set automatic line breaking
+	captionpos=b,                  % Sets the caption position to bottom
+	keepspaces=true,               % Keeps spaces in text, useful for indentation
+	numbers=left,                  % Line numbers on the left
+	numbersep=5pt,                 % How far the line numbers are from the code
+	showspaces=false,              % Do not show spaces as special characters
+	showstringspaces=false,        % Do not highlight spaces in strings
+	showtabs=false,                % Do not show tabs as special characters
+	tabsize=2,                     % Sets default tab size to 2 spaces
+	frame=single,                  % Adds a frame around the code
+	frameround=ffff,               % Round the corners of the frame
+	framesep=3pt,                  % Distance between frame and code
+	alsoletter={!},                  % Treat ! as part of keywords
+	morekeywords={fn, let, mut},   % Add more keywords specific to Rust
+	morekeywords=[2]{println!}
+}
+\lstdefinestyle{C}{
+	language=C,
+	backgroundcolor=\color{white},
+	basicstyle=\ttfamily\color{black},
+	commentstyle=\color{green!70!black},
+	keywordstyle={\bfseries\color{purple}},
+	keywordstyle=[2]{\bfseries\color{red}},
+	keywordstyle=[3]{\bfseries\color{type}},
+	keywordstyle=[4]{\bfseries\color{JungleGreen}},
+	keywordstyle=[5]{\bfseries\color{Magenta}},
+	keywordstyle=[6]{\bfseries\color{RoyalBlue}},
+	keywordstyle=[7]{\bfseries\color{Turquoise}},
+	otherkeywords={bool, inline, size\_t, FILE},
+	morekeywords=[2]{;},
+	morekeywords=[3]{i8, i32, i64, u8, u32, u64, field, word},
+	morekeywords=[4]{
+		rdtsc, measure\_cycle, measure\_time, stringToWord
+	},
+	morekeywords=[5]{
+		main
+	},
+	morekeywords=[6]{false, true, strlen, sscanf, printf},
+	morekeywords=[7]{
+		ONE, SIZE, IS\_32\_BIT\_ENV, PRIME, PRIME\_INVERSE
+	},
+	numberstyle=\tiny\color{gray},
+	stringstyle=\color{purple},
+	showstringspaces=false,
+	breaklines=true,
+	frame=single,
+	framesep=3pt,
+	%frameround=tttt,
+	framexleftmargin=3pt,
+	numbers=left,
+	numberstyle=\small\color{gray},
+	xleftmargin=15pt, % Increase the left margin
+	xrightmargin=5pt,
+	tabsize=4,
+	belowskip=0pt,
+	aboveskip=4pt
+}
+\lstdefinestyle{zsh}{
+	language=bash,                  % Set the language to bash (closest to Zsh)
+	backgroundcolor=\color{rustBack},
+	commentstyle=\color{commentColor}\ttfamily,
+	keywordstyle=\color{rustBuild}\bfseries,
+	stringstyle=\color{stringColor!70!white}\ttfamily,
+	keywordstyle=[2]{\bfseries\color{rustBuild}},
+	keywordstyle=[3]{\bfseries\color{rustCommand}},
+	showspaces=false,               % Don't show spaces as underscores
+	showstringspaces=false,         % Don't highlight spaces in strings
+	breaklines=true,                % Automatic line breaking
+	frame=none,                     % No frame around the code
+	basicstyle=\ttfamily\color{white}, % White basic text color for contrast
+	extendedchars=true,             % Allow extended characters
+	captionpos=b,                   % Caption-position at bottom
+	escapeinside={\%*}{*)},         % Allow LaTeX inside your code
+	morekeywords={echo,ls,cd,pwd,exit,clear,man,unalias,zsh,source,
+					cargo}, % Add more keywords
+	upquote=true,                   % Ensure straight quotes are used
+	literate=
+		{\$}{{\textcolor{red}{\$}}}1
+		{:}{{\textcolor{red}{:}}}1
+		{~}{{\textcolor{red}{\textasciitilde}}}1 % Color certain characters
+		{├}{{\textbrokenbar}}1  % Replace ├ with \textbrokenbar
+		{─}{{\textendash}}1     % Replace ─ with \textendash
+		{└}{{`}}1,              % Replace └ with `
+	morekeywords=[2]{Created},
+%	morekeywords=[3]{cargo, cd}
+}
+
+% Usage: \lstinputlisting[style=zsh]{sourcefile.sh}
+% or \begin{lstlisting}[style=zsh] ... \end{lstlisting}
+
+
+% Table
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{longtable}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+% Hyperlinks
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=titleblue,
+	filecolor=black,      
+	urlcolor=titleblue,
+}
+
+%Ceiling and Floor Function
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+
+
+\newcommand{\mathcolorbox}[2]{\colorbox{#1}{$\displaystyle #2$}}
+
+\newcommand{\of}[1]{\left(#1\right)}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\zero}{\textcolor{red}{\texttt{0}}}
+\newcommand{\one}{\textcolor{red}{\texttt{1}}}
+\newcommand{\binaryfield}{\set{\zero,\one}}
+
+\newcommand{\ie}{\textnormal{i.e.}}
+\newcommand{\sol}{\textcolor{magenta}{\bf Solution.\ }}
+
+\newcommand{\yes}{\textcolor{blue}{O}}
+\newcommand{\no}{\textcolor{red}{X}}
+
+\newcommand{\adjacent}{\parallel}
+
+\newcommand{\src}{\mathsf{src}}
+\newcommand{\dsc}{\mathsf{dsc}}
+\newcommand{\state}{\mathsf{state}}
+\newcommand{\data}{\mathsf{data}}
+
+\newcommand{\len}{\mathsf{len}}
+\newcommand{\bit}{\mathsf{bit}}
+\newcommand{\byte}{\mathsf{byte}}
+\newcommand{\word}{\mathsf{word}}
+
+\begin{document}	
+	% Title page
+	\begin{titlepage}
+		\begin{center}
+			{\Huge\textsf{\textbf{Mastering Cryptol: A Comprehensive Guide}}\par}
+			{\Large\textsf{\textbf{- From Basics to Advanced Patterns and Best Practices -}}\par}
+			\vspace{0.5in}
+			{\Large {Ji Yong-Hyeon}\par}
+			\vspace{1in}
+%			\includegraphics[scale=.6]{images/AES_Encryption_Round.png}\par
+			\vspace{1in}
+			{\large\bf \textsf{Department of Information Security, Cryptology, and Mathematics}\par}
+			{\textsf{College of Science and Technology}\par}
+			{\textsf{Kookmin University}\par}
+			\vspace{.25in}
+			{\large \textsf{\today}\par}
+		\end{center}
+	\end{titlepage}
+	
+	\frontmatter
+	\input{front/acknowledgements.tex}
+%	\input{front/abstract.tex}
+	
+	\newpage
+	\tableofcontents
+	
+	\newpage
+	\mainmatter
+	\input{chapters/cryptol_ch1.tex} %
+	\input{chapters/cryptol_ch2.tex} %
+%	\input{chapters/ecc_ch1_mul_squ.tex} %
+%	\input{chapters/ecc_ch1_red.tex} %
+%	\input{chapters/chapter1.tex}
+%	\input{chapters/chapter2.tex}
+	% Include more chapters as needed
+	
+	\appendix
+	\input{appendices/bibilography.tex}
+%	\input{appendices/appendixA.tex}
+%	\input{appendices/appendixB.tex}
+	
+	\backmatter
+	% Bibliography, index, etc.
+	
+\end{document}

@@ -1,0 +1,100 @@
+\chapter{Functional Cryptography and Software Verification with Cryptol}
+
+\section{Introduction to Cryptol}
+
+\textbf{Cryptol} is a purely functional programming language for cryptographic specifications. It's got a large amount of Haskell influence.
+\begin{itemize}
+	\item Very syntactically similar to Haskell
+	\item And a similar type system (with some additions, and reductions)
+	\item Purely functional
+	\item Clearly the second best programming language by these metrics alone.
+\end{itemize}
+
+Some additions.
+\begin{itemize}
+	\item Type level arithmetic, and a solver for it
+	\item Verification technology
+	\item A smattering of other small scoping 
+\end{itemize}
+
+Some reductions.
+\begin{itemize}
+	\item It has type classes, but you can't write them.
+	\item No built in IO or any other operations.
+	\item No user-defined data type or ``pattern matching'' beyond the built-in sequence type.
+\end{itemize}
+
+\newpage
+\noindent\textbf{C:}
+\begin{lstlisting}[style=C]
+uint32_t f(uint32_t x, uint32_t y) {
+	return x + y;
+}
+\end{lstlisting}
+\vspace{8pt}
+\textbf{Haskell:}
+\begin{lstlisting}[style=haskell]
+f :: Word32 -> Word32 -> Word32
+f x y = x + y
+\end{lstlisting}
+
+\noindent\textbf{Cryptol:}
+\begin{lstlisting}[style=haskell]
+f : [32] -> [32] -> [32]
+f x y = x + y
+\end{lstlisting}
+
+Large or ``weird'' numbers.
+\begin{lstlisting}[style=haskell]
+f : [17] -> [17]
+f x = -x
+
+g : [23424] -> [548683776]
+g x = x * x
+\end{lstlisting}
+
+Sequence are fundamental
+\begin{lstlisting}[style=haskell]
+[0 .. 3] = [0, 1, 2, 3]
+f : { x } x -> [4]x
+f x = [x, x, x, x]
+// Define a sequence of 5 integers
+sequenceOfInts : [5]Integer
+sequenceOfInts = [1, 2, 3, 4, 5]
+
+// Define a sequence of bits (binary sequence)
+sequenceOfBits : [8]Bit
+sequenceOfBits = [1, 0, 1, 1, 0, 0, 1, 0]
+
+// Define a nested sequence (matrix of bits)
+matrixOfBits : [3][4]Bit
+matrixOfBits = [[1, 0, 1, 0], [0, 1, 0, 1], [1, 1, 1, 1]]
+
+// Accessing elements and slices
+firstElement = sequenceOfInts @ 0      // Access the first element (index starts from 0)
+firstTwoBits = sequenceOfBits @ [0..1] // Access the first two bits
+secondRow = matrixOfBits @ 1           // Access the second row of the matrix
+
+// Sequence operations
+reversedSequence = reverse sequenceOfInts    // Reverse the sequence
+concatenatedSequence = sequenceOfInts # [6] // Concatenate [6] to the end of the sequence
+\end{lstlisting}
+
+\newpage
+\begin{lstlisting}[style=haskell]
+// Define a sequence of 16 bits
+myBits : [16]Bit
+myBits = [1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1]
+
+// Split the sequence into chunks of 4 bits
+splitChunks : [4][4]Bit
+splitChunks = split(myBits)
+
+// Define a list of sequences
+myChunks : [4][4]Bit
+myChunks = [[1, 0, 1, 1], [0, 0, 1, 0], [1, 1, 1, 0], [1, 0, 0, 1]]
+
+// Join the chunks into a single sequence
+joinedSequence : [16]Bit
+joinedSequence = join(myChunks)
+\end{lstlisting}
