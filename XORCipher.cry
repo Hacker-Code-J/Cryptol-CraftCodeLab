@@ -1,0 +1,17 @@
+// File: XORCipher.cry
+module XORCipher where
+
+// Type definitions
+type Byte = [8]         // A type for 8-bit bytes
+type Key = Byte         // A type for encryption/decryption key
+type Message = [8]Byte  // A type for 64-bit messages
+
+// Function definitions
+// XOR encryption/decryption function: takes a key and a message, returns the result
+xorCipher : Key -> Message -> Message
+xorCipher key msg = [ key ^ b | b <- msg ]
+
+// Properties about the functions
+// Property: Encrypting then decrypting with the same key should return the original message
+property encrypt_decrypt_identity key msg =
+  xorCipher key (xorCipher key msg) == msg

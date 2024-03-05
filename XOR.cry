@@ -1,0 +1,8 @@
+module XOR where
+
+// Defines an XOR function for two bits
+xor : Bit -> Bit -> Bit
+xor a b = (a || b) && ~(a && b)
+
+// Property: XOR is its own inverse
+property xor_inverse a b = xor (xor a b) b == a

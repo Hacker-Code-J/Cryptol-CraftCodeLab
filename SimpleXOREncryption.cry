@@ -1,0 +1,25 @@
+// File: SimpleXOREncryption.cry
+module SimpleXOREncryption where
+
+// Type definitions
+type Key = [128]        // A type for 128-bit encryption keys
+type Message = [128]    // A type for 128-bit messages
+type CipherText = [128] // A type for 128-bit ciphertexts
+
+// Function definitions
+// XOR encryption function: takes a key and a message, returns ciphertext
+xorEncrypt : Key -> Message -> CipherText
+xorEncrypt key msg = key ^ msg
+
+// XOR decryption function: takes a key and a ciphertext, returns message
+xorDecrypt : Key -> CipherText -> Message
+xorDecrypt key cipher = key ^ cipher
+
+// Properties about the functions
+// Property: Decrypting an encrypted message with the same key should return the original message
+property decryption_inverts_encryption key msg =
+    xorDecrypt key (xorEncrypt key msg) == msg
+
+// Property: Encrypting the same message with the same key twice should return the original message
+property encryption_is_involution key msg =
+    xorEncrypt key (xorEncrypt key msg) == msg

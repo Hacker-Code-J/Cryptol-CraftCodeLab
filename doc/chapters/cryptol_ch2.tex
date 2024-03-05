@@ -98,3 +98,61 @@ myChunks = [[1, 0, 1, 1], [0, 0, 1, 0], [1, 1, 1, 0], [1, 0, 0, 1]]
 joinedSequence : [16]Bit
 joinedSequence = join(myChunks)
 \end{lstlisting}
+
+\newpage
+\section{Split and Join}
+\begin{lstlisting}[style=C]
+// Pseudo-C code representing what 'g' might look like in C
+void g(type *z, type (*result)[a], int a) {
+	// Assuming 'z' is an array of length 2*a and 'type' is whatever 'b' represents
+	// 'result' is an array of two elements, each of which can hold 'a' items of 'type'
+	for (int i = 0; i < a; i++) {
+		result[0][i] = z[i];      // Copy the first half of 'z' into 'result[0]'
+		result[1][i] = z[i + a];  // Copy the second half of 'z' into 'result[1]'
+	}
+}
+\end{lstlisting}
+In this pseudo-C version, g takes an array z and splits it into two halves, storing these in result[0] and result[1]. This is analogous to the Cryptol version where split takes z and returns two sequences, y and x, which get assigned in reverse order due to the pattern {y, x} in the Cryptol code.
+
+\begin{align*}
+&\texttt{// Split into four bytes (8-bit)}\\
+&\texttt{split 0xAABBCCDD : [4][8] = {0xAA, 0xBB, 0xCC, 0xDD}} \\&\texttt{// Concatenation} \\
+&\texttt{join [0xAA, 0xBB, 0xCC, 0xDD] = 0xAABBCCDD}
+\end{align*}
+\begin{lstlisting}[style=haskell]
+split : { parts, each, a}
+	  (fin each
+	  ) => [parts * each]a -> [parts][each]a
+
+g: (a, b) (fin a) => [2 * a]b -> [2][a]b
+g z = {x, y}
+	where {y, x} = split z
+\end{lstlisting}
+
+\newpage
+\section{Verification}
+
+\textbf{The Quarter Round - C99}
+
+\begin{lstlisting}[style=C]
+static void
+qround(uint32_t* x, // Pointer to an array
+	   uint32_t a, // Index of 'x', representing 'a'
+	   uint32_t b, // Second index
+	   uint32_t c, // ...
+	   uint32_t d, // ...
+) {
+	/* L32 is left 32-bit ROLL, not a shift */
+	x[a] += x[b]; x[d] = L32(x[d] ^ x[a], 16);
+	x[c] += x[d]; x[b] = L32(x[b] ^ x[c], 12);
+	x[a] += x[b]; x[d] = L32(x[d] ^ x[a],  0);
+	x[c] += x[d]; x[b] = L32(x[b] ^ x[c],  7);
+}
+\end{lstlisting}
+
+Cryptol has a sister tool, called \textbf{SAW}, which can do this using deep black magic that we dare not speak of (yet).
+
+SAW has its own typed language - called SAWScript - used for scripting proofs in an automated way, which we'll use.
+
+SAW doesn't work on surface-level syntax. It works with intermediate representations, often ones your compiler splits out.
+In particular, SAW comes with tools for ingesting \textbf{LLVM bitcode, JVM Bytecode and Cryptol programs}.

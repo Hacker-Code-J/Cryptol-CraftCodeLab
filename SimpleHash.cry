@@ -1,0 +1,15 @@
+// File: SimpleHash.cry
+module SimpleHash where
+
+// Type definitions
+type Block = [512]      // A type for 512-bit blocks
+type Hash = [256]       // A type for 256-bit hashes
+
+// Function definitions
+// Simple hash function: takes a block and returns a hash
+hashFunction : Block -> Hash
+hashFunction block = take`{256} (block # zero)
+
+// Properties about the functions
+// Property: The hash of a zero block is zero
+property hash_of_zero = hashFunction (zero : Block) == (zero : Hash)
