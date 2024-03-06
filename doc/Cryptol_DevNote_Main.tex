@@ -66,6 +66,10 @@
 \definecolor{rustBack}{HTML}{282C34}
 \definecolor{rustCommand}{HTML}{8CAF54}
 
+\definecolor{vsCodeRed}{HTML}{E06C6A}
+\definecolor{vsCodeBlue}{HTML}{3986E9}
+\definecolor{CLIGreen}{HTML}{87D368}
+
 % Define custom colors
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -167,6 +171,26 @@
 	tabsize=2,
 	language=Haskell
 }
+\lstdefinestyle{cryptol}{
+	language=C,
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2,
+	language=Haskell
+}
 % Define custom Rust style
 \lstdefinestyle{rust}{
 	language=C,                   % Base the style on C language
@@ -243,7 +267,7 @@
 	keywordstyle=\color{rustBuild}\bfseries,
 	stringstyle=\color{stringColor!70!white}\ttfamily,
 	keywordstyle=[2]{\bfseries\color{rustBuild}},
-	keywordstyle=[3]{\bfseries\color{rustCommand}},
+	keywordstyle=[3]{\bfseries\color{CLIGreen}},
 	showspaces=false,               % Don't show spaces as underscores
 	showstringspaces=false,         % Don't highlight spaces in strings
 	breaklines=true,                % Automatic line breaking
@@ -256,14 +280,19 @@
 					cargo}, % Add more keywords
 	upquote=true,                   % Ensure straight quotes are used
 	literate=
-		{\$}{{\textcolor{red}{\$}}}1
-		{:}{{\textcolor{red}{:}}}1
-		{~}{{\textcolor{red}{\textasciitilde}}}1 % Color certain characters
-		{├}{{\textbrokenbar}}1  % Replace ├ with \textbrokenbar
-		{─}{{\textendash}}1     % Replace ─ with \textendash
-		{└}{{`}}1,              % Replace └ with `
-	morekeywords=[2]{Created},
-%	morekeywords=[3]{cargo, cd}
+		{\$}{{\textcolor{vsCodeRed}{$\boldsymbol{\$}$}}}1
+		{>}{{\textcolor{CLIGreen}{$\boldsymbol{>}$}}}1
+		{<}{{\textcolor{CLIGreen}{$\boldsymbol{<}$}}}1
+		{@}{{\textcolor{vsCodeRed}{@}}}1
+		{~}{{\textcolor{vsCodeRed}{$\boldsymbol{\sim}$}}}1
+		{:}{{\textcolor{rustBuild}{:}}}1,
+%		{:}{{\textcolor{red}{:}}}1
+%		{~}{{\textcolor{red}{\textasciitilde}}}1 % Color certain characters
+%		{├}{{\textbrokenbar}}1  % Replace ├ with \textbrokenbar
+%		{─}{{\textendash}}1     % Replace ─ with \textendash
+%		{└}{{`}}1,              % Replace └ with `
+	morekeywords=[2]{cryptol, load, prove,},
+	morekeywords=[3]{Main}
 }
 
 % Usage: \lstinputlisting[style=zsh]{sourcefile.sh}
@@ -331,7 +360,7 @@
 	\begin{titlepage}
 		\begin{center}
 			{\Huge\textsf{\textbf{Mastering Cryptol: A Comprehensive Guide}}\par}
-			{\Large\textsf{\textbf{- From Basics to Advanced Patterns and Best Practices -}}\par}
+			{\Large\textsf{\textbf{- A Guide for C Programmers -}}\par}
 			\vspace{0.5in}
 			{\Large {Ji Yong-Hyeon}\par}
 			\vspace{1in}

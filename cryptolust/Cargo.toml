@@ -1,0 +1,16 @@
+[package]
+name = "cryptolust"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[lib]
+name = "cryptolustlib" # The name of your library, defaults to the package name if omitted
+path = "src/lib.rs" # Path to your library's root source file, defaults to src/lib.rs
+
+[[bin]]
+name = "cryptolust" # The name of your binary executable
+path = "src/main.rs" # Path to your executable's main source file

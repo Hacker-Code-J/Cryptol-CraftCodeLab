@@ -1,0 +1,53 @@
+// Splitting a sequence into blocks
+long_seq : [16]Bit // Similar to a block of data in cryptography
+long_seq = 0xAAAA
+
+blocks : [2][8]Bit // Splitting into two blocks of 8 bits
+blocks = split long_seq // There's no direct C equivalent
+
+joined_seq : [16]Bit
+joined_seq = join blocks
+
+// A simple bitwise NOT operation applied to a sequence
+negate_seq : [8]Bit -> [8]Bit
+negate_seq input = ~input // Bitwise NOT each element
+
+input_seq : [8]Bit
+input_seq = 0xCD
+
+negated_seq : [8]Bit
+negated_seq = negate_seq input_seq // Apply function, no direct equivalent in C
+
+// a : Bit
+// a = True
+
+// b : Bit
+// b = False
+
+// // AND operation (similar to a && b in C)
+// result_and : Bit
+// result_and = a && b
+
+// // OR operation (similar to a || b in C)
+// result_or : Bit
+// result_or = a || b
+
+// // NOT operation (similar to !a in C)
+// result_not : Bit
+// result_not = ~a
+
+// result_cond : Bit
+// result_cond = if a then b else ~b
+
+// // One-time pad encryption
+// plaintext_bit : Bit
+// plaintext_bit = True // Your plaintext
+
+// key_bit : Bit
+// key_bit = False // Your secret key
+
+// encrypted_bit : Bit
+// encrypted_bit = plaintext_bit ^ key_bit // XOR for encryption
+
+// decrypted_bit : Bit
+// decrypted_bit = encrypted_bit ^ key_bit // XOR for decryption (should equal plaintext_bit)

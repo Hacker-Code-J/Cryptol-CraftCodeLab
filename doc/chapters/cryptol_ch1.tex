@@ -1,6 +1,212 @@
-\chapter{Introduction to Cryptol Part I}
+\chapter{A Crash Course in Cryptol}
 
+\section{Basic Data Types}
 
+\subsection{Bit: Booleans}
+
+\subsubsection{Basic Bit Operations}
+
+\begin{tcolorbox}[colframe=defcolor,title={\color{white}\bf Data Type: \texttt{Bit}}]
+In Cryptol, a `\texttt{Bit}` can either be
+\begin{itemize}
+	\item `\texttt{True}' (equivalent to 1 in C) or
+	\item `\texttt{False}' (equivalent to 0 in C).
+\end{itemize}
+\end{tcolorbox}
+
+\begin{lstlisting}[style=cryptol]
+a : Bit
+a = True
+
+b : Bit
+b = False
+\end{lstlisting}
+
+\noindent Similar to C, Cryptol supports logical operations like \textbf{AND}, \textbf{OR}, and \textbf{NOT}.
+\begin{lstlisting}[style=cryptol]
+// AND operation (similar to a & b in C)
+result_and : Bit
+result_and = a && b
+
+// OR operation (similar to a | b in C)
+result_or : Bit
+result_or = a || b
+
+// NOT operation (similar to !a in C)
+result_not : Bit
+result_not = ~a
+\end{lstlisting}
+
+\begin{lstlisting}[style=zsh]
+$ Main> result_and
+False
+$ Main> result_or
+True
+$ Main> result_not
+False 
+\end{lstlisting}
+
+\subsubsection{Intermediate Bit Operations}
+
+\textbf{Conditional Expressions:} Cryptol uses the `\textbf{if...then...else}' syntax, which is similar to the ternary operator `\textbf{?:}' in C.
+
+\begin{lstlisting}[style=cryptol]
+// Conditional expression (similar to a ? b : c in C)
+result_cond : Bit
+result_cond = if a then b else ~b
+\end{lstlisting}
+
+\textbf{XOR Operation}: This is commonly used in cryptography for things like one-time pads.
+
+\begin{lstlisting}[style=cryptol]
+// XOR operation
+c : Bit
+c = True // Assuming some value
+
+result_xor : Bit
+result_xor = a ^ c // Similar to a ^ c in C
+\end{lstlisting}
+
+\subsubsection{Advanced Cryptographic Applications}
+\textbf{Simple Cryptographic Operation:} Here’s a very basic example of a cryptographic operation in Cryptol, a one-time pad encryption of a single bit. In practical applications, you'll work with sequences or arrays of bits.
+
+\begin{lstlisting}[style=cryptol]
+// One-time pad encryption
+plaintext_bit : Bit
+plaintext_bit = True // Your plaintext
+
+key_bit : Bit
+key_bit = False // Your secret key
+
+// XOR for encryption
+encrypted_bit : Bit
+encrypted_bit = plaintext_bit ^ key_bit
+
+// XOR for decryption (should equal plaintext_bit)
+decrypted_bit : Bit
+decrypted_bit = encrypted_bit ^ key_bit           
+\end{lstlisting}
+
+\begin{lstlisting}[style=cryptol]
+module XOR where
+
+// Defines an XOR function for two bits
+xor : Bit -> Bit -> Bit
+xor a b = (a || b) && ~(a && b)
+
+// Property: XOR is its own inverse
+property xor_inverse a b = xor (xor a b) b == a
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ cryptol XOR.cry
+version 2.8.0
+
+Loading module Cryptol
+Loading module XOR
+$ XOR> :prove xor_inverse
+Q.E.D.
+(Total Elapsed Time: 0.008s, using Z3)
+\end{lstlisting}
+
+\newpage
+\subsection{Sequences: Homogeneous Collections}
+\subsubsection{Basic Sequence Operations}
+\textbf{Defining a Sequence:} In Cryptol, a sequence is defined with square brackets. Unlike C, where you typically define the array size and type, Cryptol infers these from the context.
+\begin{lstlisting}[style=cryptol]
+seq : [4]Bit // A sequence of 4 bits
+seq = [True, False, True, False] // Equivalent to {1, 0, 1, 0} in C
+// seq = 0b1010
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> seq
+0xa
+\end{lstlisting}
+\vspace{16pt}
+\textbf{Accessing Elements:} Accessing sequence elements is similar to accessing array elements in C.
+\begin{lstlisting}[style=cryptol]
+element1 : Bit
+element1 = seq @ 0 // Accessing the first element, similar to seq[0] in C
+
+element3 : Bit
+element3 = seq @ 3
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> element1
+True
+$ Main> element3
+False
+\end{lstlisting}
+
+\subsubsection{Intermediate Sequence Operations}
+\textbf{Sequence Concatenation:} You can concatenate sequences to form longer sequences.
+\begin{lstlisting}[style=cryptol]
+seq1 : [3]Bit
+seq1 = [True, True, False] // Similar to {1, 1, 0} in C
+
+seq2 : [5]Bit
+seq2 = [False, True, True, False, True] // Similar to {0, 1, 1, 0, 1} in C
+
+// Concatenating two sequences 0b 110 01101 = 0b 1100 1101
+combined_seq : [8]Bit
+combined_seq = seq1 # seq2
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> seq1
+0x6
+$ Main> seq2
+0x0d
+$ Main> combined_seq
+0xcd
+\end{lstlisting}
+
+\newpage
+\subsubsection{Advanced Cryptographic Applications}
+\textbf{Block Operations:} In cryptography, you often work with blocks of data. In Cryptol, you can easily split sequences into blocks or combine blocks into a single sequence.
+\begin{lstlisting}[style=cryptol]
+// Splitting a sequence into blocks
+long_seq : [16]Bit // Similar to a block of data in cryptography
+long_seq = 0xAAAA
+
+blocks : [2][8]Bit // Splitting into two blocks of 8 bits
+blocks = split long_seq // There's no direct C equivalent
+
+joined_seq : [16]Bit
+joined_seq = join blocks
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> long_seq
+0xaaaa
+$ Main> blocks
+[0xaa, 0xaa]
+$ Main> joined_seq
+0xaaaa
+\end{lstlisting}
+\vspace{16pt}
+\textbf{Applying Functions to Sequences:} In Cryptol, you can apply functions to entire sequences, which is useful for cryptographic transformations.
+\begin{lstlisting}[style=cryptol]
+// A simple bitwise NOT operation applied to a sequence
+negate_seq : [8]Bit -> [8]Bit
+negate_seq input = ~input // Bitwise NOT each element
+
+input_seq : [8]Bit
+input_seq = 0xCD // ~ 0b11001101 = 0b00110010 = 0x32
+
+negated_seq : [8]Bit
+negated_seq = negate_seq input_seq
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> negate_seq
+<function>
+$ Main> input_seq
+0xcd
+$ Main> negated_seq
+0x32
+\end{lstlisting}
+
+\newpage
+\section{Word:}
+\section{Bit: Booleans}
+\newpage
 %Creating an effective curriculum and table of contents to study Cryptol, focusing on cryptographic verification and formal proofs, requires a structured approach that builds foundational knowledge before advancing to more complex topics. Here's a structured curriculum with a table of contents designed to facilitate quick and efficient learning:
 %
 %Curriculum for Cryptol: Cryptographic Verification Tool

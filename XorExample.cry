@@ -1,0 +1,6 @@
+// Function to perform XOR operation
+xorOperation : [8] -> [8] -> [8]
+xorOperation a b = a ^ b
+// Example of generating test vectors
+exampleInputs : [10]([8], [8])
+exampleInputs = [(x, y) | x <- [0..9], y <- [0..9]]
