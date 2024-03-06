@@ -99,8 +99,10 @@
 \titleformat{\chapter}[display]
 {\normalfont\sffamily\Huge\bfseries\color{titleblue}}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
 \titleformat{\section}
-{\normalfont\sffamily\Large\bfseries\color{titleblue!100!gray}}{\thesection}{1em}{}
+{\normalfont\sffamily\LARGE\bfseries\color{titleblue!100!gray}}{\thesection}{1em}{}
 \titleformat{\subsection}
+{\normalfont\sffamily\Large\bfseries\color{titleblue!75!gray}}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}
 {\normalfont\sffamily\large\bfseries\color{titleblue!75!gray}}{\thesubsection}{1em}{}
 
 % Table of contents formatting
@@ -154,11 +156,14 @@
 % Define the style for Haskell
 \lstdefinestyle{haskell}{
 	backgroundcolor=\color{backcolour},   
-	commentstyle=\color{codegreen},
-	keywordstyle=\color{magenta},
-	numberstyle=\tiny\color{codegray},
+	commentstyle=\color{codegreen}\itshape,
+	keywordstyle=\color{magenta}\bfseries,
 	stringstyle=\color{codepurple},
-	basicstyle=\ttfamily\footnotesize,
+	identifierstyle=\color{vsCodeRed},
+	emphstyle=\color{vsCodeBlue},
+	basicstyle=\footnotesize\ttfamily,
+	morekeywords={newtype, data, where, let, in, do, case, of, if, then, else},
+	emph={map, foldl, foldr, filter},  % Add any functions you want to highlight
 	breakatwhitespace=false,         
 	breaklines=true,                 
 	captionpos=b,                    
@@ -170,6 +175,23 @@
 	showtabs=false,                  
 	tabsize=2,
 	language=Haskell
+%	backgroundcolor=\color{backcolour},   
+%	commentstyle=\color{codegreen},
+%	keywordstyle=\color{magenta},
+%	numberstyle=\tiny\color{codegray},
+%	stringstyle=\color{codepurple},
+%	basicstyle=\ttfamily\footnotesize,
+%	breakatwhitespace=false,         
+%	breaklines=true,                 
+%	captionpos=b,                    
+%	keepspaces=true,                 
+%	numbers=left,                    
+%	numbersep=5pt,                  
+%	showspaces=false,                
+%	showstringspaces=false,
+%	showtabs=false,                  
+%	tabsize=2,
+%	language=Haskell
 }
 \lstdefinestyle{cryptol}{
 	language=C,

@@ -1,22 +1,74 @@
-// Splitting a sequence into blocks
-long_seq : [16]Bit // Similar to a block of data in cryptography
-long_seq = 0xAAAA
+type MyRecord = {field1 : Bit, field2 : [3]Bit, field3 : [4]Bit}
+myRecord : MyRecord
+myRecord = {field1 = True, field2 = [False, True, False], field3 = [True, True, False, False]}
 
-blocks : [2][8]Bit // Splitting into two blocks of 8 bits
-blocks = split long_seq // There's no direct C equivalent
+first_field : Bit
+first_field = myRecord.field1 // Accessing the first field of the record
 
-joined_seq : [16]Bit
-joined_seq = join blocks
+second_field : [3]Bit
+second_field = myRecord.field2 // Accessing the second field of the record
 
-// A simple bitwise NOT operation applied to a sequence
-negate_seq : [8]Bit -> [8]Bit
-negate_seq input = ~input // Bitwise NOT each element
+updatedRecord : MyRecord
+updatedRecord = myRecord{field2 = [True, True, True]} // Updating the second field
 
-input_seq : [8]Bit
-input_seq = 0xCD
+// // An example with a simple encryption scheme
+// type Key = [8]Bit
+// type State = [8]Bit
+// type CipherText = [8]Bit
 
-negated_seq : [8]Bit
-negated_seq = negate_seq input_seq // Apply function, no direct equivalent in C
+// encrypt : (Key, State) -> CipherText
+// encrypt (key, state) = zipWith (^) key state // A simple XOR-based encryption
+
+// property EncryptDecrypt = 
+//     \(key : Key) (state : State) ->
+//         (encrypt(key, encrypt(key, state))) == state
+
+// // An example using tuples for algorithm state management
+// type RoundKey = [8]Bit
+// type RoundState = ([8]Bit, [8]Bit) // Tuple representing state for two rounds
+
+// updateState : (RoundKey, RoundState) -> RoundState
+// updateState (key, (state1, state2)) = 
+//     (zipWith (^) key state1, zipWith (^) key state2) // Update both states
+
+// property DoubleUpdate = 
+//   \(key : RoundKey) (initialState : RoundState) ->
+//      updateState(key, updateState(key, initialState)) == initialState
+
+
+
+// // Example of XORing two sequences (common in many cryptographic algorithms)
+// xor_sequences : [8]Bit -> [8]Bit -> [8]Bit
+// xor_sequences seq1 seq2 = zipWith (^) seq1 seq2 // Element-wise XOR
+
+// seqA : [8]Bit
+// seqA = 0xAA
+
+// seqB : [8]Bit
+// seqB = 0x55
+
+// result_seq : [8]Bit
+// result_seq = xor_sequences seqA seqB // Result of XORing seqA and seqB
+
+// // Splitting a sequence into blocks
+// long_seq : [16]Bit // Similar to a block of data in cryptography
+// long_seq = 0xAAAA
+
+// blocks : [2][8]Bit // Splitting into two blocks of 8 bits
+// blocks = split long_seq // There's no direct C equivalent
+
+// joined_seq : [16]Bit
+// joined_seq = join blocks
+
+// // A simple bitwise NOT operation applied to a sequence
+// negate_seq : [8]Bit -> [8]Bit
+// negate_seq input = ~input // Bitwise NOT each element
+
+// input_seq : [8]Bit
+// input_seq = 0xCD
+
+// negated_seq : [8]Bit
+// negated_seq = negate_seq input_seq // Apply function, no direct equivalent in C
 
 // a : Bit
 // a = True
