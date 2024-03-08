@@ -1,12 +1,18 @@
-genericEncrypt : {a, b, c} (a -> b -> c) -> a -> b -> c
-genericEncrypt encryptFn key plaintext = encryptFn key plaintext
+seq : [4]
+seq = 0xC
 
-modularAdd : {a} (fin a) => [a] -> [a] -> [a]
-modularAdd x y = x + y
+ele : Bit
+ele = seq @ 2
 
-// Modular addition under a specific modulus
-modularAdd2 : {a} (fin a) => ([a], [a], [a]) -> [a] // (x, y, modulus)
-modularAdd2 (x, y, modulus) = (x + y) % modulus
+// genericEncrypt : {a, b, c} (a -> b -> c) -> a -> b -> c
+// genericEncrypt encryptFn key plaintext = encryptFn key plaintext
+
+// modularAdd : {a} (fin a) => [a] -> [a] -> [a]
+// modularAdd x y = x + y
+
+// // Modular addition under a specific modulus
+// modularAdd2 : {a} (fin a) => ([a], [a], [a]) -> [a] // (x, y, modulus)
+// modularAdd2 (x, y, modulus) = (x + y) % modulus
 
 
 // A function that reverses a generic sequence
