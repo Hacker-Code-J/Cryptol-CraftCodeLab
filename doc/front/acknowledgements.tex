@@ -1,3 +1,53 @@
+\section*{Data}
+
+\begin{table}[ht]
+	\centering
+	\caption{Hierarchy of Physical and Logical Data Units}
+	\label{tab:physical_logical_data_units}
+	\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}ll}
+		\toprule
+		Physical Units & Logical Units \\
+		\midrule
+		Bit (b) & Field (Set of bytes or words) \\
+		Nibble (4 bits) & Record (Collection of fields) \\
+		Byte (B) & Block (Groups of bytes or words for storage) \\
+		Half-word (2 Bytes) & File (Collection of records) \\
+		Word (4 Bytes) & Database (Organized collection of files) \\
+		Double-word (8 Bytes) & Data Warehouse (Aggregated collection of databases) \\
+		\bottomrule
+	\end{tabular*}
+\end{table}
+
+%\begin{table}[h]
+%	\centering
+%	\begin{tabular}{|l|l|}
+%		\hline
+%		\textbf{Term} & \textbf{Description} \\
+%		\hline
+%		Bit (Binary Digital) & Minimum unit of data display (current) \\
+%		\hline
+%		Nibble & Quad Bit \\
+%		\hline
+%		Byte (byte) & A single character expression unit \\
+%		\hline
+%		Word & Command Processing Unit \\
+%		\hline
+%		Field (field: item) & Unit of data composition, minimum unit of data processing \\
+%		\hline
+%		Record & The basic unit of program processing \\
+%		\hline
+%		Block & Program input/output unit \\
+%		\hline
+%		File & Basic unit of program configuration \\
+%		\hline
+%		Database & A set of files that are related to each other \\
+%		\hline
+%		Databank & Not defined \\
+%		\hline
+%	\end{tabular}
+%	\caption{Data Representation Terms}
+%\end{table}
+
 \section*{Cryptol vs EasyCrypt}
 \begin{itemize}
 \item \textbf{Cryptol}: Cryptol is a domain-specific language designed specifically for specifying cryptographic algorithms. A creation by Galois, Inc., it's a tool used primarily for creating high-assurance cryptographic software. Cryptol allows developers to write cryptographic algorithms in a way that directly reflects the mathematical specifications, which makes it easier to analyze and verify for correctness and security.

@@ -1,15 +1,90 @@
-type MyRecord = {field1 : Bit, field2 : [3]Bit, field3 : [4]Bit}
-myRecord : MyRecord
-myRecord = {field1 = True, field2 = [False, True, False], field3 = [True, True, False, False]}
+type GenericSeq a n = [n]a
 
-first_field : Bit
-first_field = myRecord.field1 // Accessing the first field of the record
+// A function that reverses a generic sequence
+reverseGeneric : {a, fin n} (fin n) => GenericSeq a n -> GenericSeq a n
+reverseGeneric xs = [xs @ i | i <- [(n-1), (n-2) .. 0]]
 
-second_field : [3]Bit
-second_field = myRecord.field2 // Accessing the second field of the record
+// // A function that takes a generic sequence and returns the same sequence with each element duplicated
+// duplicateEach : {a, n} (fin n) => GenericSeq a n -> GenericSeq a (2 * n)
+// duplicateEach xs = [xs @ (i / 2) | i <- [0 .. (2 * n) - 1]]
 
-updatedRecord : MyRecord
-updatedRecord = myRecord{field2 = [True, True, True]} // Updating the second field
+
+// reverse : {a} (fin n) => [n]a -> [n]a
+// reverse xs = [xs @ i | i <- [(n-1), (n-2) .. 0]]
+
+// seq1 : [5]Integer
+// seq1 = [1, 2, 3, 4, 5]
+// reversedSeq1 = reverse seq1  // This will be [5, 4, 3, 2, 1]
+
+// seq2 : [4]Bit
+// seq2 = [True, False, True, True]
+// reversedSeq2 = reverse seq2  // This will be [True, True, False, True]
+
+// type AlgorithmState = {counter : Integer, buffer : [64], flags : [8]} // A record type for the algorithm state
+
+// initialState : AlgorithmState
+// initialState = {counter = zero, buffer = zero, flags = zero} // Initializes all to zero
+
+// updateState : AlgorithmState -> AlgorithmState
+// updateState state =  { state |
+//       counter = state.counter + 1, 
+//       buffer = ~state.buffer, 
+//       flags = zipWith (^) state.flags 0xf0
+// }
+
+// property CounterIncrement state = 
+//     (updateState state).counter == state.counter + 1
+
+// property BufferToggle state = 
+//     (updateState (updateState state)).buffer == state.buffer
+
+// property FlagsXOR state = 
+//     (updateState state).flags == zipWith (^) state.flags 0xf0
+
+
+// updateState : AlgorithmState -> AlgorithmState
+// updateState state = {counter = state.counter + 1, buffer = ~state.buffer, flags = state.flags ^ [1, 1, 1, 1, 0, 0, 0, 0]}
+
+
+// type AlgorithmState = {counter : IntegerBit, buffer : [64]Bit, flags : [8]Bit}
+// initialState : AlgorithmState
+// initialState = {counter = 0, buffer = replicate {False}, flags = replicate {False}}
+
+// updateState : AlgorithmState -> AlgorithmState
+// updateState state = {counter = state.counter + 1, buffer = ~state.buffer, flags = state.flags ^ [1, 1, 1, 1, 0, 0, 0, 0]}
+
+// type MyRecord = {
+//     field1 : Bit,
+//     field2 : [3]Bit,
+//     field3 : [4]Bit
+// }
+
+// myRecord : MyRecord
+// myRecord = {
+//     field1 = True,
+//     field2 = [False, True, False],
+//     field3 = [True, True, False, False]
+// }
+
+// first_field : Bit
+// first_field = myRecord.field1 // Accessing the first field of the record
+
+// second_field : [3]Bit
+// second_field = myRecord.field2 // Accessing the second field of the record
+
+// updatedRecord : MyRecord
+// updatedRecord = myRecord{field2 = [True, True, True]} // Updating the second field
+
+// type MyRecord = {field1 : Bit, field2 : [3], field3 : [4]}
+
+// type NestedRecord = {nested : MyRecord, anotherField : [5]Bit}
+// nestedRecord : NestedRecord
+// nestedRecord = {nested = {field1 = False, field2 = [True, False, True], field3 = [False, False, False, True]}, anotherField = [True, True, True, False, False]}
+
+// // toggleFirstBit : MyRecord -> MyRecord
+// toggleFirstBit : MyRecord -> MyRecord
+// toggleFirstBit record = record { field1 = ~record.field1 } // Function to toggle the first bit of a record
+
 
 // // An example with a simple encryption scheme
 // type Key = [8]Bit

@@ -1,17 +1,22 @@
 \chapter{A Crash Course in Cryptol}
 
+
+%======= Sec: Basic Data Types ======%
 \section{Basic Data Types}
 
+%%%==== Subsec: Bit ====%%%
 \subsection{Bit: Booleans}
+\begin{quote}\bf
+	``The most basic data type in Cryptol, representing a single binary digit (0 or 1).''
+\end{quote}
 
+%%%%%== Subsubsec: Bit I ==%%%%%
 \subsubsection{Basic Bit Operations}
 
 \begin{tcolorbox}[colframe=defcolor,title={\color{white}\bf Data Type: \texttt{Bit}}]
-In Cryptol, a `\texttt{Bit}` can either be
-\begin{itemize}
-	\item `\texttt{True}' (equivalent to 1 in C) or
-	\item `\texttt{False}' (equivalent to 0 in C).
-\end{itemize}
+In Cryptol, a `\texttt{Bit}` can either be \begin{center}
+`\texttt{True}' (equivalent to 1 in C)\quad or\quad `\texttt{False}' (equivalent to 0 in C).
+\end{center}
 \end{tcolorbox}
 
 \begin{lstlisting}[style=cryptol]
@@ -46,6 +51,7 @@ $ Main> result_not
 False 
 \end{lstlisting}
 
+%%%%%== Subsubsec: Bit II ==%%%%%
 \subsubsection{Intermediate Bit Operations}
 
 \textbf{Conditional Expressions:} Cryptol uses the `\textbf{if...then...else}' syntax, which is similar to the ternary operator `\textbf{?:}' in C.
@@ -67,7 +73,9 @@ result_xor : Bit
 result_xor = a ^ c // Similar to a ^ c in C
 \end{lstlisting}
 
-\subsubsection{Advanced Cryptographic Applications}
+
+%%%%%== Subsubsec: Bit III ==%%%%%
+\subsubsection{Advanced Cryptographic Applications with Bit}
 \textbf{Simple Cryptographic Operation:} Here’s a very basic example of a cryptographic operation in Cryptol, a one-time pad encryption of a single bit. In practical applications, you'll work with sequences or arrays of bits.
 
 \begin{lstlisting}[style=cryptol]
@@ -109,7 +117,13 @@ Q.E.D.
 \end{lstlisting}
 
 \newpage
+%%%==== Subsec: Sequence ====%%%
 \subsection{Sequences: Homogeneous Collections}
+\begin{quote}\bf
+``Fixed-length, ordered collections of elements, which can be bits or other types.''
+\end{quote}
+
+%%%%%== Subsubsec: Sequence I ==%%%%%
 \subsubsection{Basic Sequence Operations}
 \begin{tcolorbox}[colframe=defcolor,title={\color{white}\bf Sequence}]
 In Cryptol, a \textbf{sequence} is defined with square brackets. \[
@@ -144,6 +158,7 @@ $ Main> element3
 False
 \end{lstlisting}
 
+%%%%%== Subsubsec: Sequence II ==%%%%%
 \subsubsection{Intermediate Sequence Operations}
 \textbf{Sequence Concatenation:} You can concatenate sequences to form longer sequences.
 \begin{lstlisting}[style=cryptol]
@@ -167,7 +182,8 @@ $ Main> combined_seq
 \end{lstlisting}
 
 \newpage
-\subsubsection{Advanced Cryptographic Applications}
+%%%%%== Subsubsec: Sequence III ==%%%%%
+\subsubsection{Advanced Cryptographic Applications with Sequence}
 \textbf{Block Operations:} In cryptography, you often work with blocks of data. In Cryptol, you can easily split sequences into blocks or combine blocks into a single sequence.
 \begin{lstlisting}[style=cryptol]
 // Splitting a sequence into blocks
@@ -259,7 +275,13 @@ zipWith f list1 list2
 %\end{lstlisting}
 \end{note}
 
+%%%==== Subsec: Tuple ====%%%
 \subsection{Tuples: Heterogeneous Collections}
+\begin{quote}\bf
+``Collections of possibly different types grouped together.''
+\end{quote}
+
+%%%%%== Subsubsec: Tuple I ==%%%%%
 \subsubsection{Basic Tuple Operations}
 \begin{tcolorbox}[colframe=defcolor,title={\color{white}\bf Tuple}]
 A \textbf{tuple} can hold a fixed number of elements, which can be of different types.
@@ -304,6 +326,7 @@ $ Main> updatedTuple
 (True, 0x7, 0xc)
 \end{lstlisting}
 
+%%%%%== Subsubsec: Tuple II ==%%%%%
 \subsubsection{Intermediate Tuple Operations}
 \textbf{Tuple Decomposition:} You can decompose a tuple into its components, similar to unpacking a struct in C.
 \begin{lstlisting}[style=cryptol]
@@ -331,7 +354,8 @@ $ Main> nestedTuple
 \end{lstlisting}
 
 \newpage
-\subsubsection{Advanced Cryptographic Applications}
+%%%%%== Subsubsec: Tuple III ==%%%%%
+\subsubsection{Advanced Cryptographic Applications with Tuple}
 \textbf{Using Tuples in Cryptographic Algorithms:} Tuples can represent structured data in cryptographic algorithms, like keys and states.
 \begin{lstlisting}[style=cryptol]
 // An example with a simple encryption scheme
@@ -375,30 +399,252 @@ $ Main> :prove
 (Total Elapsed Time: 0.013s, using Z3)
 \end{lstlisting}
 
+\newpage
+%%%==== Subsec: Records ====%%%
 \subsection{Records: Named Collections}
+\begin{quote}\bf
+``Similar to tuples, but each element is identified by a name.''
+\end{quote}
+
+%%%%%== Subsubsec: Record I ==%%%%%
 \subsubsection{Basic Record Operations}
 \begin{tcolorbox}[colframe=defcolor,title={\color{white}\bf Record}]
 In Cryptol, you define a record with braces `\texttt{$\{\}$}' and specify the names and types of its fields.
 \end{tcolorbox}
-\begin{remark}
-	Unlike C, where you define a struct with named fields, Cryptol tuples are indexed by position.
-\end{remark}
+\begin{lstlisting}[style=cryptol]
+type MyRecord = {
+	field1 : Bit,
+	field2 : [3]Bit,
+	field3 : [4]Bit
+}
 
+myRecord : MyRecord
+myRecord = {
+	field1 = True,
+	field2 = [False, True, False],
+	field3 = [True, True, False, False]
+}
 
+first_field : Bit
+first_field = myRecord.field1 // Accessing the first field of the record
 
+second_field : [3]Bit
+second_field = myRecord.field2 // Accessing the second field of the record
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> myRecord
+{field1 = True, field2 = 0x2, field3 = 0xc}
+$ Main> first_field
+True
+$ Main> second_field
+0x2
+\end{lstlisting}
 
+%%%%%== Subsubsec: Record II ==%%%%%
+\subsubsection{Intermediate Record Operations}
+\textbf{Nested Records:} Records can contain other records, which allows you to structure complex data hierarchically.
+\begin{lstlisting}[style=cryptol]
+type NestedRecord = {nested : MyRecord, anotherField : [5]Bit}
+nestedRecord : NestedRecord
+nestedRecord = {
+	nested = {
+		field1 = False,
+		field2 = [True, False, True],
+		field3 = [False, False, False, True]
+	}, 
+	anotherField = [True, True, True, False, False]
+}
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> nestedRecord
+{nested = {field1 = False, field2 = 0x5, field3 = 0x1},
+	anotherField = 0x1c}
+\end{lstlisting}
 
+\newpage
+%%%%%== Subsubsec: Record III ==%%%%%
+\subsubsection{Advanced Cryptographic Applications with Record}
+\textbf{Cryptographic Keys and Configurations:} Records are excellent for representing complex keys and configuration options in cryptographic algorithms.
 
+\begin{lstlisting}[style=cryptol]
+// A record type for encryption configuration
+type CryptoConfig = {key : [128], iv : [128]} 
 
+// An example configuration using all zeros (False)
+defaultConfig : CryptoConfig
+defaultConfig = {key = zero, iv = ~zero}
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> defaultConfig
+{key = 0x00000000000000000000000000000000,
+ iv = 0xffffffffffffffffffffffffffffffff}
+\end{lstlisting}
+\vspace{16pt}
+\textbf{State Management in Cryptographic Algorithms:} Use records to manage the state of an algorithm, making it easier to handle multiple pieces of related data.
+\begin{lstlisting}[style=cryptol]
+type AlgorithmState = {counter : [32], buffer : [64], flags : [8]} // A record type for the algorithm state
 
+initialState : AlgorithmState
+initialState = {counter = zero, buffer = zero, flags = zero} // Initializes all to zero
 
+updateState : AlgorithmState -> AlgorithmState
+updateState state =  { state |
+	counter = state.counter + 1, 
+	buffer = ~state.buffer, 
+	flags = zipWith (^) state.flags 0xf0
+}
+\end{lstlisting}
 
+\begin{lstlisting}[style=cryptol]
+property CounterIncrement state = 
+	(updateState state).counter == state.counter + 1
 
+property BufferToggle state = 
+	(updateState (updateState state)).buffer == state.buffer
 
+property FlagsXOR state = 
+	(updateState state).flags == zipWith (^) state.flags 0xf0
+\end{lstlisting}
 
+\begin{lstlisting}[style=zsh]
+$ Main> :prove
+:prove CounterIncrement
+Q.E.D.
+(Total Elapsed Time: 0.013s, using Z3)
+:prove BufferToggle
+Q.E.D.
+(Total Elapsed Time: 0.008s, using Z3)
+:prove FlagsXOR
+Q.E.D.
+(Total Elapsed Time: 0.009s, using Z3)
+\end{lstlisting}
 
+\newpage
+%%%==== Subsec: Function ====%%%
+\subsection{Function}
+\begin{quote}\bf
+``Types representing functions from inputs to outputs.''
+\end{quote}
 
+%%%%%== Subsubsec: Function I ==%%%%%
+\subsubsection{Basic Function Usage}
+\textbf{Simple Function:} Let's start with a basic function that adds two numbers. In Cryptol, the syntax for function definition is concise.
+\begin{lstlisting}[style=cryptol]
+add : Integer -> Integer -> Integer;
+add x y = x + y;
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> add 4294967296 4294967296
+8589934592
+\end{lstlisting}
+\vspace{16pt}
+\textbf{Function with Bitwise Operation:} Functions in Cryptol commonly operate on bits and sequences of bits. Here's a function that performs a bitwise AND on two 8-bit sequences.
+\begin{lstlisting}[style=cryptol]
+andBits : [8] -> [8] -> [8];
+andBits a b = zipWith (&&) a b;
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> andBits 0x0f 0xf0
+0x00
+\end{lstlisting}
+\vspace{20pt}
+%%%%%== Subsubsec: Function II ==%%%%%
+\subsubsection{Intermediate Function Usage}
+\textbf{Functions with Conditional Logic:} Cryptol functions can implement more complex logic, including conditionals.
+\begin{lstlisting}[style=cryptol]
+max : Integer -> Integer -> Integer
+max x y = if x > y then x else y
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> max 51 94
+94
+\end{lstlisting}
 
+\begin{lstlisting}[style=cryptol]
+property max_ge_x (x : Integer, y : Integer) = max x y >= x
+
+property max_ge_y (x : Integer, y : Integer) = max x y >= y
+
+property max_is_either (x : Integer, y : Integer) =
+	(max x y == x) || (max x y == y)
+\end{lstlisting}
+\vspace{16pt}
+\textbf{Recursive Functions:} Cryptol supports recursive functions, which can be powerful for certain types of algorithms.
+\begin{lstlisting}[style=cryptol]
+factorial : Integer -> Integer;
+factorial n = if n == 0 then 1 else n * factorial (n - 1);
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+Main> factorial 10
+3628800
+\end{lstlisting}
+
+\newpage
+%%%%%== Subsubsec: Function III ==%%%%%
+\subsubsection{Advanced Cryptographic Function Usage}
+\textbf{Encrypting with XOR (One-Time Pad):} Here’s how you might define a simple encryption function using XOR, which is a foundational operation in many cryptographic systems..
+\begin{lstlisting}[style=cryptol]
+xorEncrypt : [8] -> [8] -> [8];
+xorEncrypt key plaintext = zipWith (^) plaintext key;
+
+property Reversibility (key : [8], plaintext : [8]) = 
+	xorEncrypt key (xorEncrypt key plaintext) == plaintext
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> :prove
+:prove Reversibility
+	Q.E.D.
+(Total Elapsed Time: 0.012s, using Z3)
+\end{lstlisting}
+
+%%%==== Subsec: Type Variables ====%%%
+\subsection{Type Variables}
+
+%%%%%== Subsubsec: Type Variables I ==%%%%%
+\subsubsection{Basic Usage of Type Variables}
+\textbf{Generic Identity Function:} A simple example of a type variable in use is the identity function, which returns whatever value is passed to it, regardless of type.
+\begin{lstlisting}[style=cryptol]
+id : {a} a -> a;
+id x = x;
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> id 0xff
+0xff
+$ Main> id 0xffff
+0xffff
+\end{lstlisting}
+\vspace{16pt}
+\textbf{Generic Swap Function:} This function swaps the elements of a 2-tuple, and works for any types contained in the tuple.
+\begin{lstlisting}[style=cryptol]
+swap : {a, b} (a, b) -> (b, a)
+swap (x, y) = (y, x)
+
+mixedPair : (Integer, [8])
+mixedPair = (42, 0xaa)
+
+swappedMixedPair : ([8], Integer)
+swappedMixedPair = swap mixedPair
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> mixedPair
+(42, 0xaa)
+$ Main> swappedMixedPair
+(0xaa, 42)
+\end{lstlisting}
+
+%%%%%== Subsubsec: Type Variables II ==%%%%%
+\subsubsection{Intermediate Usage of Type Variables}
+\textbf{Generic Arrays:} You can define functions that operate on arrays of any type. This is useful for functions that perform operations like reversing an array.
+\begin{lstlisting}[style=cryptol]
+	id : {a} a -> a;
+	id x = x;
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+	$ Main> id 0xff
+	0xff
+	$ Main> id 0xffff
+	0xffff
+\end{lstlisting}
 
 
 
