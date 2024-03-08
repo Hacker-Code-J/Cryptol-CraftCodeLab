@@ -628,22 +628,23 @@ swappedMixedPair = swap mixedPair
 \begin{lstlisting}[style=zsh]
 $ Main> mixedPair
 (42, 0xaa)
-$ Main> swappedMixedPair
+$ Main> swappedMixedPairnewp
 (0xaa, 42)
 \end{lstlisting}
 
+\newpage
 %%%%%== Subsubsec: Type Variables II ==%%%%%
 \subsubsection{Intermediate Usage of Type Variables}
 \textbf{Generic Arrays:} You can define functions that operate on arrays of any type. This is useful for functions that perform operations like reversing an array.
 \begin{lstlisting}[style=cryptol]
-	id : {a} a -> a;
-	id x = x;
+id : {a} a -> a
+id x = x
 \end{lstlisting}
 \begin{lstlisting}[style=zsh]
-	$ Main> id 0xff
-	0xff
-	$ Main> id 0xffff
-	0xffff
+$ Main> id 0xff
+0xff
+$ Main> id 0xffff
+0xffff
 \end{lstlisting}
 
 

@@ -1,8 +1,26 @@
-type GenericSeq a n = [n]a
+genericEncrypt : {a, b, c} (a -> b -> c) -> a -> b -> c
+genericEncrypt encryptFn key plaintext = encryptFn key plaintext
+
+modularAdd : {a} (fin a) => [a] -> [a] -> [a]
+modularAdd x y = x + y
+
+// Modular addition under a specific modulus
+modularAdd2 : {a} (fin a) => ([a], [a], [a]) -> [a] // (x, y, modulus)
+modularAdd2 (x, y, modulus) = (x + y) % modulus
+
 
 // A function that reverses a generic sequence
-reverseGeneric : {a, fin n} (fin n) => GenericSeq a n -> GenericSeq a n
-reverseGeneric xs = [xs @ i | i <- [(n-1), (n-2) .. 0]]
+// Generic reverse function definition
+// reverse : {n, a} (fin n) => [n]a -> [n]a
+// reverse xs = [xs @ i | i <- [n-1, n-2 .. 0]]
+//   where n = length xs
+
+
+// // Example usage
+// myList : [5]Integer
+// myList = [1, 2, 3, 4, 5]
+
+// reversedList = reverse myList // This should give [5, 4, 3, 2, 1]
 
 // // A function that takes a generic sequence and returns the same sequence with each element duplicated
 // duplicateEach : {a, n} (fin n) => GenericSeq a n -> GenericSeq a (2 * n)
