@@ -1,0 +1,25 @@
+module SimplifiedBlockCipher where
+
+import Cryptol
+
+type BlockSize = 64
+type KeySize = 128
+
+keySchedule : [KeySize] -> [BlockSize]
+keySchedule key = take`{BlockSize} (drop`{32} key)
+
+encrypt : [BlockSize] -> [KeySize] -> [BlockSize]
+encrypt plaintext key = plaintext ^ keySchedule key
+
+decrypt : [BlockSize] -> [KeySize] -> [BlockSize]
+decrypt = encrypt
+
+// Properties for verification
+property prop_inverse plaintext key =
+  decrypt (encrypt plaintext key) key == plaintext
+
+property prop_deterministic plaintext key1 key2 =
+  (keySchedule key1 == keySchedule key2) ==> (encrypt plaintext key1 == encrypt plaintext key2)
+
+property prop_doubleEncrypt plaintext key =
+  encrypt (encrypt plaintext key) key == plaintext

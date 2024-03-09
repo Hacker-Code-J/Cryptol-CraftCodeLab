@@ -1,8 +1,8 @@
-seq : [4]
-seq = 0xC
+// seq : [4]
+// seq = 0xC
 
-ele : Bit
-ele = seq @ 2
+// ele : Bit
+// ele = seq @ 2
 
 // genericEncrypt : {a, b, c} (a -> b -> c) -> a -> b -> c
 // genericEncrypt encryptFn key plaintext = encryptFn key plaintext
