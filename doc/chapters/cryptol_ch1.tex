@@ -126,17 +126,14 @@ Q.E.D.
 %%%%%== Subsubsec: Sequence I ==%%%%%
 \subsubsection{Basic Sequence Operations}
 \begin{tcolorbox}[colframe=defcolor,title={\color{white}\bf Sequence}]
-In Cryptol, a \textbf{sequence} is defined with square brackets. \[
-\texttt{[, , ,]}
-\]
+In Cryptol, a \textbf{sequence} is defined with square brackets. $\texttt{[, , ,]}$.
 \end{tcolorbox}
 \begin{remark}
 Unlike C, where you typically define the array size and type, Cryptol infers these from the context.
 \end{remark}
 \begin{lstlisting}[style=cryptol]
 seq : [4]Bit // A sequence of 4 bits
-seq = [True, False, True, False] // Equivalent to {1, 0, 1, 0} in C
-// seq = 0b1010
+seq = [True, False, True, False] // Equivalent to 0b1010
 \end{lstlisting}
 \begin{lstlisting}[style=zsh]
 $ Main> seq
@@ -181,7 +178,30 @@ $ Main> combined_seq
 0xcd
 \end{lstlisting}
 
-\newpage
+\begin{lstlisting}[style=cryptol]
+seq1 : [3][4]
+seq1 = [0xf, 0x1, 0x8]
+
+seq2 : [5][8]
+seq2 = [0xff, 0xcc, 0x11, 0x22, 0x99]
+
+ele1 : [4]
+ele1 = seq1 @ 1
+
+ele2 : [8]
+ele2 = seq2 @ 3
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> seq1
+[0xf, 0x1, 0x8]
+$ Main> ele1
+0x1
+$Main> seq2
+[0xff, 0xcc, 0x11, 0x22, 0x99]
+$ Main> ele2
+0x22
+\end{lstlisting}
+
 %%%%%== Subsubsec: Sequence III ==%%%%%
 \subsubsection{Advanced Cryptographic Applications with Sequence}
 \textbf{Block Operations:} In cryptography, you often work with blocks of data. In Cryptol, you can easily split sequences into blocks or combine blocks into a single sequence.

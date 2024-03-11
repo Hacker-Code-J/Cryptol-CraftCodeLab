@@ -1,3 +1,15 @@
+seq1 : [3][4]
+seq1 = [0xf, 0x1, 0x8]
+
+seq2 : [5][8]
+seq2 = [0xff, 0xcc, 0x11, 0x22, 0x99]
+
+ele1 : [4]
+ele1 = seq1 @ 1
+
+ele2 : [8]
+ele2 = seq2 @ 3
+
 // seq : [4]
 // seq = 0xC
 
