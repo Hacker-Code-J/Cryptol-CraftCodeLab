@@ -43,7 +43,35 @@ Cryptol stands at the intersection of cryptography and functional programming. I
 	\item \textbf{Type System:} Features a strong, static type system that prevents many common errors in cryptographic implementations.
 	\item \textbf{Abstraction:} Supports high levels of abstraction, enabling cryptographers to focus on algorithmic design rather than implementation details.
 \end{itemize}
+\[
+S=\set{2n\mid n\in\N, 1\leq n\leq 10}
+\]
+\begin{itemize}
+	\item \[
+	\fullfunction{\mathsf{encrypt}}{\binaryfield^{128}}{\binaryfield^{128}}{m}{m\oplus\delta}
+	\]
+	\item \[
+	\fullfunction{\mathsf{decrypt}}{\binaryfield^{128}}{\binaryfield^{128}}{c}{c\oplus\delta}
+	\]\[
+	\mathsf{decrypt}(\mathsf{encrypt}(m))=(m\oplus\delta)\oplus\delta=m
+	\]
+\end{itemize}
 
+\begin{itemize}
+	\item Define a mapping $$\mathsf{nagateByte}:\binaryfield^{8}\to\binaryfield^{8}$$ where \[
+	\mathsf{negateByte}(b):=\lnot b.
+	\]
+	\item Define a mapping $$\mathsf{makeWord}:\binaryfield^{8}\times\binaryfield^{8}\times \binaryfield^{8}\times \binaryfield^{8}\to\binaryfield^{32}$$ where \[
+	\mathsf{makeWord}(b_3,b_2,b_1,b_0):=b_3\adjacent b_2\adjacent b_1\adjacent b_0\in\binaryfield^{32}.
+	\]
+	\item Define a mapping $$\mathsf{negateWord}:\binaryfield^{32}\to\binaryfield^{32}$$ where \[
+	\mathsf{negateWord}(w):=\lnot w=\lnot w_3\adjacent \lnot w_2\adjacent \lnot w_1\adjacent w_0.
+	\] Here, $w=w_3\adjacent w_2\adjacent w_1\adjacent w_0$
+\end{itemize}
+
+\[
+f:\binaryfield^2\times\binaryfield^2\to\binaryfield^2.
+\]
 \section*{Applications}
 Cryptol is widely used in academic and industrial settings for:
 \begin{itemize}

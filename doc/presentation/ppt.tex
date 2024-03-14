@@ -1,0 +1,110 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx} % For including images
+\usepackage{amsmath,amsfonts,amssymb} % For mathematical symbols and environments
+\usepackage{hyperref} % For hyperlinks
+
+\begin{document}
+	
+	\section*{Overview}
+	Cryptol is a domain-specific language engineered with a clear purpose: to aid in the specification, implementation, and verification of cryptographic algorithms. Originating from a need to describe cryptographic functions in a manner both precise and verifiable, Cryptol has evolved as a bridge between the abstract world of cryptographic theory and the concrete realm of implementation.
+	
+	Unlike general-purpose programming languages, which are designed to be versatile and broad, Cryptol is finely tuned for a specific domain. It embodies the principles of functional programming, making it an exemplary tool for cryptographers more accustomed to mathematical functions than traditional software engineering constructs.
+	
+	\begin{figure}[ht]
+		\centering
+		%\includegraphics[width=0.8\textwidth]{cryptol_overview.png}
+		\caption{Illustrative representation of the transition from cryptographic theory to implementation facilitated by Cryptol.}
+		\label{fig:cryptol_overview}
+	\end{figure}
+	
+	\section*{Functional Programming in Cryptol}
+	
+	\subsection*{Pure Functions}
+	At the heart of functional programming—and consequently at the core of Cryptol—are pure functions. These functions provide the same output for the same input every time, are devoid of side effects, ensuring predictability and ease of formal verification. In Cryptol, this principle allows for the straightforward expression of cryptographic transformations.
+	
+	\begin{figure}[ht]
+		\centering
+		%\includegraphics[width=0.6\textwidth]{pure_functions.png}
+		\caption{A schematic representation of pure functions, illustrating input-output consistency without side effects.}
+		\label{fig:pure_functions}
+	\end{figure}
+	
+	\subsection*{Immutability}
+	Cryptol espouses the functional programming principle of immutability. Once data is created, it cannot be altered, mirroring the immutable nature of data in cryptographic processes.
+	
+	\begin{figure}[ht]
+		\centering
+		%\includegraphics[width=0.6\textwidth]{immutability.png}
+		\caption{Conceptual illustration of data immutability in functional programming.}
+		\label{fig:immutability}
+	\end{figure}
+	
+	\subsection*{Type System and Type Inference}
+	Cryptol's type system is robust and expressive, facilitating the prevention of common bugs found in cryptographic software.
+	
+	\begin{figure}[ht]
+		\centering
+		%\includegraphics[width=0.6\textwidth]{type_system.png}
+		\caption{An example of Cryptol's type system in action, highlighting error prevention and type inference.}
+		\label{fig:type_system}
+	\end{figure}
+	
+	\subsection*{Higher-order Functions and Currying}
+	Cryptol supports higher-order functions, enabling cryptographers to construct higher-level abstractions and compose algorithms elegantly.
+	
+	\begin{figure}[ht]
+		\centering
+		%\includegraphics[width=0.6\textwidth]{higher_order_functions.png}
+		\caption{Diagram showing the concept of higher-order functions and currying in Cryptol.}
+		\label{fig:higher_order_functions}
+	\end{figure}
+	
+	\section*{Coding Style in Cryptol}
+	
+	\subsection*{Clarity and Conciseness}
+	Cryptol code should be as clear and concise as possible, mirroring mathematical definitions.
+	
+	\begin{figure}[ht]
+		\centering
+		%\includegraphics[width=0.8\textwidth]{coding_style.png}
+		\caption{An example of Cryptol's clear and concise coding style, compared to traditional programming.}
+		\label{fig:coding_style}
+	\end{figure}
+	
+	\subsection*{Modularization and Reuse}
+	Cryptol encourages modularization and the reuse of code.
+	
+	\begin{figure}[ht]
+		\centering
+		%\includegraphics[width=0.8\textwidth]{modularization.png}
+		\caption{Illustration of modular design and code reuse in Cryptol programming.}
+		\label{fig:modularization}
+	\end{figure}
+	
+	\subsection*{Testing and Verification}
+	The language provides facilities for both property-based testing and formal verification.
+	
+	\begin{figure}[ht]
+		\centering
+		%\includegraphics[width=0.8\textwidth]{testing_verification.png}
+		\caption{Flowchart depicting the testing and verification process in Cryptol.}
+		\label{fig:testing_verification}
+	\end{figure}
+	
+	\section*{Key Features}
+	\begin{itemize}
+		\item \textbf{Mathematical Notation:} Cryptol's syntax closely mirrors the mathematical notation used in cryptography.
+		\item \textbf{Formal Verification:} Allows for the formal verification of algorithm properties.
+		\item \textbf{Type System:} Features a strong, static type system.
+		\item \textbf{Abstraction:} Supports high levels of abstraction.
+	\end{itemize}
+	
+	\section*{Applications}
+	Cryptol is widely used in academic and industrial settings for:
+	\begin{itemize}
+		\item Specifying cryptographic algorithms.
+		\item Testing and verifying the correctness of cryptographic implementations.
+		\item Educating new cryptographers.
+	\end{itemize}
+	
+\end{document}

@@ -1,3 +1,81 @@
+cryptoZip : {a, n} (a -> a -> a) -> [n]a -> [n]a -> [n]a
+cryptoZip op xs ys = [ op x y | x <- xs | y <- ys ]
+
+property xorZipTest (xs : [128]Bit) (ys : [128]Bit) = 
+  cryptoZip (^^) xs ys == [x ^^ y | x <- xs | y <- ys]
+
+
+// xor_sequences : [8]Bit -> [8]Bit -> [8]Bit
+// xor_sequences seq1 seq2 = zipWith (^) seq1 seq2
+
+// seqA : [8]Bit
+// seqA = 0xAA
+
+// seqB : [8]Bit
+// seqB = 0x55
+
+// result_seq : [8]Bit
+// result_seq = xor_sequences seqA seqB
+
+// seq : [8]
+// seq = 0xAA ^ 0x55
+
+// sayHello : {a} (fin a) => [a][8] -> [8+a][8]
+// sayHello name = greeting
+//   where
+//     greeting = "Hello, " # name # "!"
+
+// sayHello : {a} (fin a) => [a][8] -> [a+1][8]
+// sayHello name = name # [exclamation]
+//   where
+//     exclamation = 33 // ASCII value for '!'
+
+// // Define a type for basic units of data
+// type Byte = [8]
+// type Word = [32] // A word consists of 4 bytes
+
+// // Level 1: A basic function to negate a byte
+// negateByte : Byte -> Byte
+// negateByte b = ~b // Bitwise negation of the byte
+
+// // Level 2: Construct a word from four bytes
+// makeWord : (Byte, Byte, Byte, Byte) -> Word
+// makeWord (b1, b2, b3, b4) = b1 # b2 # b3 # b4 // Concatenate four bytes to form a word
+
+// // Level 3: Process a word by negating its bytes and reassembling them
+// negateWord : Word -> Word
+// negateWord w =
+//   makeWord (negateByte byte3, negateByte byte2, negateByte byte1, negateByte byte0)
+//   where
+//     byte3 = take `{8} w                 // Extract first byte
+//     byte2 = take `{8} (drop `{8} w)     // Extract second byte
+//     byte1 = take `{8} (drop `{16} w)    // Extract third byte
+//     byte0 = take `{8} (drop `{24} w)    // Extract fourth byte
+
+// // Example usage
+// data1 : Byte
+// data1 = 0xFF // 255 in decimal
+
+// data2 : Byte
+// data2 = 0x0F // 15 in decimal
+
+// data3 : Byte
+// data3 = 0xF0 // 240 in decimal
+
+// data4 : Byte
+// data4 = 0xAA // 170 in decimal
+
+// wordData : Word
+// wordData = makeWord (data1, data2, data3, data4)
+
+// wordData2 : Word
+// wordData2 = negateWord wordData
+
+
+
+// This property checks that for any shift 's', plaintext 'p', and key 'k',
+// decrypting the encryption of 'p' results in the original plaintext 'p'.
+
 // seq1 : [3][4]
 // seq1 = [0xf, 0x1, 0x8]
 
@@ -30,7 +108,7 @@
 // A function that reverses a generic sequence
 // Generic reverse function definition
 // reverse : {n, a} (fin n) => [n]a -> [n]a
-// reverse xs = [xs @ i | i <- [n-1, n-2 .. 0]]
+// reverse xs = [xs @ i | i <- [n-1 .. 0]]
 //   where n = length xs
 
 
