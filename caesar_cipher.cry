@@ -1,36 +1,137 @@
 module Caesar where
 
-// caesar : [8] -> [8]
-// caesar msg = [rot3 c | c <- msg]
-//   where
-//     rot3 c = if c >= `A` /\ c <= `Z` then
-//                 // Rotate uppercase letters
-//                 // `A` + ((c - `A` + 3) % 26)
-//                 (['A'..'Z':Char] >>> 3) @ (c - 'A')
-//              else if c >= `a` /\ c <= `z` then
-//                 // Rotate lowercase letters
-//                 // `a` + ((c - `a` + 3) % 26)
-//                 (['A'..'Z':Char] >>> 3) @ (c - 'a')
-//              else
-//                 // Non-alphabetic characters remain unchanged
-//                 c
+// Fixed-Key Caesar
+caesar_fix_enc msg = map rrot3 msg
+    where
+        rrot3 x =
+            if 'A' <= x /\ x <= 'Z' then
+            (['A'..'Z':Char] >>> 3) @ (x - 'A')
+            else if 'a' <= x /\ x <= 'z' then
+            (['a'..'z':Char] >>> 3) @ (x - 'a')
+            else
+            x
 
-caesar_enc msg = map rrot3 msg
-  where
-    rrot3 c =
-      if 'A' <= c /\ c <= 'Z' then
-        (['A'..'Z':Char] >>> 3) @ (c - 'A')
-      else if 'a' <= c /\ c <= 'z' then
-        (['a'..'z':Char] >>> 3) @ (c - 'a')
-      else
-        c
+caesar_fix_dec msg = map lrot3 msg
+    where
+        lrot3 x =
+            if 'A' <= x /\ x <= 'Z' then
+            (['A'..'Z':Char] <<< 3) @ (x - 'A')
+            else if 'a' <= x /\ x <= 'z' then
+            (['a'..'z':Char] <<< 3) @ (x - 'a')
+            else
+            x
 
-caesar_dec msg = map lrot3 msg
+// Caesar Cipher
+caesar_enc: {a}
+            (fin a) =>
+            [5] -> [a][8] -> [a][8]
+caesar_enc key msg = map rrot msg
+    where
+        rrot x = 
+            if 'A' <= x /\ x <= 'Z' then
+                (['A'..'Z':Char] >>> key) @ (x - 'A')
+            else if 'a' <= x /\ x <= 'z' then
+                (['a'..'z':Char] >>> key) @ (x - 'a')
+            else
+                x
+
+caesar_dec: {a}
+            (fin a) =>
+            [5] -> [a][8] -> [a][8]
+caesar_dec key msg = map lrot msg
   where
-    lrot3 c =
-      if 'A' <= c /\ c <= 'Z' then
-        (['A'..'Z':Char] <<< 3) @ (c - 'A')
-      else if 'a' <= c /\ c <= 'z' then
-        (['a'..'z':Char] <<< 3) @ (c - 'a')
+    lrot x =
+      if 'A' <= x /\ x <= 'Z' then
+        (['A'..'Z':Char] <<< key) @ (x - 'A')
+      else if 'a' <= x /\ x <= 'z' then
+        (['a'..'z':Char] <<< key) @ (x - 'a')
       else
-        c
+        x
+
+// Generalization
+
+/** number of characters in alphabet */
+type w = 26
+
+/** an alphabet of characters included in a rotation cipher */
+type Alphabet = String w
+
+/** a left-rotation amount */
+type Key = [width w]
+
+/** alphabet of characters to "encrypt" */
+alphabet = ['A'..'Z'] : Alphabet
+
+/**
+ * index (from end) of first occurrence (from start) of item `x` in
+ * sequence `L`
+ */
+index: {n, a} 
+        (fin n, Cmp a) =>
+        [n]a -> a -> [1 + n]
+index L x = if (or M) then (lg2 ((0b0 # M) + 1) - 1) else (length M)
+  where
+    M = (map ((==) x) L)
+
+/** `index` is correct for any sequence */
+indexCorrect:
+    {n, a} 
+    (fin n, Cmp a) =>
+    [n]a -> a -> Bit
+indexCorrect L x = elem x L ==> L ! (index L x) == x
+
+/** index is correctly identified for all characters in alphabet */
+charIsAtIndex : Char -> Bit
+property charIsAtIndex = indexCorrect alphabet
+
+encrypt : {n} Key -> String n -> String n
+encrypt key msg = map rot msg
+  where
+    /* cipher alphabet */
+    alphabet' = alphabet >>> key
+
+    rot c = if (i < length alphabet) then (alphabet' ! i) else c
+      where
+        i = index alphabet c
+
+decrypt : {n} Key -> String n -> String n
+decrypt key msg' = map rot msg'
+  where
+    /* cipher alphabet */
+    alphabet' = alphabet >>> key
+
+    rot c = if (i < length alphabet) then (alphabet ! i) else c
+      where
+        i = index alphabet' c
+
+/** classic test vector */
+property v1 = encrypt 3 "ATTACK AT DAWN" == "XQQXZH XQ AXTK"
+
+/** Wikipedia test vector */
+property v2 =
+    encrypt 3 "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG" ==
+              "QEB NRFZH YOLTK CLU GRJMP LSBO QEB IXWV ALD"
+
+/** ROT13 example */
+property v3 = encrypt 13 "ABJURER" == "NOWHERE"
+
+
+
+/* Decryption with same key recovers original message */
+recovery : {n} (fin n) => [5] -> [n][8] -> Bit
+recovery key msg = decrypt key (encrypt key msg) == msg
+
+/* Decrypting encrypted `msg` of length `1` returns original `msg`. */
+property recovery_1 = recovery`{1}
+/* Decrypting encrypted `msg` of length `2` returns original `msg`. */
+property recovery_2 = recovery`{2}
+/* Decrypting encrypted `msg` of length `3` returns original `msg`. */
+property recovery_3 = recovery`{3}
+
+property recovery_4 = recovery`{4}
+property recovery_5 = recovery`{5}
+property recovery_6 = recovery`{6}
+property recovery_7 = recovery`{7}
+
+/* Decrypting encrypted `msg` of length `14` returns original `msg`. */
+// property recovery_14 = recovery`{14}
