@@ -1,0 +1,36 @@
+module Caesar where
+
+// caesar : [8] -> [8]
+// caesar msg = [rot3 c | c <- msg]
+//   where
+//     rot3 c = if c >= `A` /\ c <= `Z` then
+//                 // Rotate uppercase letters
+//                 // `A` + ((c - `A` + 3) % 26)
+//                 (['A'..'Z':Char] >>> 3) @ (c - 'A')
+//              else if c >= `a` /\ c <= `z` then
+//                 // Rotate lowercase letters
+//                 // `a` + ((c - `a` + 3) % 26)
+//                 (['A'..'Z':Char] >>> 3) @ (c - 'a')
+//              else
+//                 // Non-alphabetic characters remain unchanged
+//                 c
+
+caesar_enc msg = map rrot3 msg
+  where
+    rrot3 c =
+      if 'A' <= c /\ c <= 'Z' then
+        (['A'..'Z':Char] >>> 3) @ (c - 'A')
+      else if 'a' <= c /\ c <= 'z' then
+        (['a'..'z':Char] >>> 3) @ (c - 'a')
+      else
+        c
+
+caesar_dec msg = map lrot3 msg
+  where
+    lrot3 c =
+      if 'A' <= c /\ c <= 'Z' then
+        (['A'..'Z':Char] <<< 3) @ (c - 'A')
+      else if 'a' <= c /\ c <= 'z' then
+        (['a'..'z':Char] <<< 3) @ (c - 'a')
+      else
+        c
