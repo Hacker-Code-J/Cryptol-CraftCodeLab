@@ -118,6 +118,7 @@ property v3 = encrypt 13 "ABJURER" == "NOWHERE"
 
 
 /* Decryption with same key recovers original message */
+// recovery : {n} (fin n) => [5] -> String n -> Bit
 recovery : {n} (fin n) => [5] -> [n][8] -> Bit
 recovery key msg = decrypt key (encrypt key msg) == msg
 
