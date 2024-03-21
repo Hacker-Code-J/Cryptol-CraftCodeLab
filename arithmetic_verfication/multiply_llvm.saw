@@ -10,14 +10,25 @@ multiply_textbook <- crucible_llvm_extract l "multiply_textbook";
 print "Extracting implementation term: multiply_karatsuba";
 multiply_karatsuba <- crucible_llvm_extract l "multiply_karatsuba";
 
-print "Proving equivalence: multiply_standard == multiply_textbook";
-let thm1 = {{ \x -> \y -> multiply_standard x y == multiply_textbook x y}};
+print "Assigning Cryptol implementation: multiply_cryptol";
+let {{
+    multiply_cryptol : [16] -> [16] -> [32]
+    multiply_cryptol x y = (zero # x) * (zero # y)
+}};
+
+print "Proving equivalence: multiply_standard == multiply_cryptol";
+let thm1 = {{ \x -> \y -> multiply_standard x y == multiply_cryptol x y}};
 result <- prove z3 thm1;
 print result;
 
-print "Proving equivalence: multiply_standard == multiply_karatsuba";
-let thm2 = {{ \x -> \y -> multiply_standard x y == multiply_textbook x y}};
+print "Proving equivalence: multiply_textbook == multiply_cryptol";
+let thm2 = {{ \x -> \y -> multiply_textbook x y == multiply_cryptol x y}};
 result <- prove z3 thm2;
+print result;
+
+print "Proving equivalence: multiply_karatsuba == multiply_cryptol";
+let thm3 = {{ \x -> \y -> multiply_karatsuba x y == multiply_cryptol x y}};
+result <- prove z3 thm3;
 print result;
 
 print "Done.";
