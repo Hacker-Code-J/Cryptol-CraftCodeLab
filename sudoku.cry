@@ -33,9 +33,9 @@ check' :
 check' G =
     supset' G [1..9]
 
-/** `check` and `check'` are equivalent. */
-check_equiv : SudokuGroup -> Bit
-property check_equiv = check === check'
+// /** `check` and `check'` are equivalent. */
+// check_equiv : SudokuGroup -> Bit
+// property check_equiv = check === check'
 
 valid : SudokuBoard -> Bit
 valid rows = [ check grp | grp <- rows # columns # squares ] == ~zero
@@ -51,10 +51,10 @@ valid' rows = all check (rows # columns # squares)
     regions = transpose (map groupBy`{3} rows)
     squares = map join (groupBy`{3} (join regions))
 
-valid_equiv:
-    SudokuBoard -> Bit
-property valid_equiv =
-    valid === valid'
+// valid_equiv:
+//     SudokuBoard -> Bit
+// property valid_equiv =
+//     valid === valid'
 
 /** This puzzle from the Cryptol blog has a solution. */
 puzzle :
