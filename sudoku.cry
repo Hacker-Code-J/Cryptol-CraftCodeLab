@@ -12,13 +12,3 @@ type SudokuBoard = [9]SudokuGroup
 // validCheck : SudokuGroup -> Bit
 // validCheck group = [ contains x | x <- [1 .. 9] ] == ~zero
 //   where contains x = [ x == y | y <- group ] != zero
-
-type AES128 = 4
-type AES192 = 6
-type AES256 = 8
-type Nk = AES128
-type Nb = 4
-type Nr = 6 + Nk
-
-type GF28 = [8]
-type State = [4][Nb]GF28

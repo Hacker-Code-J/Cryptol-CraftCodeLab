@@ -1,3 +1,4 @@
+\iffalse
 \chapter*{Introduction}
 
 \section*{Overview}
@@ -57,21 +58,6 @@ S=\set{2n\mid n\in\N, 1\leq n\leq 10}
 	\]
 \end{itemize}
 
-\begin{itemize}
-	\item Define a mapping $$\mathsf{nagateByte}:\binaryfield^{8}\to\binaryfield^{8}$$ where \[
-	\mathsf{negateByte}(b):=\lnot b.
-	\]
-	\item Define a mapping $$\mathsf{makeWord}:\binaryfield^{8}\times\binaryfield^{8}\times \binaryfield^{8}\times \binaryfield^{8}\to\binaryfield^{32}$$ where \[
-	\mathsf{makeWord}(b_3,b_2,b_1,b_0):=b_3\adjacent b_2\adjacent b_1\adjacent b_0\in\binaryfield^{32}.
-	\]
-	\item Define a mapping $$\mathsf{negateWord}:\binaryfield^{32}\to\binaryfield^{32}$$ where \[
-	\mathsf{negateWord}(w):=\lnot w=\lnot w_3\adjacent \lnot w_2\adjacent \lnot w_1\adjacent w_0.
-	\] Here, $w=w_3\adjacent w_2\adjacent w_1\adjacent w_0$
-\end{itemize}
-
-\[
-f:\binaryfield^2\times\binaryfield^2\to\binaryfield^2.
-\]
 \section*{Applications}
 Cryptol is widely used in academic and industrial settings for:
 \begin{itemize}
@@ -79,9 +65,10 @@ Cryptol is widely used in academic and industrial settings for:
 	\item Testing and verifying the correctness of cryptographic implementations.
 	\item Educating new cryptographers about algorithm design and analysis.
 \end{itemize}
+\fi
 
 \chapter{A Crash Course in Cryptol}
-
+\newpage
 %======= Sec: Basic Data Types ======%
 \section{Basic Data Types}
 
@@ -92,12 +79,11 @@ Cryptol is widely used in academic and industrial settings for:
 \end{quote}
 
 %%%%%== Subsubsec: Bit I ==%%%%%
-\subsubsection{Basic Bit Operations}
+\subsubsection{Basic Bit Operations: True or False}
 
 \begin{tcolorbox}[colframe=defcolor,title={\color{white}\bf Data Type: \texttt{Bit}}]
-In Cryptol, a `\texttt{Bit}` can either be \begin{center}
-`\texttt{True}' (equivalent to 1 in C)\quad or\quad `\texttt{False}' (equivalent to 0 in C).
-\end{center}
+In Cryptol, a `\texttt{Bit}` can either be $
+`\texttt{True}'$ or $`\texttt{False}'$.
 \end{tcolorbox}
 
 \begin{lstlisting}[style=cryptol]
@@ -108,17 +94,21 @@ b : Bit
 b = False
 \end{lstlisting}
 
-\noindent Similar to C, Cryptol supports logical operations like \textbf{AND}, \textbf{OR}, and \textbf{NOT}.
+\begin{lstlisting}[style=zsh]
+$ Main> a
+True
+$ Main> b
+False
+\end{lstlisting}
+\vspace{16pt}
+\noindent Similar to C, Cryptol supports logical operations like \textbf{AND}, \textbf{OR}, and \textbf{NOT}.\\
 \begin{lstlisting}[style=cryptol]
-// AND operation (similar to a & b in C)
 result_and : Bit
 result_and = a && b
 
-// OR operation (similar to a | b in C)
 result_or : Bit
 result_or = a || b
 
-// NOT operation (similar to !a in C)
 result_not : Bit
 result_not = ~a
 \end{lstlisting}
@@ -132,29 +122,47 @@ $ Main> result_not
 False 
 \end{lstlisting}
 
+\newpage
 %%%%%== Subsubsec: Bit II ==%%%%%
 \subsubsection{Intermediate Bit Operations}
 
-\textbf{Conditional Expressions:} Cryptol uses the `\textbf{if...then...else}' syntax, which is similar to the ternary operator `\textbf{?:}' in C.
+\textbf{Conditional Expressions:} Cryptol uses the `\textbf{if...then...else}' syntax, which is similar to the ternary operator `\textbf{ ? : }' in C.
 
 \begin{lstlisting}[style=cryptol]
-// Conditional expression (similar to a ? b : c in C)
+a : Bit
+a = True
+
+b : Bit
+b = False
+
+// Conditional expression
 result_cond : Bit
 result_cond = if a then b else ~b
 \end{lstlisting}
-
-\textbf{XOR Operation}: This is commonly used in cryptography for things like one-time pads.
-
-\begin{lstlisting}[style=cryptol]
-// XOR operation
-c : Bit
-c = True // Assuming some value
-
-result_xor : Bit
-result_xor = a ^ c // Similar to a ^ c in C
+\begin{lstlisting}[style=zsh]
+$ Main> result_cond
+False
 \end{lstlisting}
 
+\vspace{16pt}
+\noindent\textbf{XOR Operation}: This is commonly used in cryptography for things like one-time pads.
 
+\begin{lstlisting}[style=cryptol]
+a : Bit
+a = True
+	
+c : Bit
+c = True
+
+result_xor : Bit
+result_xor = a ^ c
+\end{lstlisting}
+\begin{lstlisting}[style=zsh]
+$ Main> result_xor
+False
+\end{lstlisting}
+
+\newpage
 %%%%%== Subsubsec: Bit III ==%%%%%
 \subsubsection{Advanced Cryptographic Applications with Bit}
 \textbf{Simple Cryptographic Operation:} Here’s a very basic example of a cryptographic operation in Cryptol, a one-time pad encryption of a single bit. In practical applications, you'll work with sequences or arrays of bits.
@@ -176,7 +184,13 @@ decrypted_bit : Bit
 decrypted_bit = encrypted_bit ^ key_bit           
 \end{lstlisting}
 
-\newpage
+\begin{lstlisting}[style=zsh]
+$ Main> encrypted_bit
+True
+$ Main> decrypted_bit
+True
+\end{lstlisting}
+\vspace{24pt}
 \begin{lstlisting}[style=cryptol]
 module XOR where
 
@@ -307,7 +321,8 @@ $ Main> joined_seq
 0xaaaa
 \end{lstlisting}
 \vspace{16pt}
-\textbf{Applying Functions to Sequences:} In Cryptol, you can apply functions to entire sequences, which is useful for cryptographic transformations.
+\newpage
+\noindent\textbf{Applying Functions to Sequences:} In Cryptol, you can apply functions to entire sequences, which is useful for cryptographic transformations.
 \begin{lstlisting}[style=cryptol]
 // A simple bitwise NOT operation applied to a sequence
 negate_seq : [8]Bit -> [8]Bit
@@ -328,7 +343,6 @@ $ Main> negated_seq
 0x32
 \end{lstlisting}
 \vspace{16pt}
-\newpage
 \noindent\textbf{Advanced Cryptographic Patterns:} Sequences are used in various cryptographic algorithms, such as block ciphers and hash functions, to handle data in structured formats.
 \begin{lstlisting}[style=cryptol]
 // Example of XORing two sequences (common in many cryptographic algorithms)
@@ -401,7 +415,6 @@ $ Main> myTuple
 (True, 0x2, 0xc)
 \end{lstlisting}
 \vspace{16pt}
-\newpage
 \noindent\textbf{Accessing Tuple Elements:} Elements in a tuple are accessed by their positions, starting from zero.
 \begin{lstlisting}[style=cryptol]
 first_element : Bit
@@ -428,6 +441,7 @@ $ Main> updatedTuple
 (True, 0x7, 0xc)
 \end{lstlisting}
 
+\newpage
 %%%%%== Subsubsec: Tuple II ==%%%%%
 \subsubsection{Intermediate Tuple Operations}
 \textbf{Tuple Decomposition:} You can decompose a tuple into its components, similar to unpacking a struct in C.
@@ -511,7 +525,7 @@ $ Main> :prove
 %%%%%== Subsubsec: Record I ==%%%%%
 \subsubsection{Basic Record Operations}
 \begin{tcolorbox}[colframe=defcolor,title={\color{white}\bf Record}]
-In Cryptol, you define a record with braces `\texttt{$\{\}$}' and specify the names and types of its fields.
+We define a record with braces `\texttt{$\{\}$}' and specify the names and types of its fields.
 \end{tcolorbox}
 \begin{lstlisting}[style=cryptol]
 type MyRecord = {
@@ -519,17 +533,14 @@ type MyRecord = {
 	field2 : [3]Bit,
 	field3 : [4]Bit
 }
-
 myRecord : MyRecord
 myRecord = {
 	field1 = True,
 	field2 = [False, True, False],
 	field3 = [True, True, False, False]
 }
-
 first_field : Bit
 first_field = myRecord.field1 // Accessing the first field of the record
-
 second_field : [3]Bit
 second_field = myRecord.field2 // Accessing the second field of the record
 \end{lstlisting}

@@ -194,41 +194,32 @@
 %	language=Haskell
 }
 \lstdefinestyle{cryptol}{
- backgroundcolor=\color{backcolour},   
-commentstyle=\color{codegreen},
-keywordstyle=\color{magenta},
-stringstyle=\color{codepurple},
-basicstyle=\ttfamily\footnotesize,
-breakatwhitespace=false,         
-breaklines=true,                 
-captionpos=b,                    
-keepspaces=true,                 
-numbers=none,                    % Remove line numbers
-showspaces=false,                
-showstringspaces=false,
-showtabs=false,                  
-tabsize=2,
-frame=single,                    % Add a frame around the code
-language=Haskell,
-float=*                          % Prevent code from breaking across pages
-%	language=C,
-%	backgroundcolor=\color{backcolour},   
-%	commentstyle=\color{codegreen},
-%	keywordstyle=\color{magenta},
-%	numberstyle=\tiny\color{codegray},
-%	stringstyle=\color{codepurple},
-%	basicstyle=\ttfamily\footnotesize,
-%	breakatwhitespace=false,         
-%	breaklines=true,                 
-%	captionpos=b,                    
-%	keepspaces=true,                 
-%	numbers=left,                    
-%	numbersep=5pt,                  
-%	showspaces=false,                
-%	showstringspaces=false,
-%	showtabs=false,                  
-%	tabsize=2,
-%	language=Haskell
+language=C,                   % Base the style on C language
+backgroundcolor=\color{white}, % Set background color to white
+commentstyle=\color{green!70!black},    % Set comment style to green
+keywordstyle=\color{blue},     % Set keyword style to blue
+numberstyle=\tiny\color{gray}, % Set the style for line numbers
+stringstyle=\color{red},       % Set string literal style to red
+keywordstyle={\bfseries\color{purple}},
+keywordstyle=[2]{\bfseries\color{RoyalBlue}},
+keywordstyle=[3]{\bfseries\color{violet}},
+basicstyle=\ttfamily\small,    % Set basic style to small typewriter font
+breakatwhitespace=false,       % Automatic breaks only at whitespace
+breaklines=true,               % Set automatic line breaking
+captionpos=b,                  % Sets the caption position to bottom
+keepspaces=true,               % Keeps spaces in text, useful for indentation
+numbers=none,                  % Line numbers on the left
+showspaces=false,              % Do not show spaces as special characters
+showstringspaces=false,        % Do not highlight spaces in strings
+showtabs=false,                % Do not show tabs as special characters
+tabsize=2,                     % Sets default tab size to 2 spaces
+frame=single,                  % Adds a frame around the code
+frameround=ffff,               % Round the corners of the frame
+framesep=3pt,                  % Distance between frame and code
+alsoletter={:, =},                  % Treat ! as part of keywords
+morekeywords={fn, let, mut},   % Add more keywords specific to Rust
+morekeywords=[2]{:, =},
+morekeywords=[3]{Bit}
 }
 % Define custom Rust style
 \lstdefinestyle{rust}{
@@ -423,7 +414,7 @@ float=*                          % Prevent code from breaking across pages
 	\newpage
 	\mainmatter
 	\input{chapters/cryptol_ch1.tex} %
-	\input{chapters/cryptol_ch2.tex} %
+%	\input{chapters/cryptol_ch2.tex} %
 %	\input{chapters/ecc_ch1_mul_squ.tex} %
 %	\input{chapters/ecc_ch1_red.tex} %
 %	\input{chapters/chapter1.tex}
@@ -431,7 +422,7 @@ float=*                          % Prevent code from breaking across pages
 	% Include more chapters as needed
 	
 	\appendix
-	\input{appendices/bibilography.tex}
+%	\input{appendices/bibilography.tex}
 %	\input{appendices/appendixA.tex}
 %	\input{appendices/appendixB.tex}
 	
