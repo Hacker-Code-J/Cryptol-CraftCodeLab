@@ -35,38 +35,44 @@ class Sudoku:
     def solve(self, grid=None):
         if grid is None:
             grid = self.grid
-        # Create the model
         model = cp_model.CpModel()
-        
+
         # Create a 9x9 matrix of integer variables with values in [1, 9].
         cells = [[model.NewIntVar(1, 9, f'cell_{i}_{j}') for j in range(9)] for i in range(9)]
-        
-        # Add constraints for pre-filled cells
+
+        # Shuffle numbers to introduce variability in potential solutions
+        numbers = list(range(1, 10))
+        random.shuffle(numbers)
+
+        # Apply shuffled numbers to domain
         for i in range(9):
             for j in range(9):
                 if grid[i][j] != 0:
-                    model.Add(cells[i][j] == grid[i][j])
-        
+                    # Map the pre-filled number to its position in the shuffled list
+                    shuffled_num = numbers.index(grid[i][j]) + 1
+                    model.Add(cells[i][j] == shuffled_num)
+
         # All different constraint for rows and columns
         for i in range(9):
             model.AddAllDifferent(cells[i])  # Rows
             model.AddAllDifferent([cells[j][i] for j in range(9)])  # Columns
-        
+
         # All different constraint for 3x3 subgrids
         for i in range(0, 9, 3):
             for j in range(0, 9, 3):
                 subgrid = [cells[i + di][j + dj] for di in range(3) for dj in range(3)]
                 model.AddAllDifferent(subgrid)
-        
+
         # Solve the model
         solver = cp_model.CpSolver()
         status = solver.Solve(model)
-        
-        # If a solution is found, update the grid
+
+        # If a solution is found, map shuffled numbers back to their original values
         if status == cp_model.FEASIBLE or status == cp_model.OPTIMAL:
             for i in range(9):
                 for j in range(9):
-                    self.grid[i][j] = solver.Value(cells[i][j])
+                    original_num = numbers[solver.Value(cells[i][j]) - 1]
+                    self.grid[i][j] = original_num
             return True
         return False
 
