@@ -1,0 +1,122 @@
+\chapter{CH1}
+
+\section{Basic Syntax}
+
+\subsection*{Identifiers}
+
+\begin{table}[h!]
+\begin{center}
+	\textit{Examples of Identifier}
+\end{center}
+{\ttfamily
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}|llll|}
+\hline
+\textcolor{blue}{name} & name1 & name' & longer\_name \\
+\textcolor{violet}{Name} & Name2 & Name'' & longerName\\
+\hline
+\end{tabular*}}
+\end{table}
+
+\subsection*{Keywords and Built-in Operators}
+
+\begin{table}[h!]
+\begin{center}
+\textit{Keywords}
+\end{center}
+{\ttfamily
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}|lllllll|}
+\hline
+as         &     extern  &    include &     interface &     parameter &     property  &    where \\
+by         &     hiding  &    infix   &     let       &     pragma    &     submodule &    else \\
+constraint &     if      &    infixl  &     module    &     primitive &     then & \\
+down       &     import  &    infixr  &     newtype   &     private   &     type & \\
+\hline
+\end{tabular*}}
+\end{table}
+
+\newpage
+\subsection*{Built-in Type-level Operators}
+
+\begin{table}[h!]
+\begin{center}
+\textit{Keywords}
+\end{center}\centering
+\begin{tabular}{|c|c|}\hline
+\normalfont\textbf{Operator} & \normalfont\textbf{Meaning} \\
+\midrule
+$+$ & Addition \\
+$-$ & Subtraction \\
+$*$ & Multiplication \\
+$/$ & Division \\
+$\slash\textasciicircum$ & Ceiling Division ($/$ rounded up) \\
+$\%$ & Modulus \\
+$\%\textasciicircum$ & Ceiling Modulus (Computing Padding) \\
+$\textasciicircum\textasciicircum$ & Exponentiation \\
+\texttt{lg2} & Ceiling logarithm (base 2) \\
+\texttt{width} & Bit Width (equal to \texttt{lg2(n+1)})  \\
+\texttt{max} & Maximum \\
+\texttt{min} & Minimum \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection*{Numeric Literals}
+\begin{table}[h!]
+\begin{center}
+\textit{Examples of Literals}
+\end{center}
+{\ttfamily\begin{tabular}{ll}
+254 & \textcolor{green!50!black}{// Decimal literal} \\
+0254 & \textcolor{green!50!black}{// Decimal literal} \\
+0b11111110 & \textcolor{green!50!black}{// Binary literal} \\
+0xFE & \textcolor{green!50!black}{// Hexadecimal literal} \\
+0xfe & \textcolor{green!50!black}{// Hexadecimal literal} \\
+\end{tabular}}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\textit{Polynomial Literals}
+\end{center}
+{\ttfamily\begin{tabular}{ll}
+<| x$\textasciicircum\textasciicircum$6 + x$\textasciicircum\textasciicircum$4 + x$\textasciicircum\textasciicircum$2 + x$\textasciicircum\textasciicircum$1 + 1 |> & \textcolor{green!50!black}{// : [7], equal to 0b1010111} \\
+<| x$\textasciicircum\textasciicircum$4 + x$\textasciicircum\textasciicircum$3 + x |>  & \textcolor{green!50!black}{// : [5], equal to 0b11010}
+\end{tabular}}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\textit{Fractional Literals}
+\end{center}
+{\ttfamily\begin{tabular}{ll}
+10.2 & \\
+10.2e3 & \textcolor{green!50!black}{// 10.2 * 10$\textasciicircum$3} \\
+0x30.1  & \textcolor{green!50!black}{// 3 * 64 + 1/16} \\
+0x30.1p4  & \textcolor{green!50!black}{// (3 * 64 + 1/16) * 2$\textasciicircum$4}
+\end{tabular}}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\textit{Using $\_$}
+\end{center}
+{\ttfamily\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}|ll|}
+\hline
+0b\_0000\_0010 &\\
+0x\_FFFF\_FFEA &\\
+\hline
+\end{tabular*}}
+\end{table}
+
+\newpage
+\section{Expressions}
+
+\subsection*{Calling Functions}
+\begin{table}[h!]
+{\ttfamily\begin{tabular}{ll}
+\textcolor{blue}{f} 2 & \textcolor{green!50!black}{// call `f' with parameter `2'} \\
+\textcolor{blue}{g} x y & \textcolor{green!50!black}{// call `g' with two parameters: `x' and `y'} \\
+\textcolor{blue}{h} (x,y) & \textcolor{green!50!black}{// call `h' with one parameter,  the pair `(x,y)'} \\
+\end{tabular}}
+\end{table}
+

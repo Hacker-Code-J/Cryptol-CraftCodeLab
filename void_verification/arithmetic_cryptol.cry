@@ -1,0 +1,24 @@
+module Addition where
+
+add_cryptol : [16] -> [16] -> [32]
+add_cryptol x y = (zero # x) + (zero # y)
+
+/*
+ * Correctness and No Overflow for 16-bit Inputs
+*/
+property add_correctness x y = 
+    add_cryptol x y == (zero # x) + (zero # y)                                   
+property no_overflow x y = 
+    add_cryptol x y <= 0xFFFF_FFFF                                                   
+
+/*
+ * Identity, Comuutativity and Associativitiy 
+*/
+property identity x =
+    add_cryptol x 0 == zero # x
+property zero_identity x =
+    (add_cryptol x 0 == (0 # x)) && (add_cryptol 0 x == (0 # x))                                                      
+property commutativity x y = 
+    add_cryptol x y == add_cryptol y x
+// property associativity x y z =
+//     add_cryptol (add_cryptol x y : [16]) z == add_cryptol x (add_cryptol y z : [16])

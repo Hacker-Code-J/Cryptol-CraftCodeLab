@@ -1,0 +1,36 @@
+set_base 16;
+
+print "Loading the arithmetic llvm module";
+l <- llvm_load_module "arithmetic_llvm.bc";
+
+print "Extracting reference term: add_standard";
+add_standard <- crucible_llvm_extract l "add_standard";
+
+print "Extracting implementation term: add_textbook";
+add_textbook <- crucible_llvm_extract l "add_textbook";
+
+print "Assigning Cryptol implementation: add_cryptol";
+let {{
+    add_cryptol : [16] -> [16] -> [16] -> [32]
+    add_cryptol x y z = (zero # x) + (zero # y) + (zero # z)
+}};
+
+// Prove theorems about these terms that each implementation is
+// equivalent to each of the others
+
+print "Proving equivalence: add_standard == add_textbook";
+let thm1 = {{ \x y z -> add_standard x y z == add_textbook x y z }};
+result <- prove z3 thm1;
+print result;
+
+print "Proving equivalence: add_standard == add_cryptol";
+let thm2 = {{ \x y z -> add_standard x y z == add_cryptol x y z }};
+result <- prove z3 thm2;
+print result;
+
+print "Proving equivalence: add_textbook == add_cryptol";
+let thm3 = {{ \x y z -> add_textbook x y z == add_cryptol x y z }};
+result <- prove z3 thm3;
+print result;
+
+print "Done.";
