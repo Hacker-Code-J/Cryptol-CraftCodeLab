@@ -1,9 +1,0 @@
-type AES128 = 4
-type AES192 = 6
-type AES256 = 8
-type Nk = AES128
-type Nb = 4
-type Nr = 6 + Nk
-
-type GF256 = [8] // 2^8 = 256
-type State = [4][Nb]GF256
