@@ -1,0 +1,24 @@
+\section{Add Round Key}
+\begin{lstlisting}[style=cryptol]
+type AES128 = 4
+type AES192 = 6
+type AES256 = 8
+
+type Nk = AES128
+
+// For Cryptol 2.x | x > 0
+// NkValid: `Nk -> Bit
+// property NkValid k = (k == `AES128) || (k == `AES192) || (k == `AES256)
+
+// Number of blocks and Number of rounds
+type Nb = 4
+type Nr = 6 + Nk
+
+type AESKeySize  = (Nk*32)
+
+// Helper type definitions
+type GF28        = [8]
+type State       = [4][Nb]GF28
+type RoundKey    = State
+type KeySchedule = (RoundKey, [Nr-1]RoundKey, RoundKey)
+\end{lstlisting}

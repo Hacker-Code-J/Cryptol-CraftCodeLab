@@ -1,0 +1,36 @@
+module AES where
+
+type AES128 = 4
+type AES192 = 6
+type AES256 = 8
+
+type Nk = AES128
+
+// Number of blocks and Number of rounds
+type Nb = 4                 // 4 * 32 = 128
+type Nr = 6 + Nk            // AES128/192/256 : 10/12/14
+
+type AESKeySize  = (Nk*32)  // AES128/192/256 : 128/192/256
+
+// Helper type definitions
+type GF28        = [8]                      // 8-bit = Galois Field 256 = 8-dimension bit vector space
+type State       = [4][Nb]GF28              // 4 * (4 * 8-bit )
+type RoundKey    = State                    // 128-bit
+type KeySchedule =
+    (RoundKey, [Nr-1]RoundKey, RoundKey)    // (128-bit, 10/12/14 * 128-bit, 128-bit )
+
+// GF28 operations
+gf28Add : {n} (fin n) => [n]GF28 -> GF28
+gf28Add ps = sums ! 0
+  where sums = [zero] # [  p ^ s | p <- ps | s <- sums ]
+
+// 0x11b= 0b 0001:0001:1011
+irreducible = <| x^^8 + x^^4 + x^^3 + x + 1 |>
+
+// gf28Mult : [8] x [8] -> [8]
+// GF(2) Polynomial Arithmetic
+// pdiv : {u, v} (fin u, fin v) => [u] -> [v] -> [u]
+// pmod : {u, v} (fin u, fin v) => [u] -> [1 + v] -> [u]
+// pmult : {u, v} (fin u, fin v) => [1 + u] -> [1 + v] -> [1 + u + v]
+gf28Mult : (GF28, GF28) -> GF28
+gf28Mult (x, y) = pmod(pmult x y) irreducible
