@@ -1,0 +1,22 @@
+module ARX where
+
+type Byte = [8]
+
+add_cryptol : [8] -> [8] -> [8]
+add_cryptol a b = a + b
+
+not_byte: [8] -> [8]
+not_byte a = ~a + 1
+
+/*
+ * Identity, Inverse and Associativitiy -> Group Property
+ * Commutativity -> Abelian Property
+*/
+property identity a =
+    add_cryptol a zero == a
+property inverse a =
+    add_cryptol a (not_byte a) == zero                                                      
+property associative a b c = 
+    add_cryptol a (add_cryptol b c) == add_cryptol c (add_cryptol a b)
+property commutative a b =
+    add_cryptol a b == add_cryptol b a

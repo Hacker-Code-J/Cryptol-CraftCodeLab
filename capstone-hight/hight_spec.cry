@@ -1,0 +1,88 @@
+module HIGHT where
+
+// // Define types for key and block
+// type Key128 = [128]
+// type Block64 = [64]
+// type Byte = [8]
+// type RoundKey = [128][8]
+
+// Define the type alias for Byte
+type Byte = [8]
+
+// Define the Gen-WK function
+genWK : [16]Byte -> [8]Byte
+genWK input = [ input@12, input@13, input@14, input@15, input@0, input@1, input@2, input@3 ]
+
+// Define a property to verify that genWK is well-defined
+property genWK_WellDefined input =
+  length (genWK input) == 8
+
+
+// Key Expansion
+// keyExpansion : Key128 -> RoundKey
+// keyExpansion key = [ subKey i | i <- [0..127]]
+//   where
+//     subKey i = if i < 8 then key @[i * 8 + 7, i * 8 .. i * 8] else subKey (i - 8)
+
+// subKey : {n} (fin n) => [n][8] -> [8]
+// subKey key = key @ 0 # key @ 1 # key @ 2 # key @ 3
+
+// F-function
+// F : Byte -> Byte -> Byte -> Byte -> Byte
+// F x k0 k1 k2 = ((x ^ k0) + k1) ^ ((x ^ k2) <<< 3)
+
+// // Whitening Step
+// whitening : Block64 -> [8] -> Block64
+// whitening p keys = [p0 ^ k0, p1 ^ k1, p2 ^ k2, p3 ^ k3, p4, p5, p6, p7]
+//   where
+//     p0 = p @ 0
+//     p1 = p @ 1
+//     p2 = p @ 2
+//     p3 = p @ 3
+//     p4 = p @ 4
+//     p5 = p @ 5
+//     p6 = p @ 6
+//     p7 = p @ 7
+//     k0 = keys @ 0
+//     k1 = keys @ 1
+//     k2 = keys @ 2
+//     k3 = keys @ 3
+
+// // Round Function
+// roundFunction : Block64 -> [4][8] -> Block64
+// roundFunction [x0, x1, x2, x3, x4, x5, x6, x7] [k0, k1, k2, k3] = [y0, y1, y2, y3, y4, y5, y6, y7]
+//   where
+//     y0 = x7
+//     y1 = x0 ^ F(x1, k0, k1, k2)
+//     y2 = x1
+//     y3 = x2 ^ F(x3, k0, k1, k2)
+//     y4 = x3
+//     y5 = x4 ^ F(x5, k0, k1, k2)
+//     y6 = x5
+//     y7 = x6 ^ F(x7, k0, k1, k2)
+
+// // 32 Rounds of Encryption
+// rounds : {n} (fin n) => [n]Block64 -> [n][4][8] -> Block64
+// rounds [x] _ = x
+// rounds (x # xs) keys = rounds (y # x # xs) (tail keys)
+//   where
+//     y = roundFunction x (head keys)
+
+// // Encryption Function
+// encrypt : Key128 -> Block64 -> Block64
+// encrypt key plaintext = finalWhitening (rounds (whitened # [whitened]) roundKeys) finalKeys
+//   where
+//     roundKeys = keyExpansion key
+//     whitened = whitening plaintext (take 4 roundKeys)
+//     finalKeys = drop 124 roundKeys
+//     finalWhitening x keys = whitening x keys
+
+// // Example Usage
+// testKey : Key128
+// testKey = 0x000102030405060708090A0B0C0D0E0F
+
+// testPlaintext : Block64
+// testPlaintext = 0x0001020304050607
+
+// testCiphertext : Block64
+// testCiphertext = encrypt testKey testPlaintext
