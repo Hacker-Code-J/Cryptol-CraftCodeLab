@@ -1,22 +1,85 @@
 module ARX where
 
-type Byte = [8]
+/*
+ * Addition  
+*/
 
 add_cryptol : [8] -> [8] -> [8]
 add_cryptol a b = a + b
 
-not_byte: [8] -> [8]
-not_byte a = ~a + 1
-
+not_cryptol: [8] -> [8]
+not_cryptol a = ~a + 1
 /*
  * Identity, Inverse and Associativitiy -> Group Property
  * Commutativity -> Abelian Property
 */
-property identity a =
+property add_identity a =
     add_cryptol a zero == a
-property inverse a =
-    add_cryptol a (not_byte a) == zero                                                      
-property associative a b c = 
+property add_inverse a =
+    add_cryptol a (not_cryptol a) == zero                                                      
+property add_associative a b c = 
     add_cryptol a (add_cryptol b c) == add_cryptol c (add_cryptol a b)
-property commutative a b =
+property add_commutative a b =
     add_cryptol a b == add_cryptol b a
+
+/*
+ * Rotation
+*/
+
+// // Function to perform bitwise AND
+// and8 : [8] -> [8] -> [8]
+// and8 x y = x && y
+
+// // Function to perform bitwise OR
+// or8 : [8] -> [8] -> [8]
+// or8 x y = x || y
+
+// // Function to shift bits to the right
+// shiftRight8 : [8] -> Integer -> [8]
+// shiftRight8 x n = x >> n
+
+// // Function to shift bits to the left
+// shiftLeft8 : [8] -> Integer -> [8]
+// shiftLeft8 x n = x << n
+
+// // Function to mask to 8 bits
+// mask8 : Integer -> [8]
+// mask8 x = x && 0xFF
+
+// // Right rotation function for 8-bit data in a functional style
+// // Right rotation function for 8-bit data
+// rightRotate : [8] -> Integer -> [8]
+// rightRotate x n = mask8 (or8 rightPart leftPart)
+//   where
+//     n_mod = n % 8
+//     rightPart = shiftRight8 x n_mod
+//     leftPart = shiftLeft8 x (8 - n_mod)
+
+/*
+ * XOR
+*/
+
+xor_cryptol : [8] -> [8] -> [8]
+xor_cryptol a b = a ^ b
+
+xor_cryptol2 : [8] -> [8] -> [8]
+xor_cryptol2 a b = (a || b) && ~(a && b)
+
+property xor_def a b =
+    xor_cryptol a b == xor_cryptol2 a b
+
+property xor_associative a b c =
+    xor_cryptol a (xor_cryptol b c) == xor_cryptol (xor_cryptol a b) c 
+
+property xor_identity a =
+    xor_cryptol zero a == a
+
+property xor_inverse a =
+    xor_cryptol a a == zero
+
+property xor_commutative a b =
+    xor_cryptol a b == xor_cryptol b a
+
+property xor_prop a b =
+    xor_cryptol b (xor_cryptol a b) == a
+
