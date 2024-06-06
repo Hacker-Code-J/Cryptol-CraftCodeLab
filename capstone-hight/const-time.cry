@@ -1,0 +1,8 @@
+module ConstantTime where
+
+// Constant-time comparison function
+constantTimeEq : [8] -> [8] -> Bit
+constantTimeEq x y = (foldl (||) zero (x ^ y)) == zero
+
+property constantTimeEqProperty (x : [8]) (y : [8]) =
+    constantTimeEq x y == (x == y)

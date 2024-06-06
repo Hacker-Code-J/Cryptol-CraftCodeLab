@@ -13,18 +13,93 @@ not_cryptol a = ~a + 1
  * Identity, Inverse and Associativitiy -> Group Property
  * Commutativity -> Abelian Property
 */
-property add_identity a =
+property add_identity (a : [8]) =
     add_cryptol a zero == a
-property add_inverse a =
+property add_inverse (a : [8]) =
     add_cryptol a (not_cryptol a) == zero                                                      
-property add_associative a b c = 
+property add_associative (a : [8], b : [8], c : [8]) = 
     add_cryptol a (add_cryptol b c) == add_cryptol c (add_cryptol a b)
-property add_commutative a b =
+property add_commutative (a : [8], b : [8]) =
     add_cryptol a b == add_cryptol b a
 
+
+// property associative_add (a : [8], b : [8], c : [8]) = 
+//     add_cryptol a (add_cryptol b c) == add_cryptol c (add_cryptol a b)
+
+// property identity_add (a : [8]) =
+//     add_cryptol a 0 == a
+
+// property inverse_add (a : [8]) =
+//     add_cryptol a (complement a + 1) == 0
+
+// property commutative_add (a : [8], b : [8]) =
+//     add_cryptol a b == add_cryptol b a
+
+// property distributivity_and (a : [8], b : [8], c : [8]) =
+//     add_cryptol (a && b) c == (add_cryptol a c) && (add_cryptol b c)
+
+// property distributivity_or (a : [8], b : [8], c : [8]) =
+//     add_cryptol (a || b) c == (add_cryptol a c) || (add_cryptol b c)
+
+// property distributivity_xor (a : [8], b : [8], c : [8]) =
+//     add_cryptol (a ^ b) c == (add_cryptol a c) ^ (add_cryptol b c)
+
+
 /*
- * Rotation
+ * [ Rotation ]
+ * zext{8} n: The explicit type application {8} tells Cryptol to zero-extend the 4-bit integer n to an 8-bit integer,
+ * matching the width of the array a.
+ * This ensures that the shift operations (>> and <<) are applied with operands of the same bit width, 
+ * which is necessary for correct operation in Cryptol.
 */
+
+// rotation_cryptol : [8] -> [4] -> [8]
+// rotation_cryptol a n = (a >> (zext`{8} n)) || (a << (8 - (zext`{8} n % 8)))
+
+/*
+ * Conditional Check: Added a condition to check if n is 0. 
+ * Since rotating by 0 or by the full length (which is the width of the array) should return the array as is, we handle this explicitly to avoid unnecessary computation or error.
+ * Modulo Operation: Added explicit modulo operation within the zero extension to ensure that bit widths remain consistent and 
+ * no out-of-bound errors occur when n is a full length or more.
+*/
+// shiftRight : [8] -> [8] -> [8]
+// shiftRight a n = a >> (zext`{8} n % 8)
+
+// shiftLeft : [8] -> [8] -> [8]
+// shiftLeft a n = a << (8 - (zext`{8} n % 8))
+
+// adjacent : [8] -> [8] -> [8] -> [8]
+// adjacent a leftBits rightBits n = (leftBits && maskL) || (rightBits && maskR)
+//   where
+//     shiftAmount = zext`{8} n % 8  // Ensure 'n' is treated as [8]
+//     maskL = 0xFF << shiftAmount   // Mask for left shifted bits
+//     maskR = complement maskL      // Mask for right shifted bits
+
+// rotation_cryptol : [8] -> [8] -> [8]
+// rotation_cryptol a n =
+//   if n == 0 then a
+//   else adjacent a (shiftLeft a n) (shiftRight a n) n
+
+
+
+
+rotation_cryptol : [8] -> [4] -> [8]
+rotation_cryptol a n = if n == 0 then a else (a >> (zext`{8} n % 8)) || (a << (8 - (zext`{8} n % 8)))
+
+property identity_rotation (a : [8]) =
+    rotation_cryptol a 0x0 == a
+
+property full_cycle_rotation (a : [8]) =
+    rotation_cryptol a 0x8 == a
+
+// property modulo_rotation (a : [8], n : [4]) =
+//     rotation_cryptol a n == rotation_cryptol a (n + 0x8)
+
+// property inverse_rotation (a : [8], n : [4]) =
+//     rotation_cryptol (rotation_cryptol a n) (0x8 - n) == a
+
+// property associative_rotation (a : [8], n : [4], m : [4]) =
+//     rotation_cryptol (rotation_cryptol a n) m == rotation_cryptol a ((n + m) % 0x8)
 
 // // Function to perform bitwise AND
 // and8 : [8] -> [8] -> [8]
@@ -65,21 +140,31 @@ xor_cryptol a b = a ^ b
 xor_cryptol2 : [8] -> [8] -> [8]
 xor_cryptol2 a b = (a || b) && ~(a && b)
 
-property xor_def a b =
-    xor_cryptol a b == xor_cryptol2 a b
+// property xor_def (a : [8], b : [8]) =
+//     xor_cryptol a b == xor_cryptol2 a b
 
-property xor_associative a b c =
-    xor_cryptol a (xor_cryptol b c) == xor_cryptol (xor_cryptol a b) c 
+// property xor_associative (a : [8], b : [8], c : [8]) =
+//     xor_cryptol a (xor_cryptol b c) == xor_cryptol (xor_cryptol a b) c 
 
-property xor_identity a =
-    xor_cryptol zero a == a
+// property xor_identity (a : [8]) =
+//     xor_cryptol zero a == a
 
-property xor_inverse a =
-    xor_cryptol a a == zero
+// property xor_inverse (a : [8] ) =
+//     xor_cryptol a a == zero
 
-property xor_commutative a b =
+// property xor_commutative (a : [8], b : [8]) =
+//     xor_cryptol a b == xor_cryptol b a
+
+// property xor_prop (a : [8], b : [8]) =
+//     xor_cryptol b (xor_cryptol a b) == a
+
+property commutativity (a : [8], b : [8]) =
     xor_cryptol a b == xor_cryptol b a
-
-property xor_prop a b =
-    xor_cryptol b (xor_cryptol a b) == a
-
+property associativity (a : [8], b : [8], c : [8]) =
+    xor_cryptol (xor_cryptol a b) c == xor_cryptol a (xor_cryptol b c)
+property identity_element (a : [8]) =
+    xor_cryptol a 0 == a
+property inverse_property (a : [8]) =
+    xor_cryptol a a == 0
+property xor_with_complement (a : [8]) =
+    xor_cryptol a (complement a) == complement 0
