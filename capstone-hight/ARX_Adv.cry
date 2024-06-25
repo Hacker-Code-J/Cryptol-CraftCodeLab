@@ -1,0 +1,81 @@
+add_cryptol : [8] -> [8] -> [8]
+add_cryptol a b = a + b
+
+rotation_cryptol : [8] -> [8] -> [8]
+rotation_cryptol a n = if n == 0 then a else (a >> (zext`{8} n % 8)) || (a << (8 - (zext`{8} n % 8)))
+
+xor_cryptol : [8] -> [8] -> [8]
+xor_cryptol a b = a ^ b
+
+property diffusion = 
+    all (\i -> add_cryptol 0b10101010 0x55 ^ add_cryptol (0b10101010 ^ (1 << i)) 0x55 != 0x00) [0..7]
+
+property non_linearity = 
+    add_cryptol 0b10101010 0x55 ^ add_cryptol 0b01010101 0x55 != add_cryptol (0b10101010 ^ 0b01010101) 0x55
+
+property uniform_distribution = 
+    all (\i -> add_cryptol 0b10101010 0x55 ^ add_cryptol (0b10101010 ^ (1 << i)) 0x55 != 0x00) [0..7]
+
+property differential_resistance = 
+    add_cryptol 0b10101010 0x55 ^ add_cryptol (0b10101010 ^ 0x01) 0x55 != add_cryptol 0x55 0x55
+
+// Generate a key schedule from a seed key
+// key_schedule : [8] -> [4][8]
+// key_schedule seed = [key0, key1, key2, key3]
+//     where
+//         key0 = seed
+//         key1 = add_cryptol (rotation_cryptol seed 1) 0x3C
+//         key2 = xor_cryptol (rotation_cryptol key1 2) 0xA5
+//         key3 = add_cryptol (rotation_cryptol key2 3) 0x7F
+
+
+
+// confusion : [8] -> [8] -> [8]
+// confusion a b = add_cryptol (xor_cryptol a b) 7
+
+// diffusion : [8] -> [8]
+// diffusion a = rotation_cryptol a 3
+
+// hammingDistance : {n} (fin n) => [n] -> [n] -> Integer
+// hammingDistance a b = sum (map (\x -> if x then 1 else 0) (a ^ b))
+
+// property confusion(a: [8], b: [8]) = (confusion_cryptol(a, b) != a) /\ (confusion_cryptol(a, b) != b)
+// property diffusion(a: [8], b: [8]) = hammingDistance(diffusion_cryptol(a), diffusion_cryptol(b)) >= threshold
+
+
+// add_cryptol : [8] -> [8] -> [8]
+// add_cryptol a b = a + b
+
+// rotation_cryptol : [8] -> [8] -> [8]
+// rotation_cryptol a n = if n == 0 then a else (a >> (zext`{8} n % 8)) || (a << (8 - (zext`{8} n % 8)))
+
+// xor_cryptol : [8] -> [8] -> [8]
+// xor_cryptol a b = a ^ b
+
+// property non_linearity_xor (a : [8], b : [8]) = 
+//   xor_cryptol a b != (xor_cryptol a 0 + xor_cryptol b 0)
+
+// property rotation_invariance (a : [8], n : [8]) =
+//   rotation_cryptol a n == rotation_cryptol (rotation_cryptol a 1) n
+
+// property mixed_operations (a : [8], b : [8]) =
+//   xor_cryptol (add_cryptol a b) (xor_cryptol a b) == 
+//   add_cryptol (xor_cryptol a b) (add_cryptol a b)
+
+
+
+// // Define ARX as a composite operation
+// arx_cryptol : [8] -> [8] -> [8] -> [8]
+// arx_cryptol a b n = xor_cryptol (add_cryptol a b) (rotation_cryptol a n)
+
+// property bit_independence (a : [8], b : [8], n : [8], i : [3]) =
+//   arx_cryptol a b n != arx_cryptol (a ^ (1 << i)) b n
+
+// property non_linearity (a : [8], b : [8], n : [8]) =
+//   arx_cryptol (a ^ b) b n != (arx_cryptol a b n ^ arx_cryptol b b n)
+
+// property rotation_sensitivity (a : [8], b : [8], n : [8]) =
+//   arx_cryptol a b n != arx_cryptol (rotation_cryptol a 1) b n
+
+// property symmetry_breaking (a : [8], b : [8], n : [8]) =
+//   arx_cryptol a b n != arx_cryptol b a n

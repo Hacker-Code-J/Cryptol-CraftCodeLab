@@ -8,6 +8,10 @@ u8 add_standard(u8 a, u8 b) {
   return a + b;
 }
 
+u8 rot_standard(u8 a, u8 b) {
+  return (a >> b) | (a << (8-b));
+}
+
 u8 xor_standard(u8 a, u8 b) {
   return a ^ b;
 }

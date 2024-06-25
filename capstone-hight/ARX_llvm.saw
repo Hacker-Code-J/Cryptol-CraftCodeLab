@@ -15,18 +15,11 @@ let {{
     add_cryptol a b = a + b
 }};
 
-// print "Assigning Cryptol implementation: rotation_cryptol";
-// let {{
-//     rotation_cryptol : [8] -> [8] -> [8]
-//     rotation_cryptol a n = 
-//         if n == 0 then a else (a >> (zext`{8} n % 8)) || (a << (8 - (zext`{8} n % 8)))
-// }};
-
-// print "Assigning Cryptol implementation: xor_cryptol";
-// let {{
-//     xor_cryptol : [8] -> [8] -> [8]
-//     xor_cryptol a b = a ^ b
-// }};
+print "Assigning Cryptol implementation: xor_cryptol";
+let {{
+    xor_cryptol : [8] -> [8] -> [8]
+    xor_cryptol a b = a ^ b
+}};
 
 
 // Prove theorems about these terms that each each implementation is
@@ -37,50 +30,17 @@ let thm1 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
 result <- prove z3 thm1;
 print result;
 
-print "Proving equivalence: add_standard == add_cryptol";
-let thm2 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
-result <- prove z3 thm2;
-print result;
+// print "Proving equivalence: xor_standard == xor_cryptol";
+// let thm2 = {{ \x -> \y -> rot_standard x y == rot_cryptol x y}};
+// result <- prove z3 thm2;
+// print result;
 
-print "Proving equivalence: add_standard == add_cryptol";
-let thm3 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
-result <- prove z3 thm3;
-print result;
+// print "Proving equivalence: xor_standard == xor_cryptol";
+// let thm3 = {{ \x -> \y -> xor_standard x y == xor_cryptol x y}};
+// result <- prove z3 thm3;
+// print result;
 
-print "Proving equivalence: add_standard == add_cryptol";
-let thm4 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
-result <- prove z3 thm4;
-print result;
-
-print "Proving equivalence: add_standard == add_cryptol";
-let thm5 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
-result <- prove z3 thm5;
-print result;
-
-print "Proving equivalence: add_standard == add_cryptol";
-let thm6 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
-result <- prove z3 thm6;
-print result;
-
-print "Proving equivalence: add_standard == add_cryptol";
-let thm7 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
-result <- prove z3 thm7;
-print result;
-
-print "Proving equivalence: add_standard == add_cryptol";
-let thm8 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
-result <- prove z3 thm8;
-print result;
-
-print "Proving equivalence: add_standard == add_cryptol";
-let thm9 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
-result <- prove z3 thm9;
-print result;
-
-print "Proving equivalence: add_standard == add_cryptol";
-let thm10 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
-result <- prove z3 thm10;
-print result;
+print "Done.";
 
 // print "Proving equivalence: add_standard == add_cryptol";
 // let thm2 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
@@ -92,14 +52,37 @@ print result;
 // result <- prove z3 thm3;
 // print result;
 
-// print "Proving equivalence: xor_standard == xor_cryptol";
-// let thm2 = {{ \x -> \y -> rotation_standard x y == rotation_cryptol x y}};
-// result <- prove z3 thm2;
+// print "Proving equivalence: add_standard == add_cryptol";
+// let thm4 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
+// result <- prove z3 thm4;
 // print result;
 
-// print "Proving equivalence: xor_standard == xor_cryptol";
-// let thm3 = {{ \x -> \y -> xor_standard x y == xor_cryptol x y}};
-// result <- prove z3 thm3;
+// print "Proving equivalence: add_standard == add_cryptol";
+// let thm5 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
+// result <- prove z3 thm5;
 // print result;
 
-print "Done.";
+// print "Proving equivalence: add_standard == add_cryptol";
+// let thm6 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
+// result <- prove z3 thm6;
+// print result;
+
+// print "Proving equivalence: add_standard == add_cryptol";
+// let thm7 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
+// result <- prove z3 thm7;
+// print result;
+
+// print "Proving equivalence: add_standard == add_cryptol";
+// let thm8 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
+// result <- prove z3 thm8;
+// print result;
+
+// print "Proving equivalence: add_standard == add_cryptol";
+// let thm9 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
+// result <- prove z3 thm9;
+// print result;
+
+// print "Proving equivalence: add_standard == add_cryptol";
+// let thm10 = {{ \x -> \y -> add_standard x y == add_cryptol x y}};
+// result <- prove z3 thm10;
+// print result;
