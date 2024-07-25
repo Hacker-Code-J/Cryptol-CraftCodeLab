@@ -1,0 +1,2 @@
+foreign add : [32] -> [32] -> [32]
+add x y = x + y
