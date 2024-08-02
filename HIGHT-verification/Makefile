@@ -1,41 +1,86 @@
-# Compiler and flags
-CC = clang
-CFLAGS = -Iinclude -emit-llvm -c
+CC=clang
+CFLAGS=-Wall -std=c99 -g -O2 -I./include
+LDFLAGS=
+OBJDIR=./obj
+BINDIR=./bin
+SRCDIR=./src
+TESTDIR=./tests
+INCDIR=./include
 
-# Source files and bitcode files
-SRC_DIR = src
-OBJ_DIR = build
-SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
-BC_FILES = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.bc, $(SRC_FILES))
+OBJS=$(OBJDIR)/hight_core.o $(OBJDIR)/hight_utils.o \
+	$(OBJDIR)/main.o
 
-# Output bitcode file
-OUT_BC = $(OBJ_DIR)/test_hight_combined.bc
+TARGET=$(BINDIR)/a.out
 
-# SAW script and Cryptol file
-SAW_SCRIPT = verify.saw
-CRYPTOL_FILE = cryptol/HIGHT.cry
+.PHONY: all clean dir rebuild
 
-# Default target
-all: verify
+all: dir $(TARGET)
 
-# Create the build directory if it doesn't exist
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+$(TARGET): $(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $^
 
-# Compile each .c file to .bc
-$(OBJ_DIR)/%.bc: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) $< -o $@
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
-# Link all .bc files into one combined .bc file
-$(OUT_BC): $(BC_FILES)
-	llvm-link $(BC_FILES) -o $(OUT_BC)
+-include $(OBJS:.o=.d)
 
-# Run SAW-script for verification
-verify: $(OUT_BC) $(SAW_SCRIPT) $(CRYPTOL_FILE)
-	saw $(SAW_SCRIPT)
-
-# Clean build files
 clean:
-	rm -rf $(OBJ_DIR)
+	rm -f $(OBJS) $(TARGET) $(OBJDIR)/*.d
+#	@echo "Removing AESAVS files ..."
+#	rm -rf $(KATFILES_TO_DELETE)
+#	@echo "AESAVS files removal completed  successfully."
 
-.PHONY: all verify clean
+dir:
+	@mkdir -p $(OBJDIR) $(BINDIR)
+
+rebuild: clean all
+
+run:
+	(cd bin && ./a.out)
+
+leak: 
+	(cd bin && valgrind --leak-check=full --show-leak-kinds=all ./a.out)
+
+# =======================================================================
+
+# # Compiler and flags
+# CC = clang
+# CFLAGS = -Iinclude -emit-llvm -c
+
+# # Source files and bitcode files
+# SRC_DIR = src
+# OBJ_DIR = build
+# SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
+# BC_FILES = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.bc, $(SRC_FILES))
+
+# # Output bitcode file
+# OUT_BC = $(OBJ_DIR)/test_hight_combined.bc
+
+# # SAW script and Cryptol file
+# SAW_SCRIPT = verify.saw
+# CRYPTOL_FILE = cryptol/HIGHT.cry
+
+# # Default target
+# all: verify
+
+# # Create the build directory if it doesn't exist
+# $(OBJ_DIR):
+# 	mkdir -p $(OBJ_DIR)
+
+# # Compile each .c file to .bc
+# $(OBJ_DIR)/%.bc: $(SRC_DIR)/%.c | $(OBJ_DIR)
+# 	$(CC) $(CFLAGS) $< -o $@
+
+# # Link all .bc files into one combined .bc file
+# $(OUT_BC): $(BC_FILES)
+# 	llvm-link $(BC_FILES) -o $(OUT_BC)
+
+# # Run SAW-script for verification
+# verify: $(OUT_BC) $(SAW_SCRIPT) $(CRYPTOL_FILE)
+# 	saw $(SAW_SCRIPT)
+
+# # Clean build files
+# clean:
+# 	rm -rf $(OBJ_DIR)
+
+# .PHONY: all verify clean
