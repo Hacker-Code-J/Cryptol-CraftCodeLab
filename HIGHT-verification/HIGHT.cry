@@ -1,0 +1,19 @@
+module HIGHT where
+
+type Key = [16][8]
+type Block = [8][8]
+
+// Example round function for HIGHT (simplified)
+roundFunction : {n} (fin n, n >= 1) => [8] -> [8] -> [8]
+roundFunction key block = [ block[i] ^ key[i % 8] | i <- [0..7] ]
+
+// Simplified encryption function
+encrypt : Key -> Block -> Block
+encrypt key block = [ roundFunction (key[i]) (block) | i <- [0..15] ]
+
+// Simplified decryption function
+decrypt : Key -> Block -> Block
+decrypt key block = [ roundFunction (key[15 - i]) (block) | i <- [0..15] ]
+
+property prop_decrypt_is_inverse : Key -> Block -> Bit
+prop_decrypt_is_inverse key block = decrypt key (encrypt key block) == block

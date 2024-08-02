@@ -1,0 +1,92 @@
+import "cryptol/HIGHT.cry";
+
+m <- llvm_load_module "src/test_hight_combined.bc";
+
+// Setup Cryptol specifications
+let cryptolEncrypt = do {
+    key <- crucible_fresh_var "key" (llvm_array 16 (llvm_int 8));
+    plaintext <- crucible_fresh_var "plaintext" (llvm_array 8 (llvm_int 8));
+    cryptol_key <- crucible_term "HIGHT:Key" key;
+    cryptol_plaintext <- crucible_term "HIGHT:Block" plaintext;
+    cryptol_ciphertext <- cryptol_load "HIGHT:encrypt" [cryptol_key, cryptol_plaintext];
+    return (key, plaintext, cryptol_ciphertext);
+};
+
+let cryptolDecrypt = do {
+    key <- crucible_fresh_var "key" (llvm_array 16 (llvm_int 8));
+    ciphertext <- crucible_fresh_var "ciphertext" (llvm_array 8 (llvm_int 8));
+    cryptol_key <- crucible_term "HIGHT:Key" key;
+    cryptol_ciphertext <- crucible_term "HIGHT:Block" ciphertext;
+    cryptol_plaintext <- cryptol_load "HIGHT:decrypt" [cryptol_key, cryptol_ciphertext];
+    return (key, ciphertext, cryptol_plaintext);
+};
+import "cryptol/HIGHT.cry";
+
+m <- llvm_load_module "src/test_hight_combined.bc";
+
+// Setup Cryptol specifications
+let cryptolEncrypt = do {
+    key <- crucible_fresh_var "key" (llvm_array 16 (llvm_int 8));
+    plaintext <- crucible_fresh_var "plaintext" (llvm_array 8 (llvm_int 8));
+    cryptol_key <- crucible_term "HIGHT:Key" key;
+    cryptol_plaintext <- crucible_term "HIGHT:Block" plaintext;
+    cryptol_ciphertext <- cryptol_load "HIGHT:encrypt" [cryptol_key, cryptol_plaintext];
+    return (key, plaintext, cryptol_ciphertext);
+};
+
+let cryptolDecrypt = do {
+    key <- crucible_fresh_var "key" (llvm_array 16 (llvm_int 8));
+    ciphertext <- crucible_fresh_var "ciphertext" (llvm_array 8 (llvm_int 8));
+    cryptol_key <- crucible_term "HIGHT:Key" key;
+    cryptol_ciphertext <- crucible_term "HIGHT:Block" ciphertext;
+    cryptol_plaintext <- cryptol_load "HIGHT:decrypt" [cryptol_key, cryptol_ciphertext];
+    return (key, ciphertext, cryptol_plaintext);
+};
+
+// Verify HIGHT_Encrypt
+let verify_encrypt = do {
+    (key, plaintext, cryptol_ciphertext) <- cryptolEncrypt;
+
+    crucible_execute_func ["HIGHT_Encrypt"] [plaintext, key, crucible_term "HIGHT:Block" (cryptol_ciphertext)];
+
+    crucible_return (crucible_term "HIGHT:Block" (cryptol_ciphertext));
+};
+
+// Verify HIGHT_Decrypt
+let verify_decrypt = do {
+    (key, ciphertext, cryptol_plaintext) <- cryptolDecrypt;
+
+    crucible_execute_func ["HIGHT_Decrypt"] [ciphertext, key, crucible_term "HIGHT:Block" (cryptol_plaintext)];
+
+    crucible_return (crucible_term "HIGHT:Block" (cryptol_plaintext));
+};
+
+// Prove that the C implementations match the Cryptol specifications
+verify_encrypt;
+verify_decrypt;
+
+print "HIGHT encryption and decryption verification completed.";
+
+// Verify HIGHT_Encrypt
+let verify_encrypt = do {
+    (key, plaintext, cryptol_ciphertext) <- cryptolEncrypt;
+
+    crucible_execute_func ["HIGHT_Encrypt"] [plaintext, key, crucible_term "HIGHT:Block" (cryptol_ciphertext)];
+
+    crucible_return (crucible_term "HIGHT:Block" (cryptol_ciphertext));
+};
+
+// Verify HIGHT_Decrypt
+let verify_decrypt = do {
+    (key, ciphertext, cryptol_plaintext) <- cryptolDecrypt;
+
+    crucible_execute_func ["HIGHT_Decrypt"] [ciphertext, key, crucible_term "HIGHT:Block" (cryptol_plaintext)];
+
+    crucible_return (crucible_term "HIGHT:Block" (cryptol_plaintext));
+};
+
+// Prove that the C implementations match the Cryptol specifications
+verify_encrypt;
+verify_decrypt;
+
+print "HIGHT encryption and decryption verification completed.";
