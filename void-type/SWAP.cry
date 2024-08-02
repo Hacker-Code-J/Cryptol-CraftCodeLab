@@ -1,0 +1,12 @@
+module Swap where
+
+// Swap function remains the same
+swap_list : {n} [n][32] -> [64] -> [64] -> [n][32]
+swap_list lst i j = update (update lst i jval) j ival
+    where ival = lst @ i
+          jval = lst @ j
+
+// Testing property remains unchanged
+swap_list_same : {n} (fin n) => [64] -> [n][32] -> Bit
+property swap_list_same i lst = (swap_list lst i i) == lst
+

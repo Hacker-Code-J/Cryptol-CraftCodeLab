@@ -1,0 +1,59 @@
+include "common/helpers.saw";
+import "SWAP.cry";
+swapmod <- llvm_load_module "swap.bc";
+
+let swap_diff_spec = do {
+    // NOTE: Could use ptr_to_fresh instead
+    x <- llvm_fresh_var "x" (llvm_int 32);
+    xp <- llvm_alloc (llvm_int 32);
+    llvm_points_to xp (llvm_term x);
+
+    y <- llvm_fresh_var "y" (llvm_int 32);
+    yp <- llvm_alloc (llvm_int 32);
+    llvm_points_to yp (llvm_term y);
+
+    llvm_execute_func [xp, yp];
+
+    llvm_points_to yp (llvm_term x);
+    llvm_points_to xp (llvm_term y);
+};
+
+// Verify swap
+swap_diff_ov <- llvm_verify swapmod "swap" [] true swap_diff_spec z3;
+
+let swap_same_spec = do {
+    (x, x_ptr) <- ptr_to_fresh "x" (llvm_int 32);
+
+    llvm_execute_func [x_ptr, x_ptr];
+
+    llvm_points_to x_ptr (llvm_term x);
+};
+
+swap_same_ov <- llvm_verify swapmod "swap" [] true swap_same_spec z3;
+
+// Verify xor_swap
+llvm_verify swapmod "xor_swap" [] true swap_diff_spec z3;
+
+// NOTE: The reason we created a swap_array function was to get "swap_list" in
+// our goal and reduce the number of ITEs, which in turn will help the solver
+let swap_array_spec len = do {
+    (a, a_ptr) <- ptr_to_fresh "a" (llvm_array len (llvm_int 32));
+
+    i <- llvm_fresh_var "i" (llvm_int 64);
+    j <- llvm_fresh_var "j" (llvm_int 64);
+
+    llvm_precond {{ i < `len }};
+    llvm_precond {{ j < `len }};
+
+    llvm_execute_func [ a_ptr, llvm_term i, llvm_term j ];
+
+    llvm_points_to a_ptr (llvm_term {{ swap_list a i j }});
+};
+
+let a_len = 4;
+
+swap_array_ov <- llvm_verify swapmod "swap_array"
+    [swap_diff_ov, swap_same_ov]
+    true
+    (swap_array_spec a_len)
+    (w4_unint_z3 []);

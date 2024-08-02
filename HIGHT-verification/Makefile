@@ -13,7 +13,7 @@ OUT_BC = $(OBJ_DIR)/test_hight_combined.bc
 
 # SAW script and Cryptol file
 SAW_SCRIPT = verify.saw
-CRYPTOL_FILE = HIGHT.cry
+CRYPTOL_FILE = cryptol/HIGHT.cry
 
 # Default target
 all: verify
