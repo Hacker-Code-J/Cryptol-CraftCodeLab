@@ -10,7 +10,7 @@ INCDIR=./include
 OBJS=$(OBJDIR)/hight_core.o $(OBJDIR)/hight_utils.o \
 	$(OBJDIR)/main.o
 
-TARGET=$(BINDIR)/a.out
+TARGET=$(BINDIR)/hight
 
 .PHONY: all clean dir rebuild
 
@@ -36,7 +36,7 @@ dir:
 rebuild: clean all
 
 run:
-	(cd bin && ./a.out)
+	(cd bin && ./hight)
 
 leak: 
 	(cd bin && valgrind --leak-check=full --show-leak-kinds=all ./a.out)
