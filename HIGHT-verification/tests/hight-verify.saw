@@ -1,0 +1,108 @@
+include "helpers.saw";
+import "HIGHT.cry";
+
+// Helper function to allocate fresh pointer
+// let ptr_to_fresh n ty = do {
+//     x <- crucible_fresh_var n ty;
+//     p <- alloc_init ty (crucible_term x);
+//     return (x, p);
+// };
+
+// Define the setup for encKeySchedule
+let encKeySchedule_setup : CrucibleSetup () = do {
+    (enc_WK, p_enc_WK) <- ptr_to_fresh "enc_WK" (llvm_array 8 (llvm_int 8));
+    (enc_SK, p_enc_SK) <- ptr_to_fresh "enc_SK" (llvm_array 128 (llvm_int 8));
+    (MK, p_MK) <- ptr_to_fresh_readonly "MK" (llvm_array 16 (llvm_int 8));
+
+    llvm_execute_func [p_enc_WK, p_enc_SK, p_MK];
+
+    let result = {{ encKeySchedule (enc_WK, enc_SK, MK) }};
+    llvm_points_to p_enc_WK (llvm_term {{ result.0 }});
+    llvm_points_to p_enc_SK (llvm_term {{ result.1 }});
+};
+
+// Main function to run the verification
+let main : TopLevel () = do {
+    m <- llvm_load_module "hight_core.bc";
+
+    // Verify encKeySchedule function
+    encKeySchedule_verify <- llvm_verify m "encKeySchedule" [] true encKeySchedule_setup z3;
+
+    // Print the verification result
+    print encKeySchedule_verify;
+};
+
+// Run the main function
+main;
+
+// include "helpers.saw";
+// import "HIGHT.cry";
+
+// let oneptr_update_func (type : LLVMType) (name : String) (f : Term) = do {
+//     (x, p) <- ptr_to_fresh name type;
+//     llvm_execute_func [p];
+//     llvm_points_to p (llvm_term {{ f x }});
+// };
+
+// let encKeySchedule_test = do {
+//     (enc_WK, p_enc_WK) <- ptr_to_fresh "enc_WK" (llvm_array 8 (llvm_int 8));
+//     (enc_SK, p_enc_SK) <- ptr_to_fresh "enc_SK" (llvm_array 128 (llvm_int 8));
+//     (mk, p_mk) <- ptr_to_fresh "MK" (llvm_array 16 (llvm_int 8));
+
+//     // llvm_execute_func [wk, sk, mk];
+ 
+// //   You can add additional assertions or points_to checks here
+//     // (wk, res_wk) <- ptr_to_fresh "enc_WK" [8][llvm_int 8];
+//     // (sk, res_sk) <- ptr_to_fresh "enc_SK" [128][llvm_int 8];
+//     // (mk, res_mk) <- ptr_to_fresh "MK" [16][llvm_int 8];
+    
+//     // llvm_execute_func (res_wk, res_sk, res_mk);
+
+//     llvm_store p_mk (llvm_term {{ MK }});
+//     llvm_call c_encKeySchedule [p_enc_WK, p_enc_SK, p_mk];
+//     enc_WK_res <- llvm_load p_enc_WK;
+//     enc_SK_res <- llvm_load p_enc_SK;
+//     // llvm_points_to p0 (llvm_term {{ zs@0 }});
+//     // llvm_points_to p1 (llvm_term {{ zs@1 }});
+//     // llvm_points_to p2 (llvm_term {{ zs@2 }});
+//     // llvm_points_to p3 (llvm_term {{ zs@3 }});
+// };
+
+// m      <- llvm_load_module "hight_core.bc";
+// eks    <- llvm_verify m "encKeySchedule" []      true encKeySchedule_test   z3;
+
+
+// // Define the Cryptol specification function
+// let cryptol_encKeySchedule (MK : [16][8]) : ([8][8], [128][8]) = {
+//     encKeySchedule (zero, zero, MK)
+// };
+
+// // Extract the C function
+// let c_encKeySchedule = llvm_extract_function cint "encKeySchedule";
+
+// // Define the SAW function that calls the C function
+// let call_c_encKeySchedule (MK : [16][8]) : ([8][8], [128][8]) = {
+//     enc_WK <- llvm_alloca "uint8_t[8]";
+//     enc_SK <- llvm_alloca "uint8_t[128]";
+//     llvm_call c_encKeySchedule (enc_WK, enc_SK, llvm_term MK);
+//     enc_WK_res <- llvm_load enc_WK;
+//     enc_SK_res <- llvm_load enc_SK;
+//     (enc_WK_res, enc_SK_res)
+// };
+
+// // Verify equivalence
+// let main : TopLevel () = do {
+//     // Compare the results of the Cryptol and C implementations
+//     test_spec <- llvm_verify cint "encKeySchedule"
+//         [llvm_spec "|enc_WK|", llvm_spec "|enc_SK|", llvm_spec "|MK|"]
+//         (cryptol_encKeySchedule `equiv` call_c_encKeySchedule)
+//         do {
+//             alloc enc_WK;
+//             alloc enc_SK;
+//             alloc MK;
+//         };
+//     print test_spec;
+// };
+
+// // Run the main function
+// main;

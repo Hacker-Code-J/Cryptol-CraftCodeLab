@@ -1,0 +1,10 @@
+include "helpers.saw"
+
+// Handle u8 WK[8]
+let ptr_to_fresh_u8_array_8 n = ptr_to_fresh n (llvm_array 8 (llvm_int 8));
+
+// Handle u8 SK[128]
+let ptr_to_fresh_u8_array_128 n = ptr_to_fresh n (llvm_array 128 (llvm_int 8));
+
+// Handle u8 MK[16]
+let ptr_to_fresh_u8_array_16 n = ptr_to_fresh n (llvm_array 16 (llvm_int 8));

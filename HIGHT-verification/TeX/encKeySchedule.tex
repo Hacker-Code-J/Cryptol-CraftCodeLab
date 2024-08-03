@@ -1,0 +1,138 @@
+\documentclass{article}
+    \usepackage{amsmath}
+    \usepackage{listings}
+    \usepackage{color}
+    
+    \definecolor{commentcolor}{rgb}{0.0, 0.5, 0.0}
+    \definecolor{keywordcolor}{rgb}{0.0, 0.0, 0.5}
+    
+    \lstdefinestyle{customsaw}{
+      language=Python,
+      basicstyle=\ttfamily\small,
+      keywordstyle=\color{keywordcolor}\bfseries,
+      commentstyle=\color{commentcolor}\itshape,
+      stringstyle=\color{red},
+      showstringspaces=false,
+      columns=flexible,
+      breaklines=true,
+      breakatwhitespace=true,
+      tabsize=2,
+      frame=single,
+      captionpos=b,
+    }
+    
+    \title{Detailed Explanation of SAWScript for Verifying the \texttt{encKeySchedule} Function}
+    \author{}
+    \date{}
+    
+    \begin{document}
+    \maketitle
+    
+    \section*{Introduction}
+    This document provides a detailed explanation of the SAWScript used to verify the \texttt{encKeySchedule} function written in C against its Cryptol specification. Each line of the script is explained in great detail to ensure a thorough understanding of the verification process.
+    
+    \section*{SAWScript}
+    % \begin{lstlisting}[style=customsaw,caption={SAWScript for Verifying \texttt{encKeySchedule}}]
+    % include "common/helpers.saw";
+    % import "HIGHT.cry";
+    
+    % cryptol_load "HIGHT.cry";
+    
+    % // Helper function to allocate fresh pointer
+    % let ptr_to_fresh n ty = do {
+    %     x <- crucible_fresh_var n ty;
+    %     p <- alloc_init ty (crucible_term x);
+    %     return (x, p);
+    % };
+    
+    % // Define the setup for encKeySchedule
+    % let encKeySchedule_setup : CrucibleSetup () = do {
+    %     (enc_WK, p_enc_WK) <- ptr_to_fresh "enc_WK" (llvm_array 8 (llvm_int 8));
+    %     (enc_SK, p_enc_SK) <- ptr_to_fresh "enc_SK" (llvm_array 128 (llvm_int 8));
+    %     (MK, p_MK) <- ptr_to_fresh_readonly "MK" (llvm_array 16 (llvm_int 8));
+    
+    %     llvm_execute_func [p_enc_WK, p_enc_SK, p_MK];
+    
+    %     let result = {{ encKeySchedule (enc_WK, enc_SK, MK) }};
+    %     llvm_points_to p_enc_WK (llvm_term {{ result.0 }});
+    %     llvm_points_to p_enc_SK (llvm_term {{ result.1 }});
+    % };
+    
+    % // Main function to run the verification
+    % let main : TopLevel () = do {
+    %     m <- llvm_load_module "tests/hight.bc";
+    
+    %     // Verify encKeySchedule function
+    %     encKeySchedule_verify <- llvm_verify m "encKeySchedule" [] true encKeySchedule_setup z3;
+    
+    %     // Print the verification result
+    %     print encKeySchedule_verify;
+    % };
+    
+    % // Run the main function
+    % main;
+    % % \end{lstlisting}
+    
+    \section*{Explanation}
+    
+    \paragraph{Line 1:} 
+    % \texttt{include "common/helpers.saw";} \\
+    This line includes the common helper functions defined in the \texttt{helpers.saw} file. These helper functions provide basic functionalities such as memory allocation and initialization, which are reused across different SAWScript files.
+    
+    \paragraph{Line 2:} 
+    % \texttt{import "HIGHT.cry";} \\
+    This line imports the Cryptol specification for the \texttt{encKeySchedule} function from the \texttt{HIGHT.cry} file. The imported module contains the Cryptol definition of the function that will be used for verification.
+    
+    \paragraph{Line 4:} 
+    % \texttt{cryptol_load "HIGHT.cry";} \\
+    This command loads the Cryptol module \texttt{HIGHT.cry} into the SAW environment, making its functions and definitions available for use in the script.
+    
+    \paragraph{Lines 6-10:} 
+    % \texttt{let ptr_to_fresh n ty = do \{ ... \};} \\
+    This block defines a helper function \texttt{ptr\_to\_fresh}, which allocates a fresh variable \texttt{x} of type \texttt{ty} with a given name \texttt{n}, initializes a pointer \texttt{p} to this variable, and returns a tuple containing \texttt{x} and \texttt{p}.
+    
+    \paragraph{Line 12:} 
+    % \texttt{let encKeySchedule_setup : CrucibleSetup () = do \{ ... \};} \\
+    This line begins the definition of the \texttt{encKeySchedule\_setup} function, which sets up the verification environment for the \texttt{encKeySchedule} function.
+    
+    \paragraph{Lines 13-15:} 
+    % \texttt{(enc\_WK, p\_enc\_WK) <- ptr\_to\_fresh "enc\_WK" (llvm\_array 8 (llvm\_int 8));} \\
+    % \texttt{(enc\_SK, p\_enc\_SK) <- ptr\_to\_fresh "enc\_SK" (llvm\_array 128 (llvm\_int 8));} \\
+    % \texttt{(MK, p\_MK) <- ptr\_to\_fresh\_readonly "MK" (llvm\_array 16 (llvm\_int 8));} \\
+    These lines allocate fresh variables and pointers for the arrays \texttt{enc\_WK}, \texttt{enc\_SK}, and \texttt{MK}. The \texttt{ptr\_to\_fresh} function is used for writable arrays, while \texttt{ptr\_to\_fresh\_readonly} is used for the read-only master key array.
+    
+    \paragraph{Line 17:} 
+    % \texttt{llvm\_execute\_func [p\_enc\_WK, p\_enc\_SK, p\_MK];} \\
+    This command executes the \texttt{encKeySchedule} function with the allocated pointers as arguments. The function operates on the memory locations pointed to by these pointers.
+    
+    \paragraph{Line 19:} 
+    % \texttt{let result = \{\{ encKeySchedule (enc\_WK, enc\_SK, MK) \}\};} \\
+    This line evaluates the Cryptol specification of \texttt{encKeySchedule} with the allocated arrays \texttt{enc\_WK}, \texttt{enc\_SK}, and \texttt{MK}, and stores the result.
+    
+    \paragraph{Lines 20-21:} 
+    % \texttt{llvm\_points\_to p\_enc\_WK (llvm\_term \{\{ result.0 \}\});} \\
+    % \texttt{llvm\_points\_to p\_enc\_SK (llvm\_term \{\{ result.1 \}\});} \\
+    These lines assert that the memory locations pointed to by \texttt{p\_enc\_WK} and \texttt{p\_enc\_SK} should contain the values produced by the Cryptol specification of \texttt{encKeySchedule}.
+    
+    \paragraph{Line 24:} 
+    % \texttt{let main : TopLevel () = do \{ ... \};} \\
+    This line begins the definition of the \texttt{main} function, which is the entry point for the SAWScript execution.
+    
+    \paragraph{Line 25:} 
+    % \texttt{m <- llvm\_load\_module "tests/hight.bc";} \\
+    This command loads the LLVM bitcode module for the C implementation of \texttt{encKeySchedule} from the file \texttt{tests/hight.bc}.
+    
+    \paragraph{Line 28:} 
+    % \texttt{encKeySchedule\_verify <- llvm\_verify m "encKeySchedule" [] true encKeySchedule\_setup z3;} \\
+    This line runs the verification of the \texttt{encKeySchedule} function. It compares the results of the C implementation with the Cryptol specification using the Z3 solver. The \texttt{encKeySchedule\_setup} function is used to set up the verification environment.
+    
+    \paragraph{Line 31:} 
+    % \texttt{print encKeySchedule\_verify;} \\
+    This command prints the result of the verification process.
+    
+    \paragraph{Line 34:} 
+    % \texttt{main;} \\
+    This line runs the \texttt{main} function, starting the verification process.
+    
+    \end{document}
+    

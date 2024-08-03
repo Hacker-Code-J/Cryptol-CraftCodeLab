@@ -79,6 +79,20 @@
   "files.associations": {
     "crucible.h": "c",
     "stdint.h": "c",
-    "hight.h": "c"
+    "hight.h": "c",
+    "salsa20.h": "c"
+  },
+  "files.exclude": {
+    "**/*.vo": true,
+    "**/*.vok": true,
+    "**/*.vos": true,
+    "**/*.aux": true,
+    "**/*.glob": true,
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true
   }
 }

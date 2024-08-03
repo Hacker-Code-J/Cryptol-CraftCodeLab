@@ -2,14 +2,12 @@
 
 /* Generate Encryption Key and Encryption Function */
 
-void encKeySchedule(u8 enc_WK[8], u8 enc_SK[128], const u8 MK[16]) {
+void encKeySchedule(u8 enc_WK[8], 
+                    u8 enc_SK[128],
+                    const u8 MK[16]) {
     i32 i, j;
     
     // Generate whitening keys
-    // u8 enc_WK[8] = {
-    //     MK[12], MK[13], MK[14], MK[15],
-    //     MK[ 0], MK[ 1], MK[ 2], MK[ 3]
-    // };
     enc_WK[0] = MK[12];
     enc_WK[1] = MK[13];
     enc_WK[2] = MK[14];
@@ -29,26 +27,10 @@ void encKeySchedule(u8 enc_WK[8], u8 enc_SK[128], const u8 MK[16]) {
 }
 
 void HIGHT_Encrypt(u8 dst[8], const u8 src[8], const u8 MK[16]) {
-    u8 WK[8] = {
-        MK[12], MK[13], MK[14], MK[15],
-        MK[ 0], MK[ 1], MK[ 2], MK[ 3]
-    };
-    u8 SK[128];
-    // WK[0] = MK[12];
-    // WK[1] = MK[13];
-    // WK[2] = MK[14];
-    // WK[3] = MK[15];
-    // WK[4] = MK[0];
-    // WK[5] = MK[1];
-    // WK[6] = MK[2];
-    // WK[7] = MK[3];
 
-    for (u8 i = 0; i < 8; i++) {
-        for (u8 j = 0; j < 8; j++)
-            SK[16 * i + j + 0] = MK[((j - i) & 7) + 0] + delta_table[16 * i + j + 0];
-        for (u8 j = 0; j < 8; j++)
-            SK[16 * i + j + 8] = MK[((j - i) & 7) + 8] + delta_table[16 * i + j + 8];
-    }
+    u8 WK[8];
+    u8 SK[128];
+    encKeySchedule(WK, SK, MK);
 
     u8 state[8];
     memcpy(state, src, 8);
@@ -57,19 +39,8 @@ void HIGHT_Encrypt(u8 dst[8], const u8 src[8], const u8 MK[16]) {
     state[2] ^= WK[1];
     state[4] += WK[2];
     state[6] ^= WK[3];
-    // printf("Initial  = ");
-    // for(int i = 7; i >= 0; i--) {
-    //     printf("%02x", state[i]);
-    // } puts("");
     
-    // Assume F0 and F1 are already optimized and inlined
     for (u8 i = 0; i < 31; i++) {
-        // if (i) {
-        // printf("Round %02d = ", i);  
-        //     for(int i = 7; i >= 0; i--) {
-        //         printf("%02x", state[i]);
-        //     } puts("");
-        // }
         u8 t0 = state[7], t1 = state[6];
         state[7] = state[6];
         state[6] = state[5] + (F1(state[4]) ^ SK[i * 4 + 2]);
@@ -80,31 +51,16 @@ void HIGHT_Encrypt(u8 dst[8], const u8 src[8], const u8 MK[16]) {
         state[1] = state[0];
         state[0] = t0       ^ (F0(t1      ) + SK[i * 4 + 3]);
     }
-   
-    // printf("Round 31 = ");  
-    // for(int i = 7; i >= 0; i--) {
-    //     printf("%02x", state[i]);
-    // } puts("");
 
     state[1] += (F1(state[0]) ^ SK[124]);
     state[3] ^= (F0(state[2]) + SK[125]);
     state[5] += (F1(state[4]) ^ SK[126]);
     state[7] ^= (F0(state[6]) + SK[127]);
 
-    // printf("Round 32 = ");  
-    // for(int i = 7; i >= 0; i--) {
-    //     printf("%02x", state[i]);
-    // } puts("");
-
     state[0] += WK[4];
     state[2] ^= WK[5];
     state[4] += WK[6];
     state[6] ^= WK[7];
-    
-    // printf("CT = ");  
-    // for(int i = 7; i >= 0; i--) {
-    //     printf("%02x", state[i]);
-    // } puts("");
 
     memcpy(dst, state, 8);
 }

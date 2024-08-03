@@ -22,7 +22,9 @@ static const u8 delta_table[128] = {
     0x74U, 0x3aU, 0x5dU, 0x2eU, 0x57U, 0x6bU, 0x35U, 0x5aU  // 120 ~ 127
 };
 
-void encKeySchedule(u8 enc_WK[8], u8 enc_SK[128], const u8 MK[16]);
+void encKeySchedule(u8 enc_WK[8], 
+                    u8 enc_SK[128],
+                    const u8 MK[16]);
 void decKeySchedule(u8 dec_WK[8], u8 dec_SK[128], const u8 MK[16]);
 
 // static inline u8 ROTL(u8 byte, u8 shift) {

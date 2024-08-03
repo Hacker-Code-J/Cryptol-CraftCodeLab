@@ -1,3 +1,100 @@
+\section*{SAWScript Helper Functions}
+
+\subsection*{1. \texttt{alloc\_init}}
+
+Given a type \( ty \) and a value \( v \) of type \( ty \), the function \texttt{alloc\_init} allocates memory to store \( v \) and returns a pointer \( p \) to this memory.
+
+\[
+\text{alloc\_init}(ty, v) = \left\{
+\begin{aligned}
+	& p \leftarrow \text{crucible\_alloc}(ty); \\
+	& \text{crucible\_points\_to}(p, v); \\
+	& \text{return } p;
+\end{aligned}
+\right.
+\]
+
+\subsection*{2. \texttt{alloc\_init\_readonly}}
+
+Given a type \( ty \) and a value \( v \) of type \( ty \), the function \texttt{alloc\_init\_readonly} allocates read-only memory to store \( v \) and returns a pointer \( p \) to this memory.
+
+\[
+\text{alloc\_init\_readonly}(ty, v) = \left\{
+\begin{aligned}
+	& p \leftarrow \text{crucible\_alloc\_readonly}(ty); \\
+	& \text{crucible\_points\_to}(p, v); \\
+	& \text{return } p;
+\end{aligned}
+\right.
+\]
+
+\subsection*{3. \texttt{ptr\_to\_fresh}}
+
+Given a name \( n \) and a type \( ty \), the function \texttt{ptr\_to\_fresh} allocates a fresh variable \( x \) of type \( ty \) and returns a tuple \( (x, p) \) where \( p \) is a pointer to \( x \).
+
+\[
+\text{ptr\_to\_fresh}(n, ty) = \left\{
+\begin{aligned}
+	& x \leftarrow \text{crucible\_fresh\_var}(n, ty); \\
+	& p \leftarrow \text{alloc\_init}(ty, \text{crucible\_term}(x)); \\
+	& \text{return } (x, p);
+\end{aligned}
+\right.
+\]
+
+\subsection*{4. \texttt{ptr\_to\_fresh\_readonly}}
+
+Given a name \( n \) and a type \( ty \), the function \texttt{ptr\_to\_fresh\_readonly} allocates a fresh variable \( x \) of type \( ty \) and returns a tuple \( (x, p) \) where \( p \) is a read-only pointer to \( x \).
+
+\[
+\text{ptr\_to\_fresh\_readonly}(n, ty) = \left\{
+\begin{aligned}
+	& x \leftarrow \text{crucible\_fresh\_var}(n, ty); \\
+	& p \leftarrow \text{alloc\_init\_readonly}(ty, \text{crucible\_term}(x)); \\
+	& \text{return } (x, p);
+\end{aligned}
+\right.
+\]
+
+\subsection*{5. \texttt{global\_points\_to}}
+
+Given a name \( n \) and a value \( v \), the function \texttt{global\_points\_to} asserts that the global variable \( n \) has a value of \( v \).
+
+\[
+\text{global\_points\_to}(n, v) = \left\{
+\begin{aligned}
+	& \text{crucible\_points\_to}(\text{crucible\_global}(n), \text{crucible\_term}(v));
+\end{aligned}
+\right.
+\]
+
+\subsection*{6. \texttt{global\_alloc\_init}}
+
+Given a name \( n \) and a value \( v \), the function \texttt{global\_alloc\_init} declares that \( n \) is initialized and asserts that it has the value \( v \).
+
+\[
+\text{global\_alloc\_init}(n, v) = \left\{
+\begin{aligned}
+	& \text{crucible\_alloc\_global}(n); \\
+	& \text{global\_points\_to}(n, v);
+\end{aligned}
+\right.
+\]
+
+\section*{LLVM Integer Type Aliases}
+
+\[
+\begin{aligned}
+	& i8 &= \text{llvm\_int}(8); \\
+	& i16 &= \text{llvm\_int}(16); \\
+	& i32 &= \text{llvm\_int}(32); \\
+	& i64 &= \text{llvm\_int}(64); \\
+	& i128 &= \text{llvm\_int}(128); \\
+	& i384 &= \text{llvm\_int}(384); \\
+	& i512 &= \text{llvm\_int}(512);
+\end{aligned}
+\]
+
 \section{Key Schedule}
 \subsection{Whitening-Key}
 \subsection{LFSR(Left Feedback Shift Register)}

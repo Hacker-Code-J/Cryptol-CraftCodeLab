@@ -30,18 +30,6 @@ int main(void) {
     HIGHT_Encrypt(CT, PT, MK);
     HIGHT_Decrypt(myPT, CT, MK);
 
-    // u64 enc_cycles, dec_cycles;
-    // for (u32 i = 0; i < 12000; i++) {
-    //     assign_rand(MK, 16);
-    //     assign_rand(PT, 8);
-    //     enc_cycles = measure_cycles(HIGHT_Encrypt, CT, PT, MK);
-    //     dec_cycles = measure_cycles(HIGHT_Decrypt, myPT, PT, MK);
-    //     if (i >= 1000 && i < 11000) {
-    //         printf("%" PRIu64 "\n", enc_cycles);
-    //         printf("%" PRIu64 "\n", dec_cycles);
-    //         // printf("%llu\n", (long long)cycles / (long long)SIZE);
-    //     }
-    // }
     for (int i = 7; i >= 0; i--) {
         printf("%02x:", PT[i]);
     } puts("");
@@ -51,66 +39,6 @@ int main(void) {
     for (int i = 7; i >= 0; i--) {
         printf("%02x:", myPT[i]);
     } puts("");
-
-    // measure_cpu_time(HIGHT_Encrypt, CT, PT, MK);
-    // measure_cpu_time(HIGHT_Decrypt, CT, PT, MK);
-
-    // measure_memory_usage(HIGHT_Encrypt, CT, PT, MK);
-    // measure_memory_usage(HIGHT_Decrypt, CT, PT, MK);
-    // measure_total_memory_usage(HIGHT_Decrypt, CT, PT, MK);
 #endif
-#if 0
-    printf("KEY = ");
-    for (int i = 15; i >= 0; i--) {
-        printf("%02x", MK[i]);
-    } puts("");
-    printf("PT = ");
-    for (int i = 7; i >= 0; i--) {
-        printf("%02x", PT[i]);
-    } puts("");
-
-    HIGHT_Encrypt(CT, PT, MK);
-
-    printf("myCT | ");
-    for (int i = 7; i >= 0; i--) {
-        printf("%02x:", CT[i]);
-    }
-    printf("\n");
-
-    HIGHT_Decrypt(myPT, CT, MK);
-
-    printf("myPT | ");
-    for (int i = 7; i >= 0; i--) {
-        printf("%02x:", myPT[i]);
-    }
-    printf("\n");
-
-    puts("");
-    // printf("ENC: %lu cycles\n", measure_encryption_cycle(HIGHT_Encrypt, CT, PT, MK));
-    // printf("ENC: %.3f µs\n", measure_encryption_time(HIGHT_Encrypt, CT, PT, MK)*1000000);
-    // printf("Dec: %lu cycles\n", measure_encryption_cycle(HIGHT_Decrypt, myPT, CT, MK));
-    // printf("Dec: %.3f µs\n", measure_encryption_time(HIGHT_Decrypt, myPT, CT, MK)*1000000);
-#endif
-    // for (i32 i = 0; i < 10000; i++) {
-    //     printf("%ld\n", measure_encryption_cycle(HIGHT_Encrypt, CT, PT, MK));
-    //     printf("%ld\n", measure_encryption_cycle(HIGHT_Decrypt, myPT, CT, MK));
-    // }
-
-    // for (int i = 0; i < 8; i++) {
-    //     for (int j = 0; j < 8; j++)
-    //         printf("SK[%03d] = MK[%02d] + delta[%03d]\n", 16 * i + j + 0, ((j - i) & 7) + 0, 16 * i + j + 0);
-    //     for (int j = 0; j < 8; j++)
-    //         printf("SK[%03d] = MK[%02d] + delta[%03d]\n", 16 * i + j + 8, ((j - i) & 7) + 8, 16 * i + j + 8);
-    // }
-
-    // puts("");
-
-    // for (int i = 7; i >= 0; i--) {
-    //     for (int j = 7; j >= 0; j--)
-    //         printf("SK[%d] = MK[%d] + delta[%d]\n", 127 - (16 * i + j + 8), ((j - i) & 7) + 8, 16 * i + j + 8);
-    //     for (int j = 7; j >= 0; j--)
-    //         printf("SK[%d] = MK[%d] + delta[%d]\n", 127 - (16 * i + j + 0), ((j - i) & 7) + 0, 16 * i + j + 0);
-    // }
-
     return 0;
 }
