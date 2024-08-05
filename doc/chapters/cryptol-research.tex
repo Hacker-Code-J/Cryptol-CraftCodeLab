@@ -1,0 +1,61 @@
+In Cryptol `\texttt{foldl}`  is a higher-order function that reduces a sequence (or list) to a single value by iteratively applying a binary function, starting from the left side of the sequence. It is similar to the fold operation found in many functional programming languages.
+
+To understand `\texttt{foldl}`, lets break it down mathematically. Given: \begin{itemize}
+	\item A binary operation `\texttt{f}' of type `\texttt{(b, a) -> b}'
+	\item An initial value `\texttt{z}' of type `\texttt{b}'
+	\item A sequence `\texttt{xs}' of type `\texttt{[n]a}' (a sequence of `\texttt{n}' elements, each of type `\texttt{a}')
+\end{itemize}
+The `\texttt{foldl}' function can be defined as: \[
+foldl\ f\ z\ [x_0,x_1,\dots,x_{n-1}]
+\]
+
+This can be described recursively as:
+\begin{enumerate}
+	\item If the sequence is empty, the result is the initial value `\texttt{z}'.
+	\item Otherwise, apply the function `\texttt{f}' to the initial value `\texttt{z}' and the first element of the sequence `\texttt{x\_0}', then recursively apply `\texttt{foldl}' to the result of this function application and the rest of the sequence.
+\end{enumerate}
+Mathematically, this is: \begin{align*}
+	&foldl\ f\ z\ []\ = z \\
+	&foldl\ f\ z\ (x:xs)\ = foldl\ f\ (f\ z\ x)\ xs \\
+\end{align*}
+
+\textbf{Example}
+Let's take a concrete example to illustrate foldl. Suppose we want to compute the sum of a list of numbers using foldl.
+
+Let:
+\begin{itemize}
+	\item $f(a, b) = a + b$ (binary addition function)
+	\item $z = 0$ (initial value)
+	\item $xs = [1, 2, 3, 4]$ (sequence of numbers)
+\end{itemize}
+Using foldl to compute the sum:
+\[
+foldl (+) 0 [1,2,3,4]
+\]
+Step-by-step:
+\begin{enumerate}
+	\item Start with initial value $z = 0$.
+	\item Apply the function to the initial value and the first element:
+	$f(0,1)=0+1=1$
+	\item Apply foldl to the result and the rest of the sequence:
+	$foldl (+) 1 [2,3,4]$
+	\item Repeat:
+	$f(1,2)=1+2=3$,
+	$foldl (+) 3 [3,4]$
+	\item Continue:
+	$f(3,3)=3+3=6$,
+	$foldl (+) 6 [4]$
+	\item Finally:
+	$f(6,4)=6+4=10$,
+	$foldl (+) 10 [ ]$
+\end{enumerate}
+Since the sequence is now empty, the result is 10.
+
+\textbf{Summary}
+\begin{itemize}
+	\item `\texttt{foldl}' starts with an initial value and iterates through the sequence from left to right.
+	\item It applies a binary function to the current accumulated value and the current element of the sequence.
+	\item The result of this function application becomes the new accumulated value.
+	\item The process repeats until the sequence is exhausted, at which point the accumulated value is returned as the result.
+\end{itemize}
+Understanding foldl helps in performing various reduction operations over sequences in a concise and functional manner in Cryptol.

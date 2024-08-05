@@ -19,18 +19,39 @@ void encKeySchedule(u8 enc_WK[8],
 
     // Generate subkeys
     for (i = 0; i < 8; i++) {
-        for (j = 0; j < 8; j++)
+        for (j = 0; j < 8; j++) {
             enc_SK[16 * i + j + 0] = MK[((j - i) & 7) + 0] + delta_table[16 * i + j + 0];
-        for (j = 0; j < 8; j++)
+            printf("SK[%d] = MK[%d] + delta_table[%d]\n", 16 * i + j + 0, ((j - i) & 7) + 0, 16 * i + j + 0);
+        }
+        for (j = 0; j < 8; j++) {
             enc_SK[16 * i + j + 8] = MK[((j - i) & 7) + 8] + delta_table[16 * i + j + 8];
+            printf("SK[%d] = MK[%d] + delta_table[%d]\n", 16 * i + j + 8, ((j - i) & 7) + 8, 16 * i + j + 8);
+        }
+        puts("");
     }
 }
 
 void HIGHT_Encrypt(u8 dst[8], const u8 src[8], const u8 MK[16]) {
 
+
+    printf("MK | ");
+    for (int i = 0; i < 16; i++) {
+        printf("%02x:", MK[i]);
+    } puts("");
+
     u8 WK[8];
     u8 SK[128];
     encKeySchedule(WK, SK, MK);
+
+    // printf("WK | ");
+    // for (int i = 0; i < 8; i++) {
+    //     printf("%02x:", WK[i]);
+    // } puts("");
+    printf("SK | ");
+    for (int i = 0; i < 128; i++) {
+        if (i % 8 == 0) puts("");
+        printf("%02x:", SK[i]);
+    } puts("");
 
     u8 state[8];
     memcpy(state, src, 8);
@@ -40,7 +61,7 @@ void HIGHT_Encrypt(u8 dst[8], const u8 src[8], const u8 MK[16]) {
     state[4] += WK[2];
     state[6] ^= WK[3];
     
-    for (u8 i = 0; i < 31; i++) {
+    for (u8 i = 0; i < 1; i++) {
         u8 t0 = state[7], t1 = state[6];
         state[7] = state[6];
         state[6] = state[5] + (F1(state[4]) ^ SK[i * 4 + 2]);
@@ -52,15 +73,15 @@ void HIGHT_Encrypt(u8 dst[8], const u8 src[8], const u8 MK[16]) {
         state[0] = t0       ^ (F0(t1      ) + SK[i * 4 + 3]);
     }
 
-    state[1] += (F1(state[0]) ^ SK[124]);
-    state[3] ^= (F0(state[2]) + SK[125]);
-    state[5] += (F1(state[4]) ^ SK[126]);
-    state[7] ^= (F0(state[6]) + SK[127]);
+    // state[1] += (F1(state[0]) ^ SK[124]);
+    // state[3] ^= (F0(state[2]) + SK[125]);
+    // state[5] += (F1(state[4]) ^ SK[126]);
+    // state[7] ^= (F0(state[6]) + SK[127]);
 
-    state[0] += WK[4];
-    state[2] ^= WK[5];
-    state[4] += WK[6];
-    state[6] ^= WK[7];
+    // state[0] += WK[4];
+    // state[2] ^= WK[5];
+    // state[4] += WK[6];
+    // state[6] ^= WK[7];
 
     memcpy(dst, state, 8);
 }

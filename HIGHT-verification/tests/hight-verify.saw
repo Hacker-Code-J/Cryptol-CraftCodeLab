@@ -21,6 +21,18 @@ let encKeySchedule_setup : CrucibleSetup () = do {
     llvm_points_to p_enc_SK (llvm_term {{ result.1 }});
 };
 
+// Define the setup for HIGHT_Encrypt
+let HIGHT_Encrypt_setup : CrucibleSetup () = do {
+    (dst, p_dst) <- ptr_to_fresh "dst" (llvm_array 8 (llvm_int 8));
+    (src, p_src) <- ptr_to_fresh_readonly "src" (llvm_array 8 (llvm_int 8));
+    (MK, p_MK) <- ptr_to_fresh_readonly "MK" (llvm_array 16 (llvm_int 8));
+
+    llvm_execute_func [p_dst, p_src, p_MK];
+
+    let result = {{ HIGHT_Encrypt (dst, src, MK) }};
+    llvm_points_to p_dst (llvm_term result);
+};
+
 // Main function to run the verification
 let main : TopLevel () = do {
     m <- llvm_load_module "hight_core.bc";
@@ -30,6 +42,12 @@ let main : TopLevel () = do {
 
     // Print the verification result
     print encKeySchedule_verify;
+
+    // Verify HIGHT_Encrypt function
+    HIGHT_Encrypt_verify <- llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
+
+    // Print the verification result
+    print HIGHT_Encrypt_verify;
 };
 
 // Run the main function

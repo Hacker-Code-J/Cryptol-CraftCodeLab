@@ -9,7 +9,7 @@ void viewKeySchedule(u8* SK) {
 }
 
 int main(void) {
-#if 1
+
     // const char* keyString = "00112233445566778899aabbccddeeff"; // Test Vector 1
     // const char* keyString = "ffeeddccbbaa99887766554433221100"; // Test Vector 2
     // const char* keyString = "000102030405060708090a0b0c0d0e0f"; // Test Vector 3
@@ -29,14 +29,31 @@ int main(void) {
     u8 myPT[8] = { 0x00, };
     HIGHT_Encrypt(CT, PT, MK);
     HIGHT_Decrypt(myPT, CT, MK);
-
+#if 0
+    printf("PT | ");
     for (int i = 7; i >= 0; i--) {
         printf("%02x:", PT[i]);
     } puts("");
+    printf("CT | ");
     for (int i = 7; i >= 0; i--) {
         printf("%02x:", CT[i]);
     } puts("");
+    printf("DT | ");
     for (int i = 7; i >= 0; i--) {
+        printf("%02x:", myPT[i]);
+    } puts("");
+#endif
+#if 1
+    printf("PT | ");
+    for (int i = 0; i < 8; i++) {
+        printf("%02x:", PT[i]);
+    } puts("");
+    printf("CT | ");
+    for (int i = 0; i < 8; i++) {
+        printf("%02x:", CT[i]);
+    } puts("");
+    printf("DT | ");
+    for (int i = 0; i < 8; i++) {
         printf("%02x:", myPT[i]);
     } puts("");
 #endif
