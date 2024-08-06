@@ -53,12 +53,15 @@ combineBlocks (a, b) = a # b
 rotateLeft8 : [8][8] -> [8][8]
 rotateLeft8 block = drop`{1} block # take`{1} block
 
+rotateRight8 : [8][8] -> [8][8]
+rotateRight8 block = drop`{7} block # take`{7} block
+
 updateMK : [16][8] -> [16][8]
 updateMK mk = rotatedMK
     where
     (firstHalf, secondHalf) = splitAt`{8} mk
-    rotatedFirstHalf = rotateLeft8 firstHalf
-    rotatedSecondHalf = rotateLeft8 secondHalf
+    rotatedFirstHalf = rotateRight8 firstHalf
+    rotatedSecondHalf = rotateRight8 secondHalf
     rotatedMK = rotatedFirstHalf # rotatedSecondHalf
 
 // Define the encKeySchedule function
@@ -70,48 +73,33 @@ encKeySchedule (enc_WK, enc_SK, MK) = (enc_WK', enc_SK')
       MK@12, MK@13, MK@14, MK@15,
       MK@0, MK@1, MK@2, MK@3
     ]
-    
-    MK_1 = updateMK MK
 
-    enc_SK' = join [
-      [MK @ ((j - i) % 8 + 0) + delta_table @ (16 * i + j + 0) | j <- [0..7]] #
-      [MK @ ((j - i) % 8 + 8) + delta_table @ (16 * i + j + 8) | j <- [0..7]]
-      | i <- [0..7]
-    ]
-    // [ subkey i | i <- [0..127] ]
-//   where
-//     subkey i = 
-//       if i < 16
-//       then MK @ i + delta_table @ i
-//       else if i < 32
-//       then MK @ ((i - 16 + 7) % 16) + delta_table @ i
-//       else if i < 48
-//       then MK @ ((i - 32 + 6) % 16) + delta_table @ i
-//       else if i < 64
-//       then MK @ ((i - 48 + 5) % 16) + delta_table @ i
-//       else if i < 80
-//       then MK @ ((i - 64 + 4) % 16) + delta_table @ i
-//       else if i < 96
-//       then MK @ ((i - 80 + 3) % 16) + delta_table @ i
-//       else if i < 112
-//       then MK @ ((i - 96 + 2) % 16) + delta_table @ i
-//       else
-//         MK @ ((i - 112 + 1) % 16) + delta_table @ i
-
-    // subkey i j = if j < 8
-    //              then MK @ (((j - i) && 7) + 0) + delta_table @ (16 * i + j)
-    //              else MK @ (((j - i) && 7) + 8) + delta_table @ (16 * i + j)
-    
-    // enc_SK' = [ subkey i j
-    //          | i <- [0..7]
-    //          , j <- [0..15]
-    //          ]
-    
-    // enc_SK' = join [
-    //   [MK @ (((j - i) && 7) + 0) + delta_table @ (16 * i + j + 0) | j <- [0..7]] #
-    //   [MK @ (((j - i) && 7) + 8) + delta_table @ (16 * i + j + 8) | j <- [0..7]]
-    //   | i <- [0..7]
-    // ]
+    enc_SK' = [ subkey i | i <- [0..127] ]
+  where
+    subkey i = 
+      if i < 16
+      then MK @ i + delta_table @ i
+      else if i < 32
+      then (updateMK MK) @ (i - 16) 
+            + delta_table @ i
+      else if i < 48
+      then (updateMK (updateMK MK)) @ ((i - 32)) 
+            + delta_table @ i
+      else if i < 64
+      then (updateMK (updateMK (updateMK MK))) @ (i - 48)
+            + delta_table @ i
+      else if i < 80
+      then (updateMK (updateMK (updateMK (updateMK MK)))) @ (i - 64)
+            + delta_table @ i
+      else if i < 96
+      then (updateMK (updateMK (updateMK (updateMK (updateMK MK))))) @ (i - 80) 
+            + delta_table @ i
+      else if i < 112
+      then (updateMK (updateMK (updateMK (updateMK (updateMK (updateMK MK)))))) @ (i - 96) 
+            + delta_table @ i
+      else
+           (updateMK (updateMK (updateMK (updateMK (updateMK (updateMK (updateMK MK))))))) @ (i - 112) 
+            + delta_table @ i
 
 F0 : [8] -> [8]
 F0 byte = (byte <<< 1) ^ (byte <<< 2) ^ (byte <<< 7)

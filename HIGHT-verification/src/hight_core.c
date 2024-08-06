@@ -21,14 +21,14 @@ void encKeySchedule(u8 enc_WK[8],
     for (i = 0; i < 8; i++) {
         for (j = 0; j < 8; j++) {
             enc_SK[16 * i + j + 0] = MK[((j - i) & 7) + 0] + delta_table[16 * i + j + 0];
-            printf("SK[%d] = MK[%d] + delta_table[%d]\n", 16 * i + j + 0, ((j - i) & 7) + 0, 16 * i + j + 0);
+            // printf("SK[%d] = MK[%d] + delta_table[%d]\n", 16 * i + j + 0, ((j - i) & 7) + 0, 16 * i + j + 0);
         }
         for (j = 0; j < 8; j++) {
             enc_SK[16 * i + j + 8] = MK[((j - i) & 7) + 8] + delta_table[16 * i + j + 8];
-            printf("SK[%d] = MK[%d] + delta_table[%d]\n", 16 * i + j + 8, ((j - i) & 7) + 8, 16 * i + j + 8);
+            // printf("SK[%d] = MK[%d] + delta_table[%d]\n", 16 * i + j + 8, ((j - i) & 7) + 8, 16 * i + j + 8);
         }
-        puts("");
     }
+    printf("Key Scheduling ...\n");
 }
 
 void HIGHT_Encrypt(u8 dst[8], const u8 src[8], const u8 MK[16]) {
@@ -49,7 +49,7 @@ void HIGHT_Encrypt(u8 dst[8], const u8 src[8], const u8 MK[16]) {
     // } puts("");
     printf("SK | ");
     for (int i = 0; i < 128; i++) {
-        if (i % 8 == 0) puts("");
+        if (i % 11 == 0) puts("");
         printf("%02x:", SK[i]);
     } puts("");
 

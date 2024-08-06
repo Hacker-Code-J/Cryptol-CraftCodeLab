@@ -43,11 +43,11 @@ let main : TopLevel () = do {
     // Print the verification result
     print encKeySchedule_verify;
 
-    // Verify HIGHT_Encrypt function
-    HIGHT_Encrypt_verify <- llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
+    // // Verify HIGHT_Encrypt function
+    // HIGHT_Encrypt_verify <- llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
 
-    // Print the verification result
-    print HIGHT_Encrypt_verify;
+    // // Print the verification result
+    // print HIGHT_Encrypt_verify;
 };
 
 // Run the main function

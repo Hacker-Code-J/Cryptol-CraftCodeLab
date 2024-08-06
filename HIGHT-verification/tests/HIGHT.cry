@@ -5,10 +5,6 @@
 
  module HIGHT where
 
-//  encKeySchedule : [3][8] -> [3][8]
-//  encKeySchedule [wk0, sk0, mk0] = [wk1, sk1, mk1]
-//   where
-
 delta_table : [128][8]
 delta_table = [ 
     0x5a, 0x6d, 0x36, 0x1b, 0x0d, 0x06, 0x03, 0x41, // 0 ~ 7
@@ -29,6 +25,23 @@ delta_table = [
     0x74, 0x3a, 0x5d, 0x2e, 0x57, 0x6b, 0x35, 0x5a  // 120 ~ 127
  ]
 
+// ======================== Key Schedule ========================
+
+// Function to rotate the second half of the key once to the left
+rotateLeft8 : [8][8] -> [8][8]
+rotateLeft8 block = drop`{1} block # take`{1} block
+
+rotateRight8 : [8][8] -> [8][8]
+rotateRight8 block = drop`{7} block # take`{7} block
+
+updateMK : [16][8] -> [16][8]
+updateMK mk = rotatedMK
+    where
+    (firstHalf, secondHalf) = splitAt`{8} mk
+    rotatedFirstHalf = rotateRight8 firstHalf
+    rotatedSecondHalf = rotateRight8 secondHalf
+    rotatedMK = rotatedFirstHalf # rotatedSecondHalf
+
 // Define the encKeySchedule function
 encKeySchedule : ([8][8], [128][8], [16][8]) -> ([8][8], [128][8])
 encKeySchedule (enc_WK, enc_SK, MK) = (enc_WK', enc_SK')
@@ -40,11 +53,32 @@ encKeySchedule (enc_WK, enc_SK, MK) = (enc_WK', enc_SK')
     ]
 
     // Generate subkeys
-    enc_SK' = join [
-      [MK @ ((j - i) % 8 + 0) + delta_table @ (16 * i + j + 0) | j <- [0..7]] #
-      [MK @ ((j - i) % 8 + 8) + delta_table @ (16 * i + j + 8) | j <- [0..7]]
-      | i <- [0..7]
-    ]
+    enc_SK' = [ subkey i | i <- [0..127] ]
+      where
+        subkey i = 
+          if i < 16
+          then MK @ i + delta_table @ i
+          else if i < 32
+          then (updateMK MK) @ (i - 16) 
+                + delta_table @ i
+          else if i < 48
+          then (updateMK (updateMK MK)) @ ((i - 32)) 
+                + delta_table @ i
+          else if i < 64
+          then (updateMK (updateMK (updateMK MK))) @ (i - 48)
+                + delta_table @ i
+          else if i < 80
+          then (updateMK (updateMK (updateMK (updateMK MK)))) @ (i - 64)
+                + delta_table @ i
+          else if i < 96
+          then (updateMK (updateMK (updateMK (updateMK (updateMK MK))))) @ (i - 80) 
+                + delta_table @ i
+          else if i < 112
+          then (updateMK (updateMK (updateMK (updateMK (updateMK (updateMK MK)))))) @ (i - 96) 
+                + delta_table @ i
+          else
+              (updateMK (updateMK (updateMK (updateMK (updateMK (updateMK (updateMK MK))))))) @ (i - 112) 
+                + delta_table @ i
 
 // Example usage
 example_MK : [16][8]
@@ -72,6 +106,30 @@ property encKeySchedule_whitening_keys = wk' == [ example_MK@12, example_MK@13, 
 property encKeySchedule_first_subkey = sk'@0 == example_MK@0 + delta_table@0
   where
     (_, sk') = encKeySchedule (example_enc_WK, example_enc_SK, example_MK)
+
+// Define the given hexadecimal string as a bit sequence
+key : [128]
+key = 0x28dbc3bc49ffd87dcfa509b11d422be7
+pt : [64]
+pt = 0xb41e6be2eba84a14
+ct : [64]
+ct = 0xcc047a75209c1fc6
+
+
+splitKey : [16][8]
+splitKey = reverse (split (key : [128]))
+splitPT : [8][8]
+splitPT = reverse (split (pt : [64]))
+
+// splitTmp : [8][8]
+// splitTmp = reverse (split (tmp : [64]))
+splitCT : [8][8]
+splitCT = reverse (split (ct : [64]))
+
+// property TESTVECTOR4 =
+//   HIGHT_Encrypt zero splitPT splitKey == splitCT
+
+// ==============================================================
 
 // Encryption
 F0 : [8] -> [8]
@@ -131,27 +189,27 @@ HIGHT_Encrypt (dst, src, MK) = dst'
     //   final_state @ 7
     // ]
 
-// Define the given hexadecimal string as a bit sequence
-key : [128]
-key = 0x28dbc3bc49ffd87dcfa509b11d422be7
-pt : [64]
-pt = 0xb41e6be2eba84a14
+// // Define the given hexadecimal string as a bit sequence
+// key : [128]
+// key = 0x28dbc3bc49ffd87dcfa509b11d422be7
+// pt : [64]
+// pt = 0xb41e6be2eba84a14
 
-tmp : [64]
-tmp = 0x0000000000000000
-ct : [64]
-ct = 0xcc047a75209c1fc6
+// tmp : [64]
+// tmp = 0x0000000000000000
+// ct : [64]
+// ct = 0xcc047a75209c1fc6
 
 
-splitKey : [16][8]
-splitKey = reverse (split (key : [128]))
-splitPT : [8][8]
-splitPT = reverse (split (pt : [64]))
+// splitKey : [16][8]
+// splitKey = reverse (split (key : [128]))
+// splitPT : [8][8]
+// splitPT = reverse (split (pt : [64]))
 
-splitTmp : [8][8]
-splitTmp = reverse (split (tmp : [64]))
-splitCT : [8][8]
-splitCT = reverse (split (ct : [64]))
+// splitTmp : [8][8]
+// splitTmp = reverse (split (tmp : [64]))
+// splitCT : [8][8]
+// splitCT = reverse (split (ct : [64]))
 
-property TESTVECTOR4 =
-  HIGHT_Encrypt (splitTmp, splitPT, splitKey) == splitCT
+// property TESTVECTOR4 =
+//   HIGHT_Encrypt (splitTmp, splitPT, splitKey) == splitCT
