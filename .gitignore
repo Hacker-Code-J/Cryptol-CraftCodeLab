@@ -1,3 +1,5 @@
+*.bc
+
 # C
 # Prerequisites
 *.d

@@ -10,17 +10,17 @@ void viewKeySchedule(u8* SK) {
 
 int main(void) {
 
-    // const char* keyString = "00112233445566778899aabbccddeeff"; // Test Vector 1
+    const char* keyString = "00112233445566778899aabbccddeeff"; // Test Vector 1
     // const char* keyString = "ffeeddccbbaa99887766554433221100"; // Test Vector 2
     // const char* keyString = "000102030405060708090a0b0c0d0e0f"; // Test Vector 3
-    const char* keyString = "28dbc3bc49ffd87dcfa509b11d422be7"; // Test Vector 4
+    // const char* keyString = "28dbc3bc49ffd87dcfa509b11d422be7"; // Test Vector 4
     u8 MK[16] = { 0x00, };
     stringToByte(MK, keyString);
 
-    // const char* inputString = "0000000000000000"; // Test Vector 1
+    const char* inputString = "0000000000000000"; // Test Vector 1
     // const char* inputString = "0011223344556677"; // Test Vector 2
     // const char* inputString = "0123456789abcdef"; // Test Vector 3
-    const char* inputString = "b41e6be2eba84a14"; // Test Vector 4
+    // const char* inputString = "b41e6be2eba84a14"; // Test Vector 4
     
     u8 PT[8] = { 0x00, };
     stringToByte(PT, inputString);

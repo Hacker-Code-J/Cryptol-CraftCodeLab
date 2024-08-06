@@ -108,26 +108,120 @@ property encKeySchedule_first_subkey = sk'@0 == example_MK@0 + delta_table@0
     (_, sk') = encKeySchedule (example_enc_WK, example_enc_SK, example_MK)
 
 // Define the given hexadecimal string as a bit sequence
-key : [128]
-key = 0x28dbc3bc49ffd87dcfa509b11d422be7
-pt : [64]
-pt = 0xb41e6be2eba84a14
-ct : [64]
-ct = 0xcc047a75209c1fc6
+tvKey1 : [128]
+tvKey1 = 0x00112233445566778899aabbccddeeff
+tvKey2 : [128]
+tvKey2 = 0xffeeddccbbaa99887766554433221100
+tvKey3 : [128]
+tvKey3 = 0x000102030405060708090a0b0c0d0e0f
+tvKey4 : [128]
+tvKey4 = 0x28dbc3bc49ffd87dcfa509b11d422be7
+
+tvPT1 : [64]
+tvPT1 = zero
+tvPT2 : [64]
+tvPT2 = 0x0011223344556677
+tvPT3 : [64]
+tvPT3 = 0x0123456789abcdef
+tvPT4 : [64]
+tvPT4 = 0xb41e6be2eba84a14
+
+tvCT1 : [64]
+tvCT1 = 0x00f418aed94f03f2
+tvCT2 : [64]
+tvCT2 = 0x23ce9f72e543e6d8
+tvCT3 : [64]
+tvCT3 = 0x7a6fb2a28d23f466
+tvCT4 : [64]
+tvCT4 = 0xcc047a75209c1fc6
+
+TVKey1 : [16][8]
+TVKey1 = reverse (split (tvKey1 : [128]))
+TVKey2 : [16][8]
+TVKey2 = reverse (split (tvKey2 : [128]))
+TVKey3 : [16][8]
+TVKey3 = reverse (split (tvKey3 : [128]))
+TVKey4 : [16][8]
+TVKey4 = reverse (split (tvKey4 : [128]))
+
+TVPT1 : [8][8]
+TVPT1 = reverse (split (tvPT1 : [64]))
+TVPT2 : [8][8]
+TVPT2 = reverse (split (tvPT2 : [64]))
+TVPT3 : [8][8]
+TVPT3 = reverse (split (tvPT3 : [64]))
+TVPT4 : [8][8]
+TVPT4 = reverse (split (tvPT4 : [64]))
+
+TVCT1 : [8][8]
+TVCT1 = reverse (split (tvCT1 : [64]))
+TVCT2 : [8][8]
+TVCT2 = reverse (split (tvCT2 : [64]))
+TVCT3 : [8][8]
+TVCT3 = reverse (split (tvCT3 : [64]))
+TVCT4 : [8][8]
+TVCT4 = reverse (split (tvCT4 : [64]))
 
 
-splitKey : [16][8]
-splitKey = reverse (split (key : [128]))
-splitPT : [8][8]
-splitPT = reverse (split (pt : [64]))
+TVSK1 = [0xe7135b59, 0xc99cb0c8, 0x906d96d7, 0x2c6a5599,
+ 0x27032ade, 0xb5e32d31, 0xced9de4e, 0x48919180,
+ 0xf915b5f4, 0xfadc0ee2, 0xbba15439, 0x9fadb9bf,
+ 0x16b7f8e8, 0xe41e0239, 0xd9451b36, 0xa9b0ad97,
+ 0xcfa7c7f6, 0x48555f62, 0x1f50a1b1, 0xa5986d86,
+ 0x0706f33c, 0xfb2b7aff, 0x7a755a93, 0x7bb39134,
+ 0xbcdf15f0, 0xef018ca2, 0x2a436495, 0xae882255,
+ 0xc7e50f52, 0x67d9bcf0, 0x61a18fda, 0xd1357c79] : [32][32] // 32 * 32 = 128 * 16, 1024-bit (128-byte)
+ 
+TVSK2 = [ 0x4e587e5a, 0xb8695b51, 0x07c2c9e8, 0x2b471032,
+  0x6c262bcd, 0x828eb698, 0x230cef4d, 0x254c2af7,
+  0x1c16a4c1, 0xa5657527, 0xeeb25316, 0x5a463014,
+  0x17a6c593, 0x6d85475c, 0xea44f8f1, 0x422702ca,
+  0xbe74727f, 0xaf9a8263, 0x1e2d5c4a, 0x1ceda097,
+  0xd4b17ca3, 0x404e7bee, 0x5730f30a, 0xd0e6a233,
+  0x67687c35, 0x12027b6f, 0xe5dcdbea, 0xe1992132,
+  0x504c5475, 0x68c8899b, 0xfa18e40d, 0xe2345934 ] : [32][32]
 
-// splitTmp : [8][8]
-// splitTmp = reverse (split (tmp : [64]))
-splitCT : [8][8]
-splitCT = reverse (split (ct : [64]))
+TVSK3 = [ 0x27437b69, 0x490c1018, 0x501d3667, 0x2c5a3569,
+  0x57233a5e, 0x25437d71, 0x7e796e4e, 0x38716140,
+  0x19253564, 0x5a2c4e12, 0x5b315429, 0x7f7d796f,
+  0x26376848, 0x345e3259, 0x69450b16, 0x79705d37,
+  0x4f172746, 0x88857f72, 0x1f408181, 0x65480d16,
+  0x7766437c, 0x2b4b8a7f, 0x6a552a53, 0x2b532134,
+  0x1c2f5520, 0x0f110c12, 0x0a132445, 0x4e182245,
+  0x17253f72, 0x77592c50, 0x31613f7a, 0x61356c59 ] : [32][32]
 
-// property TESTVECTOR4 =
-//   HIGHT_Encrypt zero splitPT splitKey == splitCT
+TVSK4 = [ 0x38789841, 0x10a80fbe, 0x951708dd, 0x5434f622,
+  0x8c401225, 0xc1422382, 0x784be476, 0x12321a85,
+  0x36fdfc00, 0x59d25f47, 0x2da77c03, 0x4036be69,
+  0xfefe0447, 0xda6f6776, 0xdf6de5d7, 0x32b55709,
+  0x16b326ec, 0x99ba9c4a, 0x471a423a, 0xaa42df8c,
+  0x1365e98d, 0x60686246, 0x4416e398, 0x2525975c,
+  0x1bd56655, 0x2ce9d3ae, 0xcbcc693f, 0x208e4a1f,
+  0xbd36748f, 0x4f20c84f, 0xeaa6394c, 0xd75d461a ] : [32][32]
+
+// Function to reverse the bytes in a 32-bit word
+reverseBytesInWord : [32] -> [4][8]
+reverseBytesInWord w = reverse (split w)
+
+// Function to transform the list of 32-bit words
+transformTVSK : [32][32] -> [128][8]
+transformTVSK words = join [reverseBytesInWord w | w <- words]
+
+property KeySchedule_TESTVECTOR1 =
+  encKeySchedule (zero, zero, TVKey1) == 
+  ([0x33, 0x22, 0x11, 0x00, 0xff, 0xee, 0xdd, 0xcc], transformTVSK TVSK1)
+
+property KeySchedule_TESTVECTOR2 =
+  encKeySchedule (zero, zero, TVKey2) == 
+  ([0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33], transformTVSK TVSK2)
+
+property KeySchedule_TESTVECTOR3 =
+  encKeySchedule (zero, zero, TVKey3) == 
+  ([0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c], transformTVSK TVSK3)
+
+property KeySchedule_TESTVECTOR4 =
+  encKeySchedule (zero, zero, TVKey4) == 
+  ([0xbc, 0xc3, 0xdb, 0x28, 0xe7, 0x2b, 0x42, 0x1d], transformTVSK TVSK4)
 
 // ==============================================================
 
@@ -138,78 +232,56 @@ F0 byte = (byte <<< 1) ^ (byte <<< 2) ^ (byte <<< 7)
 F1 : [8] -> [8]
 F1 byte = (byte <<< 3) ^ (byte <<< 4) ^ (byte <<< 6)
 
+type Key = [16][8]
+type SubKey = [128][8]
+type State = [8][8]
+
+// Function to perform a single round of HIGHT encryption
+round : [8][8] -> [128][8] -> [8] -> [8][8]
+round state SK i = [
+    t0 ^ (F0 t1 + SK @ (i * 4 + 3)),
+    state @ 0,
+    state @ 1 + (F1 (state @ 0) ^ SK @ (i * 4 + 0)),
+    state @ 2,
+    state @ 3 ^ (F0 (state @ 2) + SK @ (i * 4 + 1)),
+    state @ 4,
+    state @ 5 + (F1 (state @ 4) ^ SK @ (i * 4 + 2)),
+    state @ 6
+  ]
+  where
+    t0 = state @ 7
+    t1 = state @ 6
+
+// Function to perform all 31 rounds of HIGHT encryption
+rounds : [8][8] -> [128][8] -> [8][8]
+rounds state SK = foldl (\s i -> round s SK i) state [0..30]
+
 HIGHT_Encrypt : ([8][8], [8][8], [16][8]) -> [8][8]
 HIGHT_Encrypt (dst, src, MK) = dst'
   where
     (WK, SK) = encKeySchedule(zero, zero, MK)
-    state0 = [
-      src @ 0 + WK @ 0,
-      src @ 1,
-      src @ 2 ^ WK @ 1,
-      src @ 3,
-      src @ 4 + WK @ 2,
-      src @ 5,
-      src @ 6 ^ WK @ 3,
-      src @ 7
-    ]
     
-    round i state = [
-      state @ 7 ^ (F0 (state @ 6) + SK @ (i * 4 + 3)),
-      state @ 0,
-      state @ 1 + (F1 (state @ 0) ^ SK @ (i * 4 + 0)),
-      state @ 2,
-      state @ 3 ^ (F0 (state @ 2) + SK @ (i * 4 + 1)),
-      state @ 4,
-      state @ 5 + (F1(state @ 4) ^ SK @ (i * 4 + 2)),
-      state @ 6
-    ]
+    initialState = [ src @ 0 + WK @ 0,
+                    src @ 1,
+                    src @ 2 ^ WK @ 1,
+                    src @ 3,
+                    src @ 4 + WK @ 2,
+                    src @ 5,
+                    src @ 6 ^ WK @ 3,
+                    src @ 7 ] : [8][8]
+    
+    afterRounds : [8][8]
+    afterRounds = rounds initialState SK
 
-    rounds = foldl (\state i -> round i state) state0 [0 .. 7]
+    finalState = [
+      afterRounds @ 0 + WK @ 4,
+      afterRounds @ 1 + (F1 (afterRounds @ 0) ^ SK @ 124),
+      afterRounds @ 2 ^ WK @ 5,
+      afterRounds @ 3 ^ (F0 (afterRounds @ 2) + SK @ 125),
+      afterRounds @ 4 + WK @ 6,
+      afterRounds @ 5 + (F1 (afterRounds @ 4) ^ SK @ 126),
+      afterRounds @ 6 ^ WK @ 7,
+      afterRounds @ 7 ^ (F0 (afterRounds @ 6) + SK @ 127)
+    ] : [8][8]
 
-    dst' = rounds
-    // final_state = [
-    //   rounds @ 0,
-    //   rounds @ 1 + (F1 (rounds @ 0) ^ SK @ 124),
-    //   rounds @ 2,
-    //   rounds @ 3 ^ (F0 (rounds @ 2) + SK @ 125),
-    //   rounds @ 4,
-    //   rounds @ 5 + (F1 (rounds @ 4) ^ SK @ 126),
-    //   rounds @ 6,
-    //   rounds @ 7 ^ (F0 (rounds @ 6) + SK @ 127)
-    // ]
-
-    // dst' = [
-    //   final_state @ 0 + WK @ 4,
-    //   final_state @ 1,
-    //   final_state @ 2 ^ WK @ 5,
-    //   final_state @ 3,
-    //   final_state @ 4 + WK @ 6,
-    //   final_state @ 5,
-    //   final_state @ 6 ^ WK @ 7,
-    //   final_state @ 7
-    // ]
-
-// // Define the given hexadecimal string as a bit sequence
-// key : [128]
-// key = 0x28dbc3bc49ffd87dcfa509b11d422be7
-// pt : [64]
-// pt = 0xb41e6be2eba84a14
-
-// tmp : [64]
-// tmp = 0x0000000000000000
-// ct : [64]
-// ct = 0xcc047a75209c1fc6
-
-
-// splitKey : [16][8]
-// splitKey = reverse (split (key : [128]))
-// splitPT : [8][8]
-// splitPT = reverse (split (pt : [64]))
-
-// splitTmp : [8][8]
-// splitTmp = reverse (split (tmp : [64]))
-// splitCT : [8][8]
-// splitCT = reverse (split (ct : [64]))
-
-// property TESTVECTOR4 =
-//   HIGHT_Encrypt (splitTmp, splitPT, splitKey) == splitCT
+    dst' = finalState

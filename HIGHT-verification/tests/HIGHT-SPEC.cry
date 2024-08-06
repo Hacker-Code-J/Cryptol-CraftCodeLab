@@ -150,15 +150,14 @@ HIGHT_Encrypt dst src MK = finalState
     // Generate whitening keys and round keys from master key
     (WK, SK) = encKeySchedule(zero, zero, MK)
 
-
     // Initial state modification
     state1 = initialStateModification src WK
 
     // Iterate state update function 31 times (0 to 30)
-    state2 = foldl (\s i -> updateState (s, SK, i)) state1 [0..7]
+    // state2 = foldl (\s i -> updateState (s, SK, i)) state1 [0..6]
     // state2_2 = foldl (\s i -> updateState (s, SK, i)) state2_1 [8..8]
 
-    finalState = state2
+    finalState = state1
 
     // Final state modification before final round keys
     // state3 = [ state2 @ 0
