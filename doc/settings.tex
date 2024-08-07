@@ -122,13 +122,20 @@
 \pgfplotsset{compat=1.15}
 
 % Pseudo-code
+
 \usepackage[linesnumbered,ruled]{algorithm2e}
-\usepackage{algpseudocode}
-\usepackage{setspace}
-\SetKwComment{Comment}{/* }{ */}
-\SetKwProg{Fn}{Function}{:}{end}
+
+\SetKwProg{StepOne}{Step1}{:}{end}
+\SetKwProg{StepTwo}{Step2}{:}{end}
+\SetKwProg{StepThr}{Step3}{:}{end}
 \SetKw{End}{end}
-\SetKw{DownTo}{downto}
+%\usepackage[linesnumbered,ruled]{algorithm2e}
+%\usepackage{algpseudocode}
+%\usepackage{setspace}
+%\SetKwComment{Comment}{/* }{ */}
+%\SetKwProg{Fn}{Function}{:}{end}
+%\SetKw{End}{end}
+%\SetKw{DownTo}{downto}
 
 % Define a new environment for algorithms without line numbers
 \newenvironment{algorithm2}[1][]{

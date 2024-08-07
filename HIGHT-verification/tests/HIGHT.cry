@@ -232,10 +232,6 @@ F0 byte = (byte <<< 1) ^ (byte <<< 2) ^ (byte <<< 7)
 F1 : [8] -> [8]
 F1 byte = (byte <<< 3) ^ (byte <<< 4) ^ (byte <<< 6)
 
-type Key = [16][8]
-type SubKey = [128][8]
-type State = [8][8]
-
 // Function to perform a single round of HIGHT encryption
 round : [8][8] -> [128][8] -> [8] -> [8][8]
 round state SK i = [
@@ -285,3 +281,12 @@ HIGHT_Encrypt (dst, src, MK) = dst'
     ] : [8][8]
 
     dst' = finalState
+
+property Encryption_TESTVECTOR1 =
+  HIGHT_Encrypt (zero, TVPT1, TVKey1) == TVCT1
+property Encryption_TESTVECTOR2 =
+  HIGHT_Encrypt (zero, TVPT2, TVKey2) == TVCT2
+property Encryption_TESTVECTOR3 =
+  HIGHT_Encrypt (zero, TVPT3, TVKey3) == TVCT3
+property Encryption_TESTVECTOR4 =
+  HIGHT_Encrypt (zero, TVPT4, TVKey4) == TVCT4

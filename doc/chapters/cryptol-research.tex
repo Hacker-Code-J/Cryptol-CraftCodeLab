@@ -59,3 +59,39 @@ Since the sequence is now empty, the result is 10.
 	\item The process repeats until the sequence is exhausted, at which point the accumulated value is returned as the result.
 \end{itemize}
 Understanding foldl helps in performing various reduction operations over sequences in a concise and functional manner in Cryptol.
+
+\begin{algorithm}[H]
+	\small
+	\caption{General GCM}\label{alg:general_ghash}
+	\KwIn{$N$, $PT$, $key$, $AAD$}
+	\KwOut{$R$}
+	$Zero \gets 0$\;
+%	\textbf{Step 1:}\;
+	\StepOne{}{
+	$CT, H, Y \gets AES-CTR(PT, Zero, key)$\;
+	$t \gets H$\;
+	$R \gets AAD|0|CT|0|Len$\;
+	}
+%	\textbf{Step 2:}\;
+
+	\StepTwo{}{
+	\For{$i \gets 1$ \KwTo $\log_2(N)$}{
+		$t \gets t^2$\;
+		$*(H+4i) \gets t$\;
+	}}
+%	\textbf{Step 3:}\;
+	
+	\StepThr{}{
+	$R \gets 0$\;
+	\If{$N \gg 9 == 1$}{
+		$R \gets \text{parallel\_ghash\_512}(R, H)$\;
+	}
+	\For{$i \gets 8$ \KwTo $4$}{
+		\If{$N \gg i == 1$}{
+			$temp \gets \text{parallel\_ghash\_}{2^i}(src, H)$\;
+			$R \gets R \cdot H^{2^{i+1}} \oplus temp$\;
+		}
+	}}
+	$R \gets R \oplus Y$\;
+	\Return $R$\;
+\end{algorithm}
