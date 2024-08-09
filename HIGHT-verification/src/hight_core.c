@@ -19,10 +19,12 @@ void encKeySchedule(u8 enc_WK[8],
 
     // Generate subkeys
     for (i = 0; i < 8; i++) {
-        for (j = 0; j < 8; j++)
+        for (j = 0; j < 8; j++) {
             enc_SK[16 * i + j + 0] = MK[((j - i) & 7) + 0] + delta_table[16 * i + j + 0];
-        for (j = 0; j < 8; j++)
+        }
+        for (j = 0; j < 8; j++) {
             enc_SK[16 * i + j + 8] = MK[((j - i) & 7) + 8] + delta_table[16 * i + j + 8];
+        }
     }
 }
 
@@ -81,10 +83,14 @@ void decKeySchedule(u8 dec_WK[8], u8 dec_SK[128], const u8 MK[16]) {
     dec_WK[7] = MK[3];
 
     for (i = 7; i >= 0; i--) {
-        for (j = 7; j >= 0; j--)
+        for (j = 7; j >= 0; j--) {
             dec_SK[127 - (16 * i + j + 8)] = MK[((j - i) & 7) + 8] + delta_table[16 * i + j + 8];
-        for (j = 7; j >= 0; j--)
+            printf("SK[%03d] = MK[%03d] + delta[%03d]\n", 127 - (16 * i + j + 8), ((j - i) & 7) + 8, 16 * i + j + 8);
+        }
+        for (j = 7; j >= 0; j--) {
             dec_SK[127 - (16 * i + j + 0)] = MK[((j - i) & 7) + 0] + delta_table[16 * i + j + 0];
+            printf("SK[%03d] = MK[%03d] + delta[%03d]\n", 127 - (16 * i + j + 0), ((j - i) & 7) + 0, 16 * i + j + 0);
+        }
     }
 }
 
@@ -93,6 +99,11 @@ void HIGHT_Decrypt(u8 dst[8], const u8 src[8], const u8 MK[16]) {
     u8 SK[128];
     decKeySchedule(WK, SK, MK);
     
+    for (u8 i = 0; i < 128; i++) {
+        if (i % 8 == 0) puts("");
+        printf("%02x:", SK[i]);
+    } puts("");
+        
     u8 state[8] = { 0x00, };
     memcpy(state, src, 8);
     state[0] -= WK[4];
