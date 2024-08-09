@@ -38,18 +38,20 @@ let main : TopLevel () = do {
     m <- llvm_load_module "hight_core.bc";
 
     // Verify encKeySchedule function
-    // encKeySchedule_verify <- llvm_verify m "encKeySchedule" [] true encKeySchedule_setup z3;
-
-    // Print the verification result
-    // print encKeySchedule_verify;
-
-    // Verify HIGHT_Encrypt function
     print "[ Start ==========================> ]";
-    HIGHT_Encrypt_verify <- llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
+    encKeySchedule_verify <- llvm_verify m "encKeySchedule" [] true encKeySchedule_setup z3;
     print "[ ============================= End ]";
 
     // Print the verification result
-    print HIGHT_Encrypt_verify;
+    print encKeySchedule_verify;
+
+    // Verify HIGHT_Encrypt function
+    // print "[ Start ==========================> ]";
+    // HIGHT_Encrypt_verify <- llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
+    // print "[ ============================= End ]";
+
+    // Print the verification result
+    // print HIGHT_Encrypt_verify;
 };
 
 // Run the main function
