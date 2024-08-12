@@ -6,113 +6,7 @@
 
 module HIGHT where
 
-delta_table : [128][8]
-delta_table = [ 
-    0x5a, 0x6d, 0x36, 0x1b, 0x0d, 0x06, 0x03, 0x41, // 0 ~ 7
-    0x60, 0x30, 0x18, 0x4c, 0x66, 0x33, 0x59, 0x2c, // 8 ~ 15
-    0x56, 0x2b, 0x15, 0x4a, 0x65, 0x72, 0x39, 0x1c, // 16 ~ 23 
-    0x4e, 0x67, 0x73, 0x79, 0x3c, 0x5e, 0x6f, 0x37, // 24 ~ 31 
-    0x5b, 0x2d, 0x16, 0x0b, 0x05, 0x42, 0x21, 0x50, // 32 ~ 39 
-    0x28, 0x54, 0x2a, 0x55, 0x6a, 0x75, 0x7a, 0x7d, // 40 ~ 47 
-    0x3e, 0x5f, 0x2f, 0x17, 0x4b, 0x25, 0x52, 0x29, // 48 ~ 55 
-    0x14, 0x0a, 0x45, 0x62, 0x31, 0x58, 0x6c, 0x76, // 56 ~ 63 
-    0x3b, 0x1d, 0x0e, 0x47, 0x63, 0x71, 0x78, 0x7c, // 64 ~ 71 
-    0x7e, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x43, 0x61, // 72 ~ 79 
-    0x70, 0x38, 0x5c, 0x6e, 0x77, 0x7b, 0x3d, 0x1e, // 80 ~ 87 
-    0x4f, 0x27, 0x53, 0x69, 0x34, 0x1a, 0x4d, 0x26, // 88 ~ 95 
-    0x13, 0x49, 0x24, 0x12, 0x09, 0x04, 0x02, 0x01, // 96 ~ 103 
-    0x40, 0x20, 0x10, 0x08, 0x44, 0x22, 0x11, 0x48, // 104 ~ 111 
-    0x64, 0x32, 0x19, 0x0c, 0x46, 0x23, 0x51, 0x68, // 112 ~ 119 
-    0x74, 0x3a, 0x5d, 0x2e, 0x57, 0x6b, 0x35, 0x5a  // 120 ~ 127
- ]
-
-// ======================== Key Schedule ========================
-
-// Function to rotate the second half of the key once to the left
-rotateLeft8 : [8][8] -> [8][8]
-rotateLeft8 block = drop`{1} block # take`{1} block
-
-rotateRight8 : [8][8] -> [8][8]
-rotateRight8 block = drop`{7} block # take`{7} block
-
-updateMK : [16][8] -> [16][8]
-updateMK mk = rotatedMK
-    where
-    (firstHalf, secondHalf) = splitAt`{8} mk
-    rotatedFirstHalf = rotateRight8 firstHalf
-    rotatedSecondHalf = rotateRight8 secondHalf
-    rotatedMK = rotatedFirstHalf # rotatedSecondHalf
-
-updateMK2 : [16][8] -> [16][8]
-updateMK2 mk = rotatedMK
-    where
-    (firstHalf, secondHalf) = splitAt`{8} mk
-    rotatedFirstHalf = rotateLeft8 firstHalf
-    rotatedSecondHalf = rotateLeft8 secondHalf
-    rotatedMK = rotatedFirstHalf # rotatedSecondHalf
-
-// Define the encKeySchedule function
-encKeySchedule : ([8][8], [128][8], [16][8]) -> ([8][8], [128][8])
-encKeySchedule (_, _, MK) = (enc_WK, enc_SK)
-  where
-    // Generate whitening keys
-    enc_WK = [
-      MK@12, MK@13, MK@14, MK@15,
-      MK@0, MK@1, MK@2, MK@3
-    ]
-
-    // Generate subkeys
-    enc_SK = [ subkey i | i:[8] <- [0..127] ]
-      where
-        subkey i = 
-          if i < 16
-          then MK @ i + delta_table @ i
-          else if i < 32
-          then (updateMK MK) @ (i - 16) + delta_table @ i
-          else if i < 48
-          then (updateMK (updateMK MK)) @ ((i - 32)) + delta_table @ i
-          else if i < 64
-          then (updateMK (updateMK (updateMK MK))) @ (i - 48)
-                + delta_table @ i
-          else if i < 80
-          then (updateMK (updateMK (updateMK (updateMK MK)))) @ (i - 64)
-                + delta_table @ i
-          else if i < 96
-          then (updateMK2 (updateMK2 (updateMK2 MK))) @ (i - 80) 
-                + delta_table @ i
-          else if i < 112
-          then (updateMK2 (updateMK2 MK)) @ (i - 96) + delta_table @ i
-          else
-              (updateMK2 MK) @ (i - 112) + delta_table @ i
-
-// // Example usage
-// example_MK : [16][8]
-// example_MK = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F]
-
-// example_enc_WK : [8][8]
-// example_enc_WK = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
-
-// example_enc_SK : [128][8]
-// example_enc_SK = [0x00 | _:[8] <- [0..127]]
-
-// (enc_WK', enc_SK') = encKeySchedule (example_enc_WK, example_enc_SK, example_MK)
-
-// // Property to check the lengths of enc_WK and enc_SK
-// property encKeySchedule_length = length wk' == 8 /\ length sk' == 128
-//   where
-//     (wk', sk') = encKeySchedule (example_enc_WK, example_enc_SK, example_MK)
-
-// // Property to check the correctness of whitening keys
-// property encKeySchedule_whitening_keys = wk' == [ example_MK@12, example_MK@13, example_MK@14, example_MK@15, example_MK@0, example_MK@1, example_MK@2, example_MK@3 ]
-//   where
-//     (wk', _) = encKeySchedule (example_enc_WK, example_enc_SK, example_MK)
-
-// // Property to check the specific subkey generation (example for the first subkey)
-// property encKeySchedule_first_subkey = sk'@0 == example_MK@0 + delta_table@0
-//   where
-//     (_, sk') = encKeySchedule (example_enc_WK, example_enc_SK, example_MK)
-
-// Define the given hexadecimal string as a bit sequence
+// Test Vectors
 tvKey1 : [128]
 tvKey1 = 0x00112233445566778899aabbccddeeff
 tvKey2 : [128]
@@ -212,6 +106,123 @@ reverseBytesInWord w = reverse (split w)
 transformTVSK : [32][32] -> [128][8]
 transformTVSK words = join [reverseBytesInWord w | w <- words]
 
+// Implementation of HIGHT with Cryptol Language
+
+// Pre-computation Table for Delta (LFSR)
+delta_table : [128][8]
+delta_table = [ 
+    0x5a, 0x6d, 0x36, 0x1b, 0x0d, 0x06, 0x03, 0x41, // 0 ~ 7
+    0x60, 0x30, 0x18, 0x4c, 0x66, 0x33, 0x59, 0x2c, // 8 ~ 15
+    0x56, 0x2b, 0x15, 0x4a, 0x65, 0x72, 0x39, 0x1c, // 16 ~ 23 
+    0x4e, 0x67, 0x73, 0x79, 0x3c, 0x5e, 0x6f, 0x37, // 24 ~ 31 
+    0x5b, 0x2d, 0x16, 0x0b, 0x05, 0x42, 0x21, 0x50, // 32 ~ 39 
+    0x28, 0x54, 0x2a, 0x55, 0x6a, 0x75, 0x7a, 0x7d, // 40 ~ 47 
+    0x3e, 0x5f, 0x2f, 0x17, 0x4b, 0x25, 0x52, 0x29, // 48 ~ 55 
+    0x14, 0x0a, 0x45, 0x62, 0x31, 0x58, 0x6c, 0x76, // 56 ~ 63 
+    0x3b, 0x1d, 0x0e, 0x47, 0x63, 0x71, 0x78, 0x7c, // 64 ~ 71 
+    0x7e, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x43, 0x61, // 72 ~ 79 
+    0x70, 0x38, 0x5c, 0x6e, 0x77, 0x7b, 0x3d, 0x1e, // 80 ~ 87 
+    0x4f, 0x27, 0x53, 0x69, 0x34, 0x1a, 0x4d, 0x26, // 88 ~ 95 
+    0x13, 0x49, 0x24, 0x12, 0x09, 0x04, 0x02, 0x01, // 96 ~ 103 
+    0x40, 0x20, 0x10, 0x08, 0x44, 0x22, 0x11, 0x48, // 104 ~ 111 
+    0x64, 0x32, 0x19, 0x0c, 0x46, 0x23, 0x51, 0x68, // 112 ~ 119 
+    0x74, 0x3a, 0x5d, 0x2e, 0x57, 0x6b, 0x35, 0x5a  // 120 ~ 127
+ ]
+
+// ======================== Key Schedule ========================
+
+// Function to rotate the second half of the key once to the left
+rotateLeft8 : [8][8] -> [8][8]
+rotateLeft8 block = drop`{1} block # take`{1} block
+
+rotateRight8 : [8][8] -> [8][8]
+rotateRight8 block = drop`{7} block # take`{7} block
+
+updateMK : [16][8] -> [16][8]
+updateMK mk = rotatedMK
+    where
+    (firstHalf, secondHalf) = splitAt`{8} mk
+    rotatedFirstHalf = rotateRight8 firstHalf
+    rotatedSecondHalf = rotateRight8 secondHalf
+    rotatedMK = rotatedFirstHalf # rotatedSecondHalf
+
+updateMK2 : [16][8] -> [16][8]
+updateMK2 mk = rotatedMK
+    where
+    (firstHalf, secondHalf) = splitAt`{8} mk
+    rotatedFirstHalf = rotateLeft8 firstHalf
+    rotatedSecondHalf = rotateLeft8 secondHalf
+    rotatedMK = rotatedFirstHalf # rotatedSecondHalf
+
+// Define the encKeySchedule function
+encKeySchedule : ([8][8], [128][8], [16][8]) -> ([8][8], [128][8])
+encKeySchedule (_, _, MK) = (enc_WK, enc_SK)
+  where
+    // Generate whitening keys
+    enc_WK = [
+      MK@12, MK@13, MK@14, MK@15,
+      MK@0, MK@1, MK@2, MK@3
+    ]
+
+    // Generate subkeys
+    enc_SK = [ subkey i | i:[8] <- [0..127] ]
+      where
+        subkey i = 
+          if i < 16
+          then MK @ i + delta_table @ i
+          else if i < 32
+          then (updateMK MK) @ (i - 16) + delta_table @ i
+          else if i < 48
+          then (updateMK (updateMK MK)) @ ((i - 32)) + delta_table @ i
+          else if i < 64
+          then (updateMK (updateMK (updateMK MK))) @ (i - 48)
+                + delta_table @ i
+          else if i < 80
+          then (updateMK (updateMK (updateMK (updateMK MK)))) @ (i - 64)
+                + delta_table @ i
+          else if i < 96
+          then (updateMK2 (updateMK2 (updateMK2 MK))) @ (i - 80) 
+                + delta_table @ i
+          else if i < 112
+          then (updateMK2 (updateMK2 MK)) @ (i - 96) + delta_table @ i
+          else
+              (updateMK2 MK) @ (i - 112) + delta_table @ i
+
+// Define the decKeySchedule function
+decKeySchedule : ([8][8], [128][8], [16][8]) -> ([8][8], [128][8])
+decKeySchedule (_, _, MK) = (dec_WK, dec_SK)
+  where
+    // Generate whitening keys
+    dec_WK = [
+      MK@12, MK@13, MK@14, MK@15,
+      MK@0, MK@1, MK@2, MK@3
+    ]
+
+    // Generate subkeys
+    dec_SK = [ subkey i | i:[8] <- [0..127] ]
+      where
+        subkey i = 
+          if i < 16
+          then (updateMK2 MK) @ (15 - i) + delta_table @ (127 - i)
+          else if i < 32
+          then (updateMK2 (updateMK2 MK)) @ (31 - i) + delta_table @ (127 - i)
+          else if i < 48
+          then (updateMK2 (updateMK2 (updateMK2 MK))) @ (47 - i) 
+                + delta_table @ (127 - i)
+          else if i < 64
+          then (updateMK (updateMK (updateMK (updateMK MK)))) @ (63 - i)
+                + delta_table @ (127 - i)
+          else if i < 80
+          then (updateMK (updateMK (updateMK MK))) @ (79 - i)
+                + delta_table @ (127 - i)
+          else if i < 96
+          then (updateMK (updateMK MK)) @ (95 - i) + delta_table @ (127 - i)
+          else if i < 112
+          then (updateMK MK) @ (111 - i) + delta_table @ (127 - i)
+          else
+              MK @ (127 - i) + delta_table @ (127 - i)
+
+
 property KeySchedule_TESTVECTOR =
   (encKeySchedule (zero, zero, TVKey1) == 
   ([0x33, 0x22, 0x11, 0x00, 0xff, 0xee, 0xdd, 0xcc], transformTVSK TVSK1)) /\
@@ -222,9 +233,36 @@ property KeySchedule_TESTVECTOR =
   (encKeySchedule (zero, zero, TVKey4) == 
   ([0xbc, 0xc3, 0xdb, 0x28, 0xe7, 0x2b, 0x42, 0x1d], transformTVSK TVSK4))
 
-// ==============================================================
+property KeySchedule_WK =
+  (enc_WK1 == dec_WK1) /\ (enc_WK2 == dec_WK2) /\
+  (enc_WK3 == dec_WK3) /\ (enc_WK4 == dec_WK4)
+    where
+      (enc_WK1, _) = encKeySchedule (zero, zero, TVKey1)
+      (dec_WK1, _) = decKeySchedule (zero, zero, TVKey1)
+      (enc_WK2, _) = encKeySchedule (zero, zero, TVKey2)
+      (dec_WK2, _) = decKeySchedule (zero, zero, TVKey2)
+      (enc_WK3, _) = encKeySchedule (zero, zero, TVKey3)
+      (dec_WK3, _) = decKeySchedule (zero, zero, TVKey3)
+      (enc_WK4, _) = encKeySchedule (zero, zero, TVKey4)
+      (dec_WK4, _) = decKeySchedule (zero, zero, TVKey4)
 
-// Encryption
+property KeySchedule_SK =
+  (enc_SK1 == reverse dec_SK1) /\
+  (enc_SK2 == reverse dec_SK2) /\
+  (enc_SK3 == reverse dec_SK3) /\
+  (enc_SK4 == reverse dec_SK4)
+    where
+      (_, enc_SK1) = encKeySchedule (zero, zero, TVKey1)
+      (_, dec_SK1) = decKeySchedule (zero, zero, TVKey1)
+      (_, enc_SK2) = encKeySchedule (zero, zero, TVKey2)
+      (_, dec_SK2) = decKeySchedule (zero, zero, TVKey2)
+      (_, enc_SK3) = encKeySchedule (zero, zero, TVKey3)
+      (_, dec_SK3) = decKeySchedule (zero, zero, TVKey3)
+      (_, enc_SK4) = encKeySchedule (zero, zero, TVKey4)
+      (_, dec_SK4) = decKeySchedule (zero, zero, TVKey4)
+
+// ======================== Encryption ========================
+
 F0 : [8] -> [8]
 F0 byte = (byte <<< 1) ^ (byte <<< 2) ^ (byte <<< 7)
 
@@ -287,69 +325,7 @@ property Encryption_TESTVECTOR =
   (HIGHT_Encrypt (zero, TVPT3, TVKey3) == TVCT3) /\
   (HIGHT_Encrypt (zero, TVPT4, TVKey4) == TVCT4)
 
-
-// Decryption
-// Define the encKeySchedule function
-decKeySchedule : ([8][8], [128][8], [16][8]) -> ([8][8], [128][8])
-decKeySchedule (_, _, MK) = (dec_WK, dec_SK)
-  where
-    // Generate whitening keys
-    dec_WK = [
-      MK@12, MK@13, MK@14, MK@15,
-      MK@0, MK@1, MK@2, MK@3
-    ]
-
-    // Generate subkeys
-    dec_SK = [ subkey i | i:[8] <- [0..127] ]
-      where
-        subkey i = 
-          if i < 16
-          then (updateMK2 MK) @ (15 - i) + delta_table @ (127 - i)
-          else if i < 32
-          then (updateMK2 (updateMK2 MK)) @ (31 - i) + delta_table @ (127 - i)
-          else if i < 48
-          then (updateMK2 (updateMK2 (updateMK2 MK))) @ (47 - i) 
-                + delta_table @ (127 - i)
-          else if i < 64
-          then (updateMK (updateMK (updateMK (updateMK MK)))) @ (63 - i)
-                + delta_table @ (127 - i)
-          else if i < 80
-          then (updateMK (updateMK (updateMK MK))) @ (79 - i)
-                + delta_table @ (127 - i)
-          else if i < 96
-          then (updateMK (updateMK MK)) @ (95 - i) + delta_table @ (127 - i)
-          else if i < 112
-          then (updateMK MK) @ (111 - i) + delta_table @ (127 - i)
-          else
-              MK @ (127 - i) + delta_table @ (127 - i)
-
-property KeySchedule_WK =
-  (enc_WK1 == dec_WK1) /\ (enc_WK2 == dec_WK2) /\
-  (enc_WK3 == dec_WK3) /\ (enc_WK4 == dec_WK4)
-    where
-      (enc_WK1, _) = encKeySchedule (zero, zero, TVKey1)
-      (dec_WK1, _) = decKeySchedule (zero, zero, TVKey1)
-      (enc_WK2, _) = encKeySchedule (zero, zero, TVKey2)
-      (dec_WK2, _) = decKeySchedule (zero, zero, TVKey2)
-      (enc_WK3, _) = encKeySchedule (zero, zero, TVKey3)
-      (dec_WK3, _) = decKeySchedule (zero, zero, TVKey3)
-      (enc_WK4, _) = encKeySchedule (zero, zero, TVKey4)
-      (dec_WK4, _) = decKeySchedule (zero, zero, TVKey4)
-
-property KeySchedule_SK =
-  (enc_SK1 == reverse dec_SK1) /\
-  (enc_SK2 == reverse dec_SK2) /\
-  (enc_SK3 == reverse dec_SK3) /\
-  (enc_SK4 == reverse dec_SK4)
-    where
-      (_, enc_SK1) = encKeySchedule (zero, zero, TVKey1)
-      (_, dec_SK1) = decKeySchedule (zero, zero, TVKey1)
-      (_, enc_SK2) = encKeySchedule (zero, zero, TVKey2)
-      (_, dec_SK2) = decKeySchedule (zero, zero, TVKey2)
-      (_, enc_SK3) = encKeySchedule (zero, zero, TVKey3)
-      (_, dec_SK3) = decKeySchedule (zero, zero, TVKey3)
-      (_, enc_SK4) = encKeySchedule (zero, zero, TVKey4)
-      (_, dec_SK4) = decKeySchedule (zero, zero, TVKey4)
+// ======================== Decryption ========================
 
 // Function to perform a single round of HIGHT encryption
 dec_round : [8][8] -> [128][8] -> [8] -> [8][8]
