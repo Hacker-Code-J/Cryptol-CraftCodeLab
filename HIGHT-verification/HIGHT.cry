@@ -354,49 +354,65 @@ property KeySchedule_SK =
 // Function to perform a single round of HIGHT encryption
 dec_round : [8][8] -> [128][8] -> [8] -> [8][8]
 dec_round state SK i = [
-    t0 ^ (F0 t1 + SK @ (i * 4 + 3)),
-    state @ 0,
-    state @ 1 + (F1 (state @ 0) ^ SK @ (i * 4 + 0)),
-    state @ 2,
-    state @ 3 ^ (F0 (state @ 2) + SK @ (i * 4 + 1)),
-    state @ 4,
-    state @ 5 + (F1 (state @ 4) ^ SK @ (i * 4 + 2)),
-    state @ 6
+    state @ 1,
+    t2 - (F1(state @ 1) ^ (SK @ (i * 4 + 3))),
+    state @ 3,
+    t4 ^ F0(state @ 3) + (SK @ (i * 4 + 2)),
+    state @ 5,
+    t6 - (F1(state @ 5) ^ (SK @ (i * 4 + 1))),
+    state @ 7,
+    t0 ^ F0(state @ 7) + (SK @ (i * 4 + 0))
   ]
   where
-    t0 = state @ 7
-    t1 = state @ 6
+    t0 = state @ 0
+    t2 = state @ 2
+    t4 = state @ 4
+    t6 = state @ 6
 
 // Function to perform all 31 rounds of HIGHT decryption
 dec_rounds : [8][8] -> [128][8] -> [8][8]
-dec_rounds state SK = foldl (\s i -> dec_round s SK i) state [0..30]
+dec_rounds state SK = foldl (\s i -> dec_round s SK i) state [1..31]
 
 HIGHT_Decrypt : ([8][8], [8][8], [16][8]) -> [8][8]
 HIGHT_Decrypt (_, src, MK) = dst
   where
     (WK, SK) = decKeySchedule(zero, zero, MK)
 
+    initialState : [8][8]
     initialState = [
-      afterRounds @ 0 - WK @ 4,
-      afterRounds @ 1 - (F1 (afterRounds @ 0) ^ SK @ 3),
-      afterRounds @ 2 ^ WK @ 5,
-      afterRounds @ 3 ^ (F0 (afterRounds @ 2) + SK @ 2),
-      afterRounds @ 4 - WK @ 6,
-      afterRounds @ 5 - (F1 (afterRounds @ 4) ^ SK @ 1),
-      afterRounds @ 6 ^ WK @ 7,
-      afterRounds @ 7 ^ (F0 (afterRounds @ 6) + SK @ 0)
-    ] : [8][8]
+      t0,
+      src @ 1 - ((F1 t0) ^ (SK @ 3)),
+      t2,
+      src @ 3 ^ ((F0 t2) + (SK @ 2)),
+      t4,
+      src @ 5 - ((F1 t4) ^ (SK @ 1)),
+      t6,
+      src @ 7 ^ ((F0 t6) + (SK @ 0))
+    ] where
+      t0 = src @ 0 - WK @ 4
+      t2 = src @ 2 ^ WK @ 5
+      t4 = src @ 4 - WK @ 6
+      t6 = src @ 6 ^ WK @ 7
 
     afterRounds : [8][8]
     afterRounds = dec_rounds initialState SK
 
-    finalState = [ src @ 0 - WK @ 0,
-                    src @ 1,
-                    src @ 2 ^ WK @ 1,
-                    src @ 3,
-                    src @ 4 - WK @ 2,
-                    src @ 5,
-                    src @ 6 ^ WK @ 3,
-                    src @ 7 ] : [8][8]
+    finalState = [ afterRounds @ 0 - WK @ 0,
+                    afterRounds @ 1,
+                    afterRounds @ 2 ^ WK @ 1,
+                    afterRounds @ 3,
+                    afterRounds @ 4 - WK @ 2,
+                    afterRounds @ 5,
+                    afterRounds @ 6 ^ WK @ 3,
+                    afterRounds @ 7 ] : [8][8]
     
     dst = finalState
+
+property HIGHT_TESTVECTOR =
+  HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT1, TVKey1), TVKey1) == TVPT1 /\
+  HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT2, TVKey2), TVKey2) == TVPT2 /\
+  HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT3, TVKey3), TVKey3) == TVPT3 /\
+  HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT4, TVKey4), TVKey4) == TVPT4
+
+// property HIGHT_Correctness (src : [8][8]) (key : [16][8]) = 
+//     HIGHT_Decrypt (zero, HIGHT_Encrypt (zero, src, key), key) == src

@@ -17,9 +17,9 @@ OBJS = $(OBJDIR)/hight_core.o $(OBJDIR)/hight_utils.o \
 	$(OBJDIR)/main.o
 
 TARGET = $(BINDIR)/hight
-BC_FILES = $(TESTDIR)/hight_core.bc # $(TESTDIR)/hight_utils.bc $(TESTDIR)/main.bc
-SAW_SCRIPT = $(TESTDIR)/hight-verify.saw
-CRYPTOL_FILE = $(TESTDIR)/HIGHT.cry
+BC_FILES = hight_core.bc # $(TESTDIR)/hight_utils.bc $(TESTDIR)/main.bc
+SAW_SCRIPT = HIGHT-VERIF.saw
+CRYPTOL_FILE = HIGHT.cry
 
 .PHONY: all clean dir rebuild verify
 
@@ -45,7 +45,7 @@ dir:
 rebuild: clean all
 
 # Compile C code to LLVM bitcode
-$(TESTDIR)/%.bc: $(SRCDIR)/%.c
+%.bc: $(SRCDIR)/%.c
 	$(LLVM_CC) $(LLVM_CFLAGS) $< -o $@
 
 # Run SAWScript
