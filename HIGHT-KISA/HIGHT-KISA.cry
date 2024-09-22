@@ -154,6 +154,40 @@ updateMK2 mk = rotatedMK
     rotatedSecondHalf = rotateLeft8 secondHalf
     rotatedMK = rotatedFirstHalf # rotatedSecondHalf
 
+// Define the HIGHT_KeySched function
+HIGHT_KeySched_Cryptol : ([8][8], [128][8], [16][8]) -> ([8][8], [128][8])
+HIGHT_KeySched_Cryptol (_, _, MK) = (enc_WK, enc_SK)
+  where
+    // Generate whitening keys
+    enc_WK = [
+      MK@12, MK@13, MK@14, MK@15,
+      MK@0, MK@1, MK@2, MK@3
+    ]
+
+    // Generate subkeys
+    enc_SK = [ subkey i | i:[8] <- [0..127] ]
+      where
+        subkey i = 
+          if i < 16
+          then MK @ i + delta_table @ i
+          else if i < 32
+          then (updateMK MK) @ (i - 16) + delta_table @ i
+          else if i < 48
+          then (updateMK (updateMK MK)) @ ((i - 32)) + delta_table @ i
+          else if i < 64
+          then (updateMK (updateMK (updateMK MK))) @ (i - 48)
+                + delta_table @ i
+          else if i < 80
+          then (updateMK (updateMK (updateMK (updateMK MK)))) @ (i - 64)
+                + delta_table @ i
+          else if i < 96
+          then (updateMK2 (updateMK2 (updateMK2 MK))) @ (i - 80) 
+                + delta_table @ i
+          else if i < 112
+          then (updateMK2 (updateMK2 MK)) @ (i - 96) + delta_table @ i
+          else
+              (updateMK2 MK) @ (i - 112) + delta_table @ i
+
 // Define the encKeySchedule function
 encKeySchedule : ([8][8], [128][8], [16][8]) -> ([8][8], [128][8])
 encKeySchedule (_, _, MK) = (enc_WK, enc_SK)

@@ -42,7 +42,7 @@ void HIGHT_Encrypt(u8 dst[8], const u8 src[8], const u8 MK[16]) {
     state[4] += WK[2];
     state[6] ^= WK[3];
     
-    for (u8 i = 0; i < 31; i++) {
+    for (u8 i = 0; i < 16; i++) {
         u8 t0 = state[7], t1 = state[6];
         state[7] = state[6];
         state[6] = state[5] + (F1(state[4]) ^ SK[i * 4 + 2]);
@@ -116,7 +116,7 @@ void HIGHT_Decrypt(u8 dst[8], const u8 src[8], const u8 MK[16]) {
     state[5] -= (F1(state[4]) ^ SK[1]); // SK[127- 126]
     state[7] ^= (F0(state[6]) + SK[0]); // SK[127- 127]
 
-    for (i8 i = 1; i < 32; i++) {
+    for (i8 i = 1; i < 17; i++) {
         u8 temp0 = state[0];
         u8 temp2 = state[2];
         u8 temp4 = state[4];
@@ -127,10 +127,10 @@ void HIGHT_Decrypt(u8 dst[8], const u8 src[8], const u8 MK[16]) {
         state[4] = state[5];
         state[6] = state[7];
 
-        state[7] = temp0 ^ (F0(state[7]) + SK[i * 4 + 0]);
-        state[5] = temp6 - (F1(state[5]) ^ SK[i * 4 + 1]);
-        state[3] = temp4 ^ (F0(state[3]) + SK[i * 4 + 2]);
         state[1] = temp2 - (F1(state[1]) ^ SK[i * 4 + 3]);
+        state[3] = temp4 ^ (F0(state[3]) + SK[i * 4 + 2]);
+        state[5] = temp6 - (F1(state[5]) ^ SK[i * 4 + 1]);
+        state[7] = temp0 ^ (F0(state[7]) + SK[i * 4 + 0]);
     }
 
     state[0] -= WK[0];

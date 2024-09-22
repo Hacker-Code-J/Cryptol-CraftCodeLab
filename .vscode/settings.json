@@ -80,7 +80,8 @@
     "crucible.h": "c",
     "stdint.h": "c",
     "hight.h": "c",
-    "salsa20.h": "c"
+    "salsa20.h": "c",
+    "kisa_hight_ecb.h": "c"
   },
   "files.exclude": {
     "**/*.vo": true,
