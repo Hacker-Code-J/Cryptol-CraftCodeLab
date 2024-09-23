@@ -10,7 +10,7 @@
 #define _HIGHT_H_
 
 /*************** Header files *********************************************/
-
+#include <stdint.h>
 
 /*************** Definitions **********************************************/
 
@@ -72,7 +72,6 @@ void    HIGHT_Encrypt(
 void    HIGHT_Decrypt(
             BYTE    *RoundKey,      
             BYTE    *Data);         
-                                    
-
+                                
 
 #endif  /* _HIGHT_H_ */

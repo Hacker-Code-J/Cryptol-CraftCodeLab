@@ -1,105 +1,54 @@
 include "helpers.saw";
-import "HIGHT.cry";
+import "HIGHT-KISA.cry";
 
 // Define the setup for encKeySchedule
-let encKeySchedule_setup : CrucibleSetup () = do {
-    (enc_WK, p_enc_WK) <- ptr_to_fresh "enc_WK" (llvm_array 8 (llvm_int 8));
-    (enc_SK, p_enc_SK) <- ptr_to_fresh "enc_SK" (llvm_array 128 (llvm_int 8));
-    (MK, p_MK) <- ptr_to_fresh_readonly "MK" (llvm_array 16 (llvm_int 8));
+let KeySched_setup : CrucibleSetup () = do {
+    (MK, p_mk) <- ptr_to_fresh_readonly "MK" (llvm_array 16 (llvm_int 8));
+    (RK, p_rk) <- ptr_to_fresh "RK" (llvm_array 136 (llvm_int 8));
 
-    llvm_execute_func [p_enc_WK, p_enc_SK, p_MK];
+    llvm_execute_func [p_mk, llvm_term {{ 0 : [32] }}, p_rk];
 
-    let result = {{ encKeySchedule (enc_WK, enc_SK, MK) }};
-    llvm_points_to p_enc_WK (llvm_term {{ result.0 }});
-    llvm_points_to p_enc_SK (llvm_term {{ result.1 }});
-};
-
-// Define the setup for decKeySchedule
-let decKeySchedule_setup : CrucibleSetup () = do {
-    (dec_WK, p_dec_WK) <- ptr_to_fresh "dec_WK" (llvm_array 8 (llvm_int 8));
-    (dec_SK, p_dec_SK) <- ptr_to_fresh "dec_SK" (llvm_array 128 (llvm_int 8));
-    (MK, p_MK) <- ptr_to_fresh_readonly "MK" (llvm_array 16 (llvm_int 8));
-
-    llvm_execute_func [p_dec_WK, p_dec_SK, p_MK];
-
-    let result = {{ decKeySchedule (dec_WK, dec_SK, MK) }};
-    llvm_points_to p_dec_WK (llvm_term {{ result.0 }});
-    llvm_points_to p_dec_SK (llvm_term {{ result.1 }});
+    let result = {{ HIGHT_KeySched_Cryptol MK }};
+    llvm_points_to p_rk (llvm_term result);
 };
 
 // Define the setup for HIGHT_Encrypt
 let HIGHT_Encrypt_setup : CrucibleSetup () = do {
-    (dst, p_dst) <- ptr_to_fresh "dst" (llvm_array 8 (llvm_int 8));
+    (RK, p_rk) <- ptr_to_fresh_readonly "RK" (llvm_array 136 (llvm_int 8));
     (src, p_src) <- ptr_to_fresh_readonly "src" (llvm_array 8 (llvm_int 8));
-    (MK, p_MK) <- ptr_to_fresh_readonly "MK" (llvm_array 16 (llvm_int 8));
+    (dst, p_dst) <- ptr_to_fresh "dst" (llvm_array 8 (llvm_int 8));
+    
+    llvm_execute_func [p_rk, p_src, p_dst];
 
-    llvm_execute_func [p_dst, p_src, p_MK];
-
-    let result = {{ HIGHT_Encrypt (dst, src, MK) }};
+    let result = {{ HIGHT_Encrypt_Cryptol (RK, src) }};
     llvm_points_to p_dst (llvm_term result);
 };
 
-// Define the setup for HIGHT_Decrypt
-let HIGHT_Decrypt_setup : CrucibleSetup () = do {
-    (dst, p_dst) <- ptr_to_fresh "dst" (llvm_array 8 (llvm_int 8));
-    (src, p_src) <- ptr_to_fresh_readonly "src" (llvm_array 8 (llvm_int 8));
-    (MK, p_MK) <- ptr_to_fresh_readonly "MK" (llvm_array 16 (llvm_int 8));
+// // Define the setup for HIGHT_Decrypt
+// let HIGHT_Decrypt_setup : CrucibleSetup () = do {
+//     (dst, p_dst) <- ptr_to_fresh "dst" (llvm_array 8 (llvm_int 8));
+//     (src, p_src) <- ptr_to_fresh_readonly "src" (llvm_array 8 (llvm_int 8));
+//     (MK, p_MK) <- ptr_to_fresh_readonly "MK" (llvm_array 16 (llvm_int 8));
 
-    llvm_execute_func [p_dst, p_src, p_MK];
+//     llvm_execute_func [p_dst, p_src, p_MK];
 
-    let result = {{ HIGHT_Decrypt (dst, src, MK) }};
-    llvm_points_to p_dst (llvm_term result);
-};
+//     let result = {{ HIGHT_Decrypt (dst, src, MK) }};
+//     llvm_points_to p_dst (llvm_term result);
+// };
 
 // Main function to run the verification
 let main : TopLevel () = do {
-    m <- llvm_load_module "hight_core.bc";
+    m <- llvm_load_module "KISA_HIGHT_ECB.bc";
 
     print "[ Start ==========================> ]";
-    encKeySchedule_verify <- llvm_verify m "encKeySchedule" [] true encKeySchedule_setup z3;
-    decKeySchedule_verify <- llvm_verify m "decKeySchedule" [] true decKeySchedule_setup z3;
-    print "[ Round 0 ~ 15 ]";
-    // HIGHT_Encrypt_verify <- llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
-    // HIGHT_Decrypt_verify <- llvm_verify m "HIGHT_Decrypt" [] true HIGHT_Decrypt_setup z3;
+    KeySched_verify <- llvm_verify m "HIGHT_KeySched" [] true KeySched_setup z3;
     print "[ ============================= End ]";
 
+    print "[ Start ==========================> ]";
+    HIGHT_Encrypt_verify <- llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
+    print "[ ============================= End ]";
+    
     // Print the verification result
-    print encKeySchedule_verify;
-    print decKeySchedule_verify;
-    // print HIGHT_Encrypt_verify;
-    // print HIGHT_Decrypt_verify;
+    print KeySched_verify;
+    print HIGHT_Encrypt_verify;
 };
-
-// // Main function to run the verification
-// let main : TopLevel () = do {
-//     m <- llvm_load_module "hight_core.bc";
-
-//     // Verify encKeySchedule function
-//     // print "[ Start ==========================> ]";
-//     encKeySchedule_verify <- llvm_verify m "encKeySchedule" [] true encKeySchedule_setup z3;
-//     // decKeySchedule_verify <- llvm_verify m "decKeySchedule" [] true decKeySchedule_setup z3;
-//     // print "[ ============================= End ]";
-
-//     // Print the verification result
-//     print encKeySchedule_verify;
-//     // print decKeySchedule_verify;
-
-//     // Verify HIGHT_Encrypt function
-//     // print "[ Start ==========================> ]";
-//     // HIGHT_Encrypt_verify <- llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
-//     // print "[ ============================= End ]";
-
-//     // Print the verification result
-//     // print HIGHT_Encrypt_verify;
-
-//     // Verify HIGHT_Encrypt function
-//     // print "[ Start ==========================> ]";
-//     // HIGHT_Decrypt_verify <- llvm_verify m "HIGHT_Decrypt" [] true HIGHT_Decrypt_setup z3;
-//     // print "[ ============================= End ]";
-
-//     // Print the verification result
-//     // print HIGHT_Decrypt_verify;
-// };
-
-// Run the main function
-// main;

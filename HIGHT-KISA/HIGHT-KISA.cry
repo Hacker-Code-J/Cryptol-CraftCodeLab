@@ -4,7 +4,7 @@
  * Distributed under the terms of the BSD3 license (see LICENSE file)
  */
 
-module HIGHT where
+module HIGHT_KISA where
 
 // Test Vectors
 tvKey1 : [128]
@@ -138,16 +138,16 @@ rotateLeft8 block = drop`{1} block # take`{1} block
 rotateRight8 : [8][8] -> [8][8]
 rotateRight8 block = drop`{7} block # take`{7} block
 
-updateMK : [16][8] -> [16][8]
-updateMK mk = rotatedMK
+right_update_MK : [16][8] -> [16][8]
+right_update_MK mk = rotatedMK
     where
     (firstHalf, secondHalf) = splitAt`{8} mk
     rotatedFirstHalf = rotateRight8 firstHalf
     rotatedSecondHalf = rotateRight8 secondHalf
     rotatedMK = rotatedFirstHalf # rotatedSecondHalf
 
-updateMK2 : [16][8] -> [16][8]
-updateMK2 mk = rotatedMK
+left_update_MK : [16][8] -> [16][8]
+left_update_MK mk = rotatedMK
     where
     (firstHalf, secondHalf) = splitAt`{8} mk
     rotatedFirstHalf = rotateLeft8 firstHalf
@@ -155,145 +155,46 @@ updateMK2 mk = rotatedMK
     rotatedMK = rotatedFirstHalf # rotatedSecondHalf
 
 // Define the HIGHT_KeySched function
-HIGHT_KeySched_Cryptol : ([8][8], [128][8], [16][8]) -> ([8][8], [128][8])
-HIGHT_KeySched_Cryptol (_, _, MK) = (enc_WK, enc_SK)
+HIGHT_KeySched_Cryptol : [16][8] -> [136][8]
+HIGHT_KeySched_Cryptol MK = RK
   where
-    // Generate whitening keys
-    enc_WK = [
-      MK@12, MK@13, MK@14, MK@15,
-      MK@0, MK@1, MK@2, MK@3
-    ]
-
-    // Generate subkeys
-    enc_SK = [ subkey i | i:[8] <- [0..127] ]
+    // Generate round-keys
+    RK = [ subkey i | i:[8] <- [0..135] ]
       where
         subkey i = 
-          if i < 16
-          then MK @ i + delta_table @ i
-          else if i < 32
-          then (updateMK MK) @ (i - 16) + delta_table @ i
-          else if i < 48
-          then (updateMK (updateMK MK)) @ ((i - 32)) + delta_table @ i
-          else if i < 64
-          then (updateMK (updateMK (updateMK MK))) @ (i - 48)
-                + delta_table @ i
-          else if i < 80
-          then (updateMK (updateMK (updateMK (updateMK MK)))) @ (i - 64)
-                + delta_table @ i
-          else if i < 96
-          then (updateMK2 (updateMK2 (updateMK2 MK))) @ (i - 80) 
-                + delta_table @ i
-          else if i < 112
-          then (updateMK2 (updateMK2 MK)) @ (i - 96) + delta_table @ i
+          if i < 4
+          then MK @ (12 + i)
+          else if i < 8
+          then MK @ (i - 4)
+          else if i < 24
+          then MK @ (i - 8) + delta_table @ (i - 8)
+          else if i < 40
+          then (right_update_MK MK) @ (i - 24) + delta_table @ (i - 8)
+          else if i < 56
+          then (right_update_MK (right_update_MK MK)) @ ((i - 40)) + delta_table @ (i - 8)
+          else if i < 72
+          then (right_update_MK (right_update_MK (right_update_MK MK))) @ (i - 56)
+                + delta_table @ (i - 8)
+          else if i < 88
+          then (right_update_MK (right_update_MK (right_update_MK (right_update_MK MK)))) @ (i - 72)
+                + delta_table @ (i - 8)
+          else if i < 104
+          then (left_update_MK (left_update_MK (left_update_MK MK))) @ (i - 88) 
+                + delta_table @ (i - 8)
+          else if i < 120
+          then (left_update_MK (left_update_MK MK)) @ (i - 104) + delta_table @ (i - 8)
           else
-              (updateMK2 MK) @ (i - 112) + delta_table @ i
+              (left_update_MK MK) @ (i - 120) + delta_table @ (i - 8)
 
-// Define the encKeySchedule function
-encKeySchedule : ([8][8], [128][8], [16][8]) -> ([8][8], [128][8])
-encKeySchedule (_, _, MK) = (enc_WK, enc_SK)
-  where
-    // Generate whitening keys
-    enc_WK = [
-      MK@12, MK@13, MK@14, MK@15,
-      MK@0, MK@1, MK@2, MK@3
-    ]
-
-    // Generate subkeys
-    enc_SK = [ subkey i | i:[8] <- [0..127] ]
-      where
-        subkey i = 
-          if i < 16
-          then MK @ i + delta_table @ i
-          else if i < 32
-          then (updateMK MK) @ (i - 16) + delta_table @ i
-          else if i < 48
-          then (updateMK (updateMK MK)) @ ((i - 32)) + delta_table @ i
-          else if i < 64
-          then (updateMK (updateMK (updateMK MK))) @ (i - 48)
-                + delta_table @ i
-          else if i < 80
-          then (updateMK (updateMK (updateMK (updateMK MK)))) @ (i - 64)
-                + delta_table @ i
-          else if i < 96
-          then (updateMK2 (updateMK2 (updateMK2 MK))) @ (i - 80) 
-                + delta_table @ i
-          else if i < 112
-          then (updateMK2 (updateMK2 MK)) @ (i - 96) + delta_table @ i
-          else
-              (updateMK2 MK) @ (i - 112) + delta_table @ i
-
-// Define the decKeySchedule function
-decKeySchedule : ([8][8], [128][8], [16][8]) -> ([8][8], [128][8])
-decKeySchedule (_, _, MK) = (dec_WK, dec_SK)
-  where
-    // Generate whitening keys
-    dec_WK = [
-      MK@12, MK@13, MK@14, MK@15,
-      MK@0, MK@1, MK@2, MK@3
-    ]
-
-    // Generate subkeys
-    dec_SK = [ subkey i | i:[8] <- [0..127] ]
-      where
-        subkey i = 
-          if i < 16
-          then (updateMK2 MK) @ (15 - i) + delta_table @ (127 - i)
-          else if i < 32
-          then (updateMK2 (updateMK2 MK)) @ (31 - i) + delta_table @ (127 - i)
-          else if i < 48
-          then (updateMK2 (updateMK2 (updateMK2 MK))) @ (47 - i) 
-                + delta_table @ (127 - i)
-          else if i < 64
-          then (updateMK (updateMK (updateMK (updateMK MK)))) @ (63 - i)
-                + delta_table @ (127 - i)
-          else if i < 80
-          then (updateMK (updateMK (updateMK MK))) @ (79 - i)
-                + delta_table @ (127 - i)
-          else if i < 96
-          then (updateMK (updateMK MK)) @ (95 - i) + delta_table @ (127 - i)
-          else if i < 112
-          then (updateMK MK) @ (111 - i) + delta_table @ (127 - i)
-          else
-              MK @ (127 - i) + delta_table @ (127 - i)
-
-
-property KeySchedule_TESTVECTOR =
-  (encKeySchedule (zero, zero, TVKey1) == 
-  ([0x33, 0x22, 0x11, 0x00, 0xff, 0xee, 0xdd, 0xcc], transformTVSK TVSK1)) /\
-  (encKeySchedule (zero, zero, TVKey2) == 
-  ([0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33], transformTVSK TVSK2)) /\
-  (encKeySchedule (zero, zero, TVKey3) == 
-  ([0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c], transformTVSK TVSK3)) /\
-  (encKeySchedule (zero, zero, TVKey4) == 
-  ([0xbc, 0xc3, 0xdb, 0x28, 0xe7, 0x2b, 0x42, 0x1d], transformTVSK TVSK4))
-
-property KeySchedule_WK =
-  (enc_WK1 == dec_WK1) /\ (enc_WK2 == dec_WK2) /\
-  (enc_WK3 == dec_WK3) /\ (enc_WK4 == dec_WK4)
-    where
-      (enc_WK1, _) = encKeySchedule (zero, zero, TVKey1)
-      (dec_WK1, _) = decKeySchedule (zero, zero, TVKey1)
-      (enc_WK2, _) = encKeySchedule (zero, zero, TVKey2)
-      (dec_WK2, _) = decKeySchedule (zero, zero, TVKey2)
-      (enc_WK3, _) = encKeySchedule (zero, zero, TVKey3)
-      (dec_WK3, _) = decKeySchedule (zero, zero, TVKey3)
-      (enc_WK4, _) = encKeySchedule (zero, zero, TVKey4)
-      (dec_WK4, _) = decKeySchedule (zero, zero, TVKey4)
-
-property KeySchedule_SK =
-  (enc_SK1 == reverse dec_SK1) /\
-  (enc_SK2 == reverse dec_SK2) /\
-  (enc_SK3 == reverse dec_SK3) /\
-  (enc_SK4 == reverse dec_SK4)
-    where
-      (_, enc_SK1) = encKeySchedule (zero, zero, TVKey1)
-      (_, dec_SK1) = decKeySchedule (zero, zero, TVKey1)
-      (_, enc_SK2) = encKeySchedule (zero, zero, TVKey2)
-      (_, dec_SK2) = decKeySchedule (zero, zero, TVKey2)
-      (_, enc_SK3) = encKeySchedule (zero, zero, TVKey3)
-      (_, dec_SK3) = decKeySchedule (zero, zero, TVKey3)
-      (_, enc_SK4) = encKeySchedule (zero, zero, TVKey4)
-      (_, dec_SK4) = decKeySchedule (zero, zero, TVKey4)
+property HIGHT_KeySched_Cryptol_TESTVECTOR =
+  (HIGHT_KeySched_Cryptol TVKey1 == 
+  [0x33, 0x22, 0x11, 0x00, 0xff, 0xee, 0xdd, 0xcc] # transformTVSK TVSK1) /\
+  (HIGHT_KeySched_Cryptol TVKey2 == 
+  ([0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33] # transformTVSK TVSK2)) /\
+  (HIGHT_KeySched_Cryptol TVKey3 == 
+  ([0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c] # transformTVSK TVSK3)) /\
+  (HIGHT_KeySched_Cryptol TVKey4 == 
+  ([0xbc, 0xc3, 0xdb, 0x28, 0xe7, 0x2b, 0x42, 0x1d] # transformTVSK TVSK4))
 
 // ======================== Encryption ========================
 
@@ -304,15 +205,15 @@ F1 : [8] -> [8]
 F1 byte = (byte <<< 3) ^ (byte <<< 4) ^ (byte <<< 6)
 
 // Function to perform a single round of HIGHT encryption
-enc_round : [8][8] -> [128][8] -> [8] -> [8][8]
+enc_round : [8][8] -> [136][8] -> [8] -> [8][8]
 enc_round state SK i = [
-    t0 ^ (F0 t1 + SK @ (i * 4 + 3)),
+    t0 ^ (F0 t1 + SK @ (8 + (i * 4 + 3))),
     state @ 0,
-    state @ 1 + (F1 (state @ 0) ^ SK @ (i * 4 + 0)),
+    state @ 1 + (F1 (state @ 0) ^ SK @ (8 + (i * 4 + 0))),
     state @ 2,
-    state @ 3 ^ (F0 (state @ 2) + SK @ (i * 4 + 1)),
+    state @ 3 ^ (F0 (state @ 2) + SK @ (8 + (i * 4 + 1))),
     state @ 4,
-    state @ 5 + (F1 (state @ 4) ^ SK @ (i * 4 + 2)),
+    state @ 5 + (F1 (state @ 4) ^ SK @ (8 + (i * 4 + 2))),
     state @ 6
   ]
   where
@@ -320,109 +221,107 @@ enc_round state SK i = [
     t1 = state @ 6
 
 // Function to perform all 31 rounds of HIGHT encryption
-enc_rounds : [8][8] -> [128][8] -> [8][8]
-enc_rounds state SK = foldl (\s i -> enc_round s SK i) state [0..15]
+enc_rounds : [8][8] -> [136][8] -> [8][8]
+enc_rounds state SK = foldl (\s i -> enc_round s SK i) state [0..2]
 
-HIGHT_Encrypt : ([8][8], [8][8], [16][8]) -> [8][8]
-HIGHT_Encrypt (_, src, MK) = dst
+HIGHT_Encrypt_Cryptol : ([136][8], [8][8]) -> [8][8]
+HIGHT_Encrypt_Cryptol (RK, src) = dst
   where
-    (WK, SK) = encKeySchedule(zero, zero, MK)
-    
-    initialState = [ src @ 0 + WK @ 0,
+    initialState = [ src @ 0 + RK @ 0,
                     src @ 1,
-                    src @ 2 ^ WK @ 1,
+                    src @ 2 ^ RK @ 1,
                     src @ 3,
-                    src @ 4 + WK @ 2,
+                    src @ 4 + RK @ 2,
                     src @ 5,
-                    src @ 6 ^ WK @ 3,
+                    src @ 6 ^ RK @ 3,
                     src @ 7 ] : [8][8]
     
     afterRounds : [8][8]
-    afterRounds = enc_rounds initialState SK
+    afterRounds = enc_rounds initialState RK
 
     finalState = [
-      afterRounds @ 0 + WK @ 4,
-      afterRounds @ 1 + (F1 (afterRounds @ 0) ^ SK @ 124),
-      afterRounds @ 2 ^ WK @ 5,
-      afterRounds @ 3 ^ (F0 (afterRounds @ 2) + SK @ 125),
-      afterRounds @ 4 + WK @ 6,
-      afterRounds @ 5 + (F1 (afterRounds @ 4) ^ SK @ 126),
-      afterRounds @ 6 ^ WK @ 7,
-      afterRounds @ 7 ^ (F0 (afterRounds @ 6) + SK @ 127)
-    ] : [8][8]
+      afterRounds @ 0 + RK @ 4,
+      afterRounds @ 1 + (F1 (afterRounds @ 0) ^ RK @ 132),
+      afterRounds @ 2 ^ RK @ 5,
+      afterRounds @ 3 ^ (F0 (afterRounds @ 2) + RK @ 133),
+      afterRounds @ 4 + RK @ 6,
+      afterRounds @ 5 + (F1 (afterRounds @ 4) ^ RK @ 134),
+      afterRounds @ 6 ^ RK @ 7,
+      afterRounds @ 7 ^ (F0 (afterRounds @ 6) + RK @ 135)
+    ]
 
     dst = finalState
 
-property Encryption_TESTVECTOR =
-  (HIGHT_Encrypt (zero, TVPT1, TVKey1) == TVCT1) /\
-  (HIGHT_Encrypt (zero, TVPT2, TVKey2) == TVCT2) /\
-  (HIGHT_Encrypt (zero, TVPT3, TVKey3) == TVCT3) /\
-  (HIGHT_Encrypt (zero, TVPT4, TVKey4) == TVCT4)
+property HIGHT_Encrypt_Cryptol_TESTVECTOR =
+  (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey1, TVPT1) == TVCT1) /\
+  (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey2, TVPT2) == TVCT2) /\
+  (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey3, TVPT3) == TVCT3) /\
+  (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey4, TVPT4) == TVCT4)
 
-// ======================== Decryption ========================
+// // ======================== Decryption ========================
 
-// Function to perform a single round of HIGHT encryption
-dec_round : [8][8] -> [128][8] -> [8] -> [8][8]
-dec_round state SK i = [
-    state @ 1,
-    t2 - (F1(state @ 1) ^ (SK @ (i * 4 + 3))),
-    state @ 3,
-    t4 ^ F0(state @ 3) + (SK @ (i * 4 + 2)),
-    state @ 5,
-    t6 - (F1(state @ 5) ^ (SK @ (i * 4 + 1))),
-    state @ 7,
-    t0 ^ F0(state @ 7) + (SK @ (i * 4 + 0))
-  ]
-  where
-    t0 = state @ 0
-    t2 = state @ 2
-    t4 = state @ 4
-    t6 = state @ 6
+// // Function to perform a single round of HIGHT encryption
+// dec_round : [8][8] -> [128][8] -> [8] -> [8][8]
+// dec_round state SK i = [
+//     state @ 1,
+//     t2 - (F1(state @ 1) ^ (SK @ (i * 4 + 3))),
+//     state @ 3,
+//     t4 ^ F0(state @ 3) + (SK @ (i * 4 + 2)),
+//     state @ 5,
+//     t6 - (F1(state @ 5) ^ (SK @ (i * 4 + 1))),
+//     state @ 7,
+//     t0 ^ F0(state @ 7) + (SK @ (i * 4 + 0))
+//   ]
+//   where
+//     t0 = state @ 0
+//     t2 = state @ 2
+//     t4 = state @ 4
+//     t6 = state @ 6
 
-// Function to perform all 31 rounds of HIGHT decryption
-dec_rounds : [8][8] -> [128][8] -> [8][8]
-dec_rounds state SK = foldl (\s i -> dec_round s SK i) state [1..16]
+// // Function to perform all 31 rounds of HIGHT decryption
+// dec_rounds : [8][8] -> [128][8] -> [8][8]
+// dec_rounds state SK = foldl (\s i -> dec_round s SK i) state [1..16]
 
-HIGHT_Decrypt : ([8][8], [8][8], [16][8]) -> [8][8]
-HIGHT_Decrypt (_, src, MK) = dst
-  where
-    (WK, SK) = decKeySchedule(zero, zero, MK)
+// HIGHT_Decrypt : ([8][8], [8][8], [16][8]) -> [8][8]
+// HIGHT_Decrypt (_, src, MK) = dst
+//   where
+//     (WK, SK) = decKeySchedule(zero, zero, MK)
 
-    initialState : [8][8]
-    initialState = [
-      t0,
-      src @ 1 - ((F1 t0) ^ (SK @ 3)),
-      t2,
-      src @ 3 ^ ((F0 t2) + (SK @ 2)),
-      t4,
-      src @ 5 - ((F1 t4) ^ (SK @ 1)),
-      t6,
-      src @ 7 ^ ((F0 t6) + (SK @ 0))
-    ] where
-      t0 = src @ 0 - WK @ 4
-      t2 = src @ 2 ^ WK @ 5
-      t4 = src @ 4 - WK @ 6
-      t6 = src @ 6 ^ WK @ 7
+//     initialState : [8][8]
+//     initialState = [
+//       t0,
+//       src @ 1 - ((F1 t0) ^ (SK @ 3)),
+//       t2,
+//       src @ 3 ^ ((F0 t2) + (SK @ 2)),
+//       t4,
+//       src @ 5 - ((F1 t4) ^ (SK @ 1)),
+//       t6,
+//       src @ 7 ^ ((F0 t6) + (SK @ 0))
+//     ] where
+//       t0 = src @ 0 - WK @ 4
+//       t2 = src @ 2 ^ WK @ 5
+//       t4 = src @ 4 - WK @ 6
+//       t6 = src @ 6 ^ WK @ 7
 
-    afterRounds : [8][8]
-    afterRounds = dec_rounds initialState SK
+//     afterRounds : [8][8]
+//     afterRounds = dec_rounds initialState SK
 
-    finalState = [ afterRounds @ 0 - WK @ 0,
-                    afterRounds @ 1,
-                    afterRounds @ 2 ^ WK @ 1,
-                    afterRounds @ 3,
-                    afterRounds @ 4 - WK @ 2,
-                    afterRounds @ 5,
-                    afterRounds @ 6 ^ WK @ 3,
-                    afterRounds @ 7 ] : [8][8]
+//     finalState = [ afterRounds @ 0 - WK @ 0,
+//                     afterRounds @ 1,
+//                     afterRounds @ 2 ^ WK @ 1,
+//                     afterRounds @ 3,
+//                     afterRounds @ 4 - WK @ 2,
+//                     afterRounds @ 5,
+//                     afterRounds @ 6 ^ WK @ 3,
+//                     afterRounds @ 7 ] : [8][8]
     
-    dst = finalState
+//     dst = finalState
 
-property HIGHT_TESTVECTOR =
-  HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT1, TVKey1), TVKey1) == TVPT1 /\
-  HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT2, TVKey2), TVKey2) == TVPT2 /\
-  HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT3, TVKey3), TVKey3) == TVPT3 /\
-  HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT4, TVKey4), TVKey4) == TVPT4
+// property HIGHT_TESTVECTOR =
+//   HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT1, TVKey1), TVKey1) == TVPT1 /\
+//   HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT2, TVKey2), TVKey2) == TVPT2 /\
+//   HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT3, TVKey3), TVKey3) == TVPT3 /\
+//   HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT4, TVKey4), TVKey4) == TVPT4
 
 // property HIGHT_Correctness ` (src : [8][8]) (key : [16][8]) = 
 //     HIGHT_Decrypt (zero, HIGHT_Encrypt (zero, src, key), key) == src

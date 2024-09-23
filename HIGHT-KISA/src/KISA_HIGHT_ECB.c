@@ -10,12 +10,13 @@
 
 /*************** Header files *********************************************/
 #include <stdio.h>
+#include <string.h>
 #include "KISA_HIGHT_ECB.h"
 
 /*************** Macros ***************************************************/
 
 /*************** Global Variables *****************************************/
-static BYTE Delta[128] = {
+static const BYTE Delta[128] = {
         0x5A,0x6D,0x36,0x1B,0x0D,0x06,0x03,0x41,
         0x60,0x30,0x18,0x4C,0x66,0x33,0x59,0x2C,
         0x56,0x2B,0x15,0x4A,0x65,0x72,0x39,0x1C,
@@ -104,9 +105,9 @@ static BYTE HIGHT_F1[256] = {
 /*************** Function *************************************************/
 
 void    HIGHT_KeySched(
-            BYTE    *UserKey,   // Byte = 8-bit 
+            BYTE*    UserKey,   // Byte = 8-bit 
             DWORD   UserKeyLen, // DWORD = 32-bit
-            BYTE    *RoundKey)      
+            BYTE*    RoundKey)      
 {
     int     i, j;
 
@@ -276,8 +277,12 @@ void    HIGHT_Decrypt(
 int main()
 {
 	BYTE pdwRoundKey[136] = {0,};																									// Round keys for encryption or decryption
-	BYTE pbUserKey[16] = {0x88, 0xE3, 0x4F, 0x8F, 0x08, 0x17, 0x79, 0xF1, 0xE9, 0xF3, 0x94, 0x37, 0x0A, 0xD4, 0x05, 0x89 }; 		// User secret key
-	BYTE pbData[8]    = {0xD7, 0x6D, 0x0D,0x18, 0x32, 0x7E, 0xC5, 0x62}; 															// input plaintext to be encrypted
+	// BYTE pbUserKey[16] = {0x88, 0xE3, 0x4F, 0x8F, 0x08, 0x17, 0x79, 0xF1, 0xE9, 0xF3, 0x94, 0x37, 0x0A, 0xD4, 0x05, 0x89 }; 		// User secret key
+    // BYTE pbData[8]    = {0xD7, 0x6D, 0x0D,0x18, 0x32, 0x7E, 0xC5, 0x62}; 															// input plaintext to be encrypted
+    
+    // BYTE pbUserKey[16] = {0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    BYTE pbUserKey[16] = {0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00 };
+    BYTE pbData[8]    = { 0x00, };
 
 	int i;
 
@@ -293,7 +298,14 @@ int main()
 		
 // Derive roundkeys from user secret key
 	HIGHT_KeySched( pbUserKey, 16, pdwRoundKey );
-	
+
+// Print Round Keys
+	// printf ("\nRound Keys  : \n");
+	// for (i=0;i<136;i++)	{
+    //     if ((i != 0) && (i % 8 == 0)) puts("");
+    //     printf("%02X ",pdwRoundKey[i]);
+    // } puts("");
+		
 // Encryption
 	printf ("\n\nEncryption....\n");
 	HIGHT_Encrypt( pdwRoundKey, pbData );
@@ -302,6 +314,7 @@ int main()
 	printf ("Ciphertext : ");
 	for (i=0;i<8;i++)	
 		printf("%02X ",pbData[i]);
+    puts("");
 	
 // Decryption
 	printf ("\n\nDecryption....\n");
@@ -311,13 +324,13 @@ int main()
 	printf ("Plaintext  : ");
 	for (i=0;i<8;i++)	
 		printf("%02X ",pbData[i]);
-	
+	puts("");
 // Print round keys at round i
-	printf ("\n\nRound Key  : \n");
-	for (i=0;i<8;i++) {
-		printf("K%2d,0 : %08X\t", i+1, pdwRoundKey[2*i]);
-		printf("K%2d,1 : %08X\n", i+1, pdwRoundKey[2*i+1]);
-	}
+	// printf ("\n\nRound Key  : \n");
+	// for (i=0;i<8;i++) {
+	// 	printf("K%2d,0 : %08X\t", i+1, pdwRoundKey[2*i]);
+	// 	printf("K%2d,1 : %08X\n", i+1, pdwRoundKey[2*i+1]);
+	// }
 
     return 0;
 }

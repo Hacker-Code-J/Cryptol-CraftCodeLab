@@ -37,7 +37,7 @@ run:
 	(cd bin && ./hight)
 
 clean:
-	rm -f $(OBJS) $(TARGET) $(OBJDIR)/*.d $(BC_FILES)
+	rm -rf $(OBJDIR) $(BINDIR) $(BC_FILES)
 
 dir:
 	@mkdir -p $(OBJDIR) $(BINDIR)

@@ -1,8 +1,15 @@
-# Compiler
-CC = clang
+# # Compiler
+# CC = clang
 
-# Compiler flags
-CFLAGS = -Wall -O2 -Iinclude
+# # Compiler flags
+# CFLAGS = -Wall -O2 -Iinclude
+
+# Compiler and flags
+CC = gcc
+CFLAGS = -Wall -std=c99 -g -O2 -I./include
+LDFLAGS =
+LLVM_CC = clang
+LLVM_CFLAGS = -c -emit-llvm -I$(INCDIR)
 
 # Directories
 SRCDIR = src
@@ -12,6 +19,9 @@ BINDIR = bin
 
 # Target executable
 TARGET = $(BINDIR)/hight_ecb
+BC_FILES = KISA_HIGHT_ECB.bc
+SAW_SCRIPT = HIGHT-KISA-VERIF.saw
+CRYPTOL_FILE = HIGHT-KISA.cry
 
 # Source and object files
 SRCS = $(wildcard $(SRCDIR)/*.c)
@@ -37,7 +47,7 @@ $(BINDIR):
 
 # Clean rule to remove the compiled files
 clean:
-	rm -rf $(OBJDIR) $(BINDIR)
+	rm -rf $(OBJDIR) $(BINDIR) *.bc
 
 # Rebuild rule: clean and build again
 rebuild: clean all
@@ -45,6 +55,14 @@ rebuild: clean all
 # Run rule: build and run the program
 run: $(TARGET)
 	./$(TARGET)
+
+# Compile C code to LLVM bitcode
+%.bc: $(SRCDIR)/%.c
+	$(LLVM_CC) $(LLVM_CFLAGS) $< -o $@
+
+# Run SAWScript
+verify: $(BC_FILES) $(SAW_SCRIPT) $(CRYPTOL_FILE)
+	saw $(SAW_SCRIPT)
 
 # Phony targets to prevent conflicts with file names
 .PHONY: all clean rebuild run

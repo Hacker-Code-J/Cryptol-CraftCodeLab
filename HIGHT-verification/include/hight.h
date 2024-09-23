@@ -25,6 +25,7 @@ static const u8 delta_table[128] = {
 void encKeySchedule(u8 enc_WK[8], 
                     u8 enc_SK[128],
                     const u8 MK[16]);
+
 void decKeySchedule(u8 dec_WK[8], u8 dec_SK[128], const u8 MK[16]);
 
 // static inline u8 ROTL(u8 byte, u8 shift) {
