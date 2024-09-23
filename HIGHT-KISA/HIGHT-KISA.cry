@@ -222,7 +222,7 @@ enc_round state SK i = [
 
 // Function to perform all 31 rounds of HIGHT encryption
 enc_rounds : [8][8] -> [136][8] -> [8][8]
-enc_rounds state SK = foldl (\s i -> enc_round s SK i) state [0..2]
+enc_rounds state SK = foldl (\s i -> enc_round s SK i) state [0..30]
 
 HIGHT_Encrypt_Cryptol : ([136][8], [8][8]) -> [8][8]
 HIGHT_Encrypt_Cryptol (RK, src) = dst

@@ -15,7 +15,7 @@ let KeySched_setup : CrucibleSetup () = do {
 // Define the setup for HIGHT_Encrypt
 let HIGHT_Encrypt_setup : CrucibleSetup () = do {
     (RK, p_rk) <- ptr_to_fresh_readonly "RK" (llvm_array 136 (llvm_int 8));
-    (src, p_src) <- ptr_to_fresh_readonly "src" (llvm_array 8 (llvm_int 8));
+    (src, p_src) <- ptr_to_fresh "src" (llvm_array 8 (llvm_int 8));
     (dst, p_dst) <- ptr_to_fresh "dst" (llvm_array 8 (llvm_int 8));
     
     llvm_execute_func [p_rk, p_src, p_dst];
