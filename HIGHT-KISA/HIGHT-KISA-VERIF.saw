@@ -37,6 +37,17 @@ let HIGHT_Encrypt_setup : CrucibleSetup () = do {
 // };
 
 // Main function to run the verification
+// let main : TopLevel () = do {
+//     m <- llvm_load_module "KISA_HIGHT_ECB.bc";
+//     print "[ Start ==========================> ]";
+//     KeySched_verify <- llvm_verify m "HIGHT_KeySched" [] true KeySched_setup z3;
+//     print "[ ============================= End ]";
+    
+//     // Print the verification result
+//     print KeySched_verify;
+// };
+
+// Main function to run the verification
 let main : TopLevel () = do {
     m <- llvm_load_module "KISA_HIGHT_ECB.bc";
 
