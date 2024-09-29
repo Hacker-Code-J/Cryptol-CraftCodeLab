@@ -9,7 +9,7 @@ let encKeySchedule_setup : CrucibleSetup () = do {
 
     llvm_execute_func [p_enc_WK, p_enc_SK, p_MK];
 
-    let result = {{ encKeySchedule (enc_WK, enc_SK, MK) }};
+    let result = {{ encKeySchedule MK }};
     llvm_points_to p_enc_WK (llvm_term {{ result.0 }});
     llvm_points_to p_enc_SK (llvm_term {{ result.1 }});
 };

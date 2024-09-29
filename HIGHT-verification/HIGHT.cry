@@ -155,8 +155,8 @@ updateMK2 mk = rotatedMK
     rotatedMK = rotatedFirstHalf # rotatedSecondHalf
 
 // Define the encKeySchedule function
-encKeySchedule : ([8][8], [128][8], [16][8]) -> ([8][8], [128][8])
-encKeySchedule (_, _, MK) = (enc_WK, enc_SK)
+encKeySchedule : [16][8] -> ([8][8], [128][8])
+encKeySchedule MK = (enc_WK, enc_SK)
   where
     // Generate whitening keys
     enc_WK = [
@@ -189,8 +189,8 @@ encKeySchedule (_, _, MK) = (enc_WK, enc_SK)
               (updateMK2 MK) @ (i - 112) + delta_table @ i
 
 // Define the decKeySchedule function
-decKeySchedule : ([8][8], [128][8], [16][8]) -> ([8][8], [128][8])
-decKeySchedule (_, _, MK) = (dec_WK, dec_SK)
+decKeySchedule : [16][8] -> ([8][8], [128][8])
+decKeySchedule MK = (dec_WK, dec_SK)
   where
     // Generate whitening keys
     dec_WK = [
@@ -224,13 +224,13 @@ decKeySchedule (_, _, MK) = (dec_WK, dec_SK)
 
 
 property KeySchedule_TESTVECTOR =
-  (encKeySchedule (zero, zero, TVKey1) == 
+  (encKeySchedule TVKey1 == 
   ([0x33, 0x22, 0x11, 0x00, 0xff, 0xee, 0xdd, 0xcc], transformTVSK TVSK1)) /\
-  (encKeySchedule (zero, zero, TVKey2) == 
+  (encKeySchedule TVKey2 == 
   ([0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33], transformTVSK TVSK2)) /\
-  (encKeySchedule (zero, zero, TVKey3) == 
+  (encKeySchedule TVKey3 == 
   ([0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c], transformTVSK TVSK3)) /\
-  (encKeySchedule (zero, zero, TVKey4) == 
+  (encKeySchedule TVKey4 == 
   ([0xbc, 0xc3, 0xdb, 0x28, 0xe7, 0x2b, 0x42, 0x1d], transformTVSK TVSK4))
 
 // property KeySchedule_WK =
@@ -289,10 +289,10 @@ enc_round state SK i = [
 enc_rounds : [8][8] -> [128][8] -> [8][8]
 enc_rounds state SK = foldl (\s i -> enc_round s SK i) state [0..30]
 
-HIGHT_Encrypt : ([8][8], [8][8], [16][8]) -> [8][8]
-HIGHT_Encrypt (_, src, MK) = dst
+HIGHT_Encrypt : ([8][8], [16][8]) -> [8][8]
+HIGHT_Encrypt (src, MK) = dst
   where
-    (WK, SK) = encKeySchedule(zero, zero, MK)
+    (WK, SK) = encKeySchedule MK
     
     initialState = [ src @ 0 + WK @ 0,
                     src @ 1,
@@ -320,10 +320,10 @@ HIGHT_Encrypt (_, src, MK) = dst
     dst = finalState
 
 property Encryption_TESTVECTOR =
-  (HIGHT_Encrypt (zero, TVPT1, TVKey1) == TVCT1) /\
-  (HIGHT_Encrypt (zero, TVPT2, TVKey2) == TVCT2) /\
-  (HIGHT_Encrypt (zero, TVPT3, TVKey3) == TVCT3) /\
-  (HIGHT_Encrypt (zero, TVPT4, TVKey4) == TVCT4)
+  (HIGHT_Encrypt (TVPT1, TVKey1) == TVCT1) /\
+  (HIGHT_Encrypt (TVPT2, TVKey2) == TVCT2) /\
+  (HIGHT_Encrypt (TVPT3, TVKey3) == TVCT3) /\
+  (HIGHT_Encrypt (TVPT4, TVKey4) == TVCT4)
 
 // ======================== Decryption ========================
 
@@ -349,10 +349,10 @@ dec_round state SK i = [
 dec_rounds : [8][8] -> [128][8] -> [8][8]
 dec_rounds state SK = foldl (\s i -> dec_round s SK i) state [1..31]
 
-HIGHT_Decrypt : ([8][8], [8][8], [16][8]) -> [8][8]
-HIGHT_Decrypt (_, src, MK) = dst
+HIGHT_Decrypt : ([8][8], [16][8]) -> [8][8]
+HIGHT_Decrypt (src, MK) = dst
   where
-    (WK, SK) = decKeySchedule(zero, zero, MK)
+    (WK, SK) = decKeySchedule MK
 
     initialState : [8][8]
     initialState = [
@@ -385,10 +385,10 @@ HIGHT_Decrypt (_, src, MK) = dst
     dst = finalState
 
 property HIGHT_TESTVECTOR =
-  HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT1, TVKey1), TVKey1) == TVPT1 /\
-  HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT2, TVKey2), TVKey2) == TVPT2 /\
-  HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT3, TVKey3), TVKey3) == TVPT3 /\
-  HIGHT_Decrypt (zero,  HIGHT_Encrypt (zero, TVPT4, TVKey4), TVKey4) == TVPT4
+  HIGHT_Decrypt (HIGHT_Encrypt (TVPT1, TVKey1), TVKey1) == TVPT1 /\
+  HIGHT_Decrypt (HIGHT_Encrypt (TVPT2, TVKey2), TVKey2) == TVPT2 /\
+  HIGHT_Decrypt (HIGHT_Encrypt (TVPT3, TVKey3), TVKey3) == TVPT3 /\
+  HIGHT_Decrypt (HIGHT_Encrypt (TVPT4, TVKey4), TVKey4) == TVPT4
 
 // property HIGHT_Correctness ` (src : [8][8]) (key : [16][8]) = 
 //     HIGHT_Decrypt (zero, HIGHT_Encrypt (zero, src, key), key) == src
