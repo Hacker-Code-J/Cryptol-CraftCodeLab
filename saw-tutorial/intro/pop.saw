@@ -5,6 +5,41 @@ let pop_is_ok = do {
      x <- symbolic_variable uint32_t "x";
      execute [x];
      returns TRUE;
+     // returns FALSE;
 };
 
-llvm_verify popmod "pop_spec_check" [] pop_is_ok;
+// =====================================================
+// A function to print a formatted title
+let print_header msg = do {
+    print "=========================================";
+    print msg;
+    print "=========================================";
+};
+
+// A function to run the verification and format the output
+let run_verification = do {
+    print_header "Starting Verification";
+    print "Module: popcount.bc";
+    print "Specification: pop_spec_check";
+    print "";
+
+    // Measure the verification time
+    time (do {
+        llvm_verify popmod "pop_spec_check" [] pop_is_ok;
+        print "Verification Status: Successful";
+    });
+
+    print "=========================================";
+    print "Verification completed.";
+    print "=========================================";
+};
+
+// Run the verification with the formatted output
+run_verification;
+// =====================================================
+
+// llvm_verify popmod "pop_spec_check" [] pop_is_ok;
+
+time (do {
+    llvm_verify popmod "pop_spec_check" [] pop_is_ok;
+});
