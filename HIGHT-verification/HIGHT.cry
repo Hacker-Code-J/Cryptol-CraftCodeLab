@@ -2,6 +2,8 @@
  * Copyright (c) 2024 Crypto & Security Engineering Lab (CSE).
  * https://sites.google.com/kookmin.ac.kr/cselab/club-activity?authuser=0
  * Distributed under the terms of the BSD3 license (see LICENSE file)
+ *
+ * See https://seed.kisa.or.kr/kisa/algorithm/EgovHightInfo.do
  */
 
 module HIGHT where
@@ -233,33 +235,33 @@ property KeySchedule_TESTVECTOR =
   (encKeySchedule TVKey4 == 
   ([0xbc, 0xc3, 0xdb, 0x28, 0xe7, 0x2b, 0x42, 0x1d], transformTVSK TVSK4))
 
-// property KeySchedule_WK =
-//   (enc_WK1 == dec_WK1) /\ (enc_WK2 == dec_WK2) /\
-//   (enc_WK3 == dec_WK3) /\ (enc_WK4 == dec_WK4)
-//     where
-//       (enc_WK1, _) = encKeySchedule (zero, zero, TVKey1)
-//       (dec_WK1, _) = decKeySchedule (zero, zero, TVKey1)
-//       (enc_WK2, _) = encKeySchedule (zero, zero, TVKey2)
-//       (dec_WK2, _) = decKeySchedule (zero, zero, TVKey2)
-//       (enc_WK3, _) = encKeySchedule (zero, zero, TVKey3)
-//       (dec_WK3, _) = decKeySchedule (zero, zero, TVKey3)
-//       (enc_WK4, _) = encKeySchedule (zero, zero, TVKey4)
-//       (dec_WK4, _) = decKeySchedule (zero, zero, TVKey4)
+property TEST_KeySchedule_WK =
+  (enc_WK1 == dec_WK1) /\ (enc_WK2 == dec_WK2) /\
+  (enc_WK3 == dec_WK3) /\ (enc_WK4 == dec_WK4)
+    where
+      (enc_WK1, _) = encKeySchedule TVKey1
+      (dec_WK1, _) = decKeySchedule TVKey1
+      (enc_WK2, _) = encKeySchedule TVKey2
+      (dec_WK2, _) = decKeySchedule TVKey2
+      (enc_WK3, _) = encKeySchedule TVKey3
+      (dec_WK3, _) = decKeySchedule TVKey3
+      (enc_WK4, _) = encKeySchedule TVKey4
+      (dec_WK4, _) = decKeySchedule TVKey4
 
-// property KeySchedule_SK =
-//   (enc_SK1 == reverse dec_SK1) /\
-//   (enc_SK2 == reverse dec_SK2) /\
-//   (enc_SK3 == reverse dec_SK3) /\
-//   (enc_SK4 == reverse dec_SK4)
-//     where
-//       (_, enc_SK1) = encKeySchedule (zero, zero, TVKey1)
-//       (_, dec_SK1) = decKeySchedule (zero, zero, TVKey1)
-//       (_, enc_SK2) = encKeySchedule (zero, zero, TVKey2)
-//       (_, dec_SK2) = decKeySchedule (zero, zero, TVKey2)
-//       (_, enc_SK3) = encKeySchedule (zero, zero, TVKey3)
-//       (_, dec_SK3) = decKeySchedule (zero, zero, TVKey3)
-//       (_, enc_SK4) = encKeySchedule (zero, zero, TVKey4)
-//       (_, dec_SK4) = decKeySchedule (zero, zero, TVKey4)
+property TEST_KeySchedule_SK =
+  (enc_SK1 == reverse dec_SK1) /\
+  (enc_SK2 == reverse dec_SK2) /\
+  (enc_SK3 == reverse dec_SK3) /\
+  (enc_SK4 == reverse dec_SK4)
+    where
+      (_, enc_SK1) = encKeySchedule TVKey1
+      (_, dec_SK1) = decKeySchedule TVKey1
+      (_, enc_SK2) = encKeySchedule TVKey2
+      (_, dec_SK2) = decKeySchedule TVKey2
+      (_, enc_SK3) = encKeySchedule TVKey3
+      (_, dec_SK3) = decKeySchedule TVKey3
+      (_, enc_SK4) = encKeySchedule TVKey4
+      (_, dec_SK4) = decKeySchedule TVKey4
 
 // ======================== Encryption ========================
 
@@ -390,5 +392,5 @@ property HIGHT_TESTVECTOR =
   HIGHT_Decrypt (HIGHT_Encrypt (TVPT3, TVKey3), TVKey3) == TVPT3 /\
   HIGHT_Decrypt (HIGHT_Encrypt (TVPT4, TVKey4), TVKey4) == TVPT4
 
-// property HIGHT_Correctness ` (src : [8][8]) (key : [16][8]) = 
-//     HIGHT_Decrypt (zero, HIGHT_Encrypt (zero, src, key), key) == src
+property HIGHT_Correctness (src : [8][8]) (key : [16][8]) = 
+    HIGHT_Decrypt (HIGHT_Encrypt (src, key), key) == src

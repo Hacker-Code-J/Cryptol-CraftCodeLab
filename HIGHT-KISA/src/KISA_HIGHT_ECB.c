@@ -205,80 +205,72 @@ void    HIGHT_Encrypt(
 
 // Same as encrypt, except that round keys are applied in reverse order
 
-// void    HIGHT_Decrypt(
-//             BYTE    *RoundKey,     
-//             BYTE    *Data)          
-// {
-//     DWORD   XX[8];
+void    HIGHT_Decrypt(
+            BYTE    *RoundKey,     
+            BYTE    *Data)          
+{
+    DWORD   XX[8];
 
-//     XX[2] = (BYTE) Data[1];
-//     XX[4] = (BYTE) Data[3];
-//     XX[6] = (BYTE) Data[5];
-//     XX[0] = (BYTE) Data[7];
+    XX[2] = (BYTE) Data[1];
+    XX[4] = (BYTE) Data[3];
+    XX[6] = (BYTE) Data[5];
+    XX[0] = (BYTE) Data[7];
 
-//     XX[1] = (BYTE) (Data[0] - RoundKey[4]);
-//     XX[3] = (BYTE) (Data[2] ^ RoundKey[5]);
-//     XX[5] = (BYTE) (Data[4] - RoundKey[6]);
-//     XX[7] = (BYTE) (Data[6] ^ RoundKey[7]);
+    XX[1] = (BYTE) (Data[0] - RoundKey[4]);
+    XX[3] = (BYTE) (Data[2] ^ RoundKey[5]);
+    XX[5] = (BYTE) (Data[4] - RoundKey[6]);
+    XX[7] = (BYTE) (Data[6] ^ RoundKey[7]);
 
-//     #define HIGHT_DEC(k, i0,i1,i2,i3,i4,i5,i6,i7) {                         \
-//         XX[i1] = (XX[i1] - (HIGHT_F1[XX[i2]] ^ RoundKey[4*k+2])) & 0xFF;    \
-//         XX[i3] = (XX[i3] ^ (HIGHT_F0[XX[i4]] + RoundKey[4*k+1])) & 0xFF;    \
-//         XX[i5] = (XX[i5] - (HIGHT_F1[XX[i6]] ^ RoundKey[4*k+0])) & 0xFF;    \
-//         XX[i7] = (XX[i7] ^ (HIGHT_F0[XX[i0]] + RoundKey[4*k+3])) & 0xFF;    \
-//     }
-// [1]);
-//     Data[3] = (BYTE) (XX[3]);
-//     Data[5] = (BYTE) (XX[5]);
-//     Data[7] = (BYTE) (XX[7]);
+    #define HIGHT_DEC(k, i0,i1,i2,i3,i4,i5,i6,i7) {                         \
+        XX[i1] = (XX[i1] - (HIGHT_F1[XX[i2]] ^ RoundKey[4*k+2])) & 0xFF;    \
+        XX[i3] = (XX[i3] ^ (HIGHT_F0[XX[i4]] + RoundKey[4*k+1])) & 0xFF;    \
+        XX[i5] = (XX[i5] - (HIGHT_F1[XX[i6]] ^ RoundKey[4*k+0])) & 0xFF;    \
+        XX[i7] = (XX[i7] ^ (HIGHT_F0[XX[i0]] + RoundKey[4*k+3])) & 0xFF;    \
+    }
 
-//     Data[0] = (BYTE) (XX[0] - RoundKey[0]);
-//     Data[2] = (BYTE) (XX[2] ^ RoundKey[1]);
-//     Data[4] = (BYTE) (XX[4] - RoundKey[2]);
-//     Data[6] = (BYTE) (XX
-//     HIGHT_DEC(33,  7,6,5,4,3,2,1,0);
-//     HIGHT_DEC(32,  0,7,6,5,4,3,2,1);
-//     HIGHT_DEC(31,  1,0,7,6,5,4,3,2);
-//     HIGHT_DEC(30,  2,1,0,7,6,5,4,3);
-//     HIGHT_DEC(29,  3,2,1,0,7,6,5,4);
-//     HIGHT_DEC(28,  4,3,2,1,0,7,6,5);
-//     HIGHT_DEC(27,  5,4,3,2,1,0,7,6);
-//     HIGHT_DEC(26,  6,5,4,3,2,1,0,7);
-//     HIGHT_DEC(25,  7,6,5,4,3,2,1,0);
-//     HIGHT_DEC(24,  0,7,6,5,4,3,2,1);
-//     HIGHT_DEC(23,  1,0,7,6,5,4,3,2);
-//     HIGHT_DEC(22,  2,1,0,7,6,5,4,3);
-//     HIGHT_DEC(21,  3,2,1,0,7,6,5,4);
-//     HIGHT_DEC(20,  4,3,2,1,0,7,6,5);
-//     HIGHT_DEC(19,  5,4,3,2,1,0,7,6);
-//     HIGHT_DEC(18,  6,5,4,3,2,1,0,7);
-//     HIGHT_DEC(17,  7,6,5,4,3,2,1,0);
-//     HIGHT_DEC(16,  0,7,6,5,4,3,2,1);
-//     HIGHT_DEC(15,  1,0,7,6,5,4,3,2);
-//     HIGHT_DEC(14,  2,1,0,7,6,5,4,3);
-//     HIGHT_DEC(13,  3,2,1,0,7,6,5,4);
-//     HIGHT_DEC(12,  4,3,2,1,0,7,6,5);
-//     HIGHT_DEC(11,  5,4,3,2,1,0,7,6);
-//     HIGHT_DEC(10,  6,5,4,3,2,1,0,7);
-//     HIGHT_DEC( 9,  7,6,5,4,3,2,1,0);
-//     HIGHT_DEC( 8,  0,7,6,5,4,3,2,1);
-//     HIGHT_DEC( 7,  1,0,7,6,5,4,3,2);
-//     HIGHT_DEC( 6,  2,1,0,7,6,5,4,3);
-//     HIGHT_DEC( 5,  3,2,1,0,7,6,5,4);
-//     HIGHT_DEC( 4,  4,3,2,1,0,7,6,5);
-//     HIGHT_DEC( 3,  5,4,3,2,1,0,7,6);
-//     HIGHT_DEC( 2,  6,5,4,3,2,1,0,7);
+    HIGHT_DEC(33,  7,6,5,4,3,2,1,0);
+    HIGHT_DEC(32,  0,7,6,5,4,3,2,1);
+    HIGHT_DEC(31,  1,0,7,6,5,4,3,2);
+    HIGHT_DEC(30,  2,1,0,7,6,5,4,3);
+    HIGHT_DEC(29,  3,2,1,0,7,6,5,4);
+    HIGHT_DEC(28,  4,3,2,1,0,7,6,5);
+    HIGHT_DEC(27,  5,4,3,2,1,0,7,6);
+    HIGHT_DEC(26,  6,5,4,3,2,1,0,7);
+    HIGHT_DEC(25,  7,6,5,4,3,2,1,0);
+    HIGHT_DEC(24,  0,7,6,5,4,3,2,1);
+    HIGHT_DEC(23,  1,0,7,6,5,4,3,2);
+    HIGHT_DEC(22,  2,1,0,7,6,5,4,3);
+    HIGHT_DEC(21,  3,2,1,0,7,6,5,4);
+    HIGHT_DEC(20,  4,3,2,1,0,7,6,5);
+    HIGHT_DEC(19,  5,4,3,2,1,0,7,6);
+    HIGHT_DEC(18,  6,5,4,3,2,1,0,7);
+    HIGHT_DEC(17,  7,6,5,4,3,2,1,0);
+    HIGHT_DEC(16,  0,7,6,5,4,3,2,1);
+    HIGHT_DEC(15,  1,0,7,6,5,4,3,2);
+    HIGHT_DEC(14,  2,1,0,7,6,5,4,3);
+    HIGHT_DEC(13,  3,2,1,0,7,6,5,4);
+    HIGHT_DEC(12,  4,3,2,1,0,7,6,5);
+    HIGHT_DEC(11,  5,4,3,2,1,0,7,6);
+    HIGHT_DEC(10,  6,5,4,3,2,1,0,7);
+    HIGHT_DEC( 9,  7,6,5,4,3,2,1,0);
+    HIGHT_DEC( 8,  0,7,6,5,4,3,2,1);
+    HIGHT_DEC( 7,  1,0,7,6,5,4,3,2);
+    HIGHT_DEC( 6,  2,1,0,7,6,5,4,3);
+    HIGHT_DEC( 5,  3,2,1,0,7,6,5,4);
+    HIGHT_DEC( 4,  4,3,2,1,0,7,6,5);
+    HIGHT_DEC( 3,  5,4,3,2,1,0,7,6);
+    HIGHT_DEC( 2,  6,5,4,3,2,1,0,7);
 
-//     Data[1] = (BYTE) (XX[1]);
-//     Data[3] = (BYTE) (XX[3]);
-//     Data[5] = (BYTE) (XX[5]);
-//     Data[7] = (BYTE) (XX[7]);
+    Data[1] = (BYTE) (XX[1]);
+    Data[3] = (BYTE) (XX[3]);
+    Data[5] = (BYTE) (XX[5]);
+    Data[7] = (BYTE) (XX[7]);
 
-//     Data[0] = (BYTE) (XX[0] - RoundKey[0]);
-//     Data[2] = (BYTE) (XX[2] ^ RoundKey[1]);
-//     Data[4] = (BYTE) (XX[4] - RoundKey[2]);
-//     Data[6] = (BYTE) (XX[6] ^ RoundKey[3]);
-// }
+    Data[0] = (BYTE) (XX[0] - RoundKey[0]);
+    Data[2] = (BYTE) (XX[2] ^ RoundKey[1]);
+    Data[4] = (BYTE) (XX[4] - RoundKey[2]);
+    Data[6] = (BYTE) (XX[6] ^ RoundKey[3]);
+}
 
 /*************** END OF FILE **********************************************/
 
@@ -286,20 +278,42 @@ void    HIGHT_Encrypt(
 
 int main()
 {
-	BYTE pdwRoundKey[136] = {0,};																									// Round keys for encryption or decryption
-	// BYTE pbUserKey[16] = {0x88, 0xE3, 0x4F, 0x8F, 0x08, 0x17, 0x79, 0xF1, 0xE9, 0xF3, 0x94, 0x37, 0x0A, 0xD4, 0x05, 0x89 }; 		// User secret key
+	// BYTE pdwRoundKey[136] = {0,};																									// Round keys for encryption or decryption
+	BYTE pdwRoundKey[136] = {
+        0x02, 0x4B, 0x00, 0xA4, 0x62, 0x00, 0x78, 0x00,
+        0xB2, 0x81, 0x59, 0xA2, 0x2B, 0x98, 0x06, 0x42,
+        0xC4, 0x22, 0xB2, 0xB3, 0x90, 0x13, 0x6D, 0x88,
+        0x0E, 0x4C, 0xE5, 0xEE, 0x47, 0xB1, 0x46, 0x34,
+        0xEE, 0xBD, 0x33, 0x7C, 0xD6, 0xB4, 0xFE, 0xE6,
+        0x4C, 0x5F, 0x5C, 0xB9, 0x85, 0xF5, 0xFF, 0xAF,
+        0xB8, 0x78, 0xE7, 0x9E, 0x6D, 0x36, 0xF1, 0x87,
+        0xE5, 0x1E, 0x52, 0xF8, 0xC1, 0x0A, 0xD7, 0x9B,
+        0x93, 0x23, 0x22, 0x33, 0x63, 0x84, 0x40, 0xEE,
+        0x7C, 0x10, 0x0F, 0xBC, 0xF7, 0x64, 0x87, 0x7A,
+        0xC7, 0x1C, 0x94, 0x6B, 0x3A, 0x74, 0x8D, 0x93,
+        0x77, 0xD8, 0x4F, 0xBE, 0xC4, 0xE2, 0x49, 0xB4,
+        0xDC, 0x9E, 0x91, 0xC0, 0xB0, 0x74, 0x80, 0x2F,
+        0x1A, 0x9E, 0xA2, 0x20, 0x8A, 0xF9, 0xCA, 0x3B,
+        0x1B, 0x02, 0xF9, 0x2C, 0xEB, 0xFF, 0x84, 0x0F,
+        0xB8, 0xFC, 0x75, 0x7F, 0x37, 0x7C, 0xA4, 0x6C,
+        0xA3, 0x83, 0x5B, 0xE9, 0x6F, 0x7B, 0x90, 0x58
+    };
+    
+    // BYTE pbUserKey[16] = {0x88, 0xE3, 0x4F, 0x8F, 0x08, 0x17, 0x79, 0xF1, 0xE9, 0xF3, 0x94, 0x37, 0x0A, 0xD4, 0x05, 0x89 }; 		// User secret key
     // BYTE pbData[8]    = {0xD7, 0x6D, 0x0D,0x18, 0x32, 0x7E, 0xC5, 0x62}; 															// input plaintext to be encrypted
     
     // BYTE pbUserKey[16] = {0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-    BYTE pbUserKey[16] = {0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00 };
-    BYTE pbData[8]    = { 0x00, };
+    // BYTE pbUserKey[16] = {0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00 };
+    // BYTE pbData[8]    = { 0x00, };
+    BYTE pbData[8] = { 0x00, 0x30, 0x88, 0x81,
+                       0x20, 0x06, 0xA8, 0xC5 };
 
 	int i;
 
 // Print user secret key
-	printf ("Key        : ");
-	for (i=0;i<16;i++)	
-		printf("%02X ",pbUserKey[i]);
+	// printf ("Key        : ");
+	// for (i=0;i<16;i++)	
+	// 	printf("%02X ",pbUserKey[i]);
 
 // Print plaintext to be encrypted
 	printf ("\nPlaintext  : ");
@@ -307,14 +321,14 @@ int main()
 		printf("%02X ",pbData[i]);
 		
 // Derive roundkeys from user secret key
-	HIGHT_KeySched( pbUserKey, 16, pdwRoundKey );
+	// HIGHT_KeySched( pbUserKey, 16, pdwRoundKey );
 
 // Print Round Keys
-	// printf ("\nRound Keys  : \n");
-	// for (i=0;i<136;i++)	{
-    //     if ((i != 0) && (i % 8 == 0)) puts("");
-    //     printf("%02X ",pdwRoundKey[i]);
-    // } puts("");
+	printf ("\nRound Keys  : \n");
+	for (i=0;i<136;i++)	{
+        if ((i != 0) && (i % 8 == 0)) puts("");
+        printf("%02X ",pdwRoundKey[i]);
+    } puts("");
 		
 // Encryption
 	printf ("\n\nEncryption....\n");
@@ -326,21 +340,21 @@ int main()
 		printf("%02X ",pbData[i]);
     puts("");
 	
-// // Decryption
-// 	printf ("\n\nDecryption....\n");
-// 	HIGHT_Decrypt( pdwRoundKey, pbData );
+// Decryption
+	printf ("\n\nDecryption....\n");
+	HIGHT_Decrypt( pdwRoundKey, pbData );
 	
-// // Print decrypted data(plaintext)
-// 	printf ("Plaintext  : ");
-// 	for (i=0;i<8;i++)	
-// 		printf("%02X ",pbData[i]);
-// 	puts("");
+// Print decrypted data(plaintext)
+	printf ("Plaintext  : ");
+	for (i=0;i<8;i++)	
+		printf("%02X ",pbData[i]);
+	puts("");
 // Print round keys at round i
-	// printf ("\n\nRound Key  : \n");
-	// for (i=0;i<8;i++) {
-	// 	printf("K%2d,0 : %08X\t", i+1, pdwRoundKey[2*i]);
-	// 	printf("K%2d,1 : %08X\n", i+1, pdwRoundKey[2*i+1]);
-	// }
+	printf ("\n\nRound Key  : \n");
+	for (i=0;i<8;i++) {
+		printf("K%2d,0 : %08X\t", i+1, pdwRoundKey[2*i]);
+		printf("K%2d,1 : %08X\n", i+1, pdwRoundKey[2*i+1]);
+	}
 
     return 0;
 }

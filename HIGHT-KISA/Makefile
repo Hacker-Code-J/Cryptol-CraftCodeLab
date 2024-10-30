@@ -6,10 +6,10 @@
 
 # Compiler and flags
 CC = gcc
-CFLAGS = -Wall -std=c99 -g -O2 -I./include
+CFLAGS = -Wall -std=c99 -g -O1 -I./include
 LDFLAGS =
 LLVM_CC = clang
-LLVM_CFLAGS = -c -emit-llvm -I$(INCDIR)
+LLVM_CFLAGS = -g -O1 -c -emit-llvm -I$(INCDIR)
 
 # Directories
 SRCDIR = src

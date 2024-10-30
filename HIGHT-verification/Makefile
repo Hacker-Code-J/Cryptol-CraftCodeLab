@@ -1,9 +1,9 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -Wall -std=c99 -g -O2 -Iinclude -MMD
+CFLAGS = -Wall -std=c99 -g -O1 -Iinclude -MMD -MP
 LDFLAGS =
 LLVM_CC = clang
-LLVM_CFLAGS = -c -emit-llvm -I$(INCDIR)
+LLVM_CFLAGS = -g -O1 -c -emit-llvm -I$(INCDIR)
 
 # Directories
 OBJDIR = obj
@@ -33,7 +33,7 @@ $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $^
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 -include $(OBJS:.o=.d)
 
