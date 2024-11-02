@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2024 Crypto & Security Engineering Lab (CSE).
- * https://sites.google.com/kookmin.ac.kr/cselab/club-activity?authuser=0
- * Distributed under the terms of the BSD3 license (see LICENSE file)
- *
- * See https://seed.kisa.or.kr/kisa/algorithm/EgovHightInfo.do
+  @Copyright (c) 2024 Crypto & Security Engineering Lab (CSE).
+  @author Ji, Yong-hyeon <hacker3740@kookmin.ac.kr>
+  https://sites.google.com/kookmin.ac.kr/cselab/club-activity?authuser=0
+  
+  Distributed under the terms of the BSD3 license (see LICENSE file)
+
+  References
+  https://seed.kisa.or.kr/kisa/algorithm/EgovHightInfo.do
  */
 
 module HIGHT where

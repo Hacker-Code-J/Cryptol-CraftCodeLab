@@ -1,0 +1,17 @@
+let side_effect_spec = do {
+    a_ptr <- llvm_alloc ( llvm_int 32) ;
+    a_val <- llvm_fresh_var " a_val " ( llvm_int 32) ;
+    llvm_points_to a_ptr ( llvm_term a_val ) ;
+    llvm _exec ute_fu nc [ a_ptr ];
+};
+
+let foo_spec = do {
+    x <- llvm_fresh_var " x " ( llvm_int 32) ;
+    llvm _exec ute_fu nc [ llvm_term x ];
+    llvm_return ( llvm_term x ) ;
+};
+
+let main : TopLevel () = do {
+    side_effect_ov <- llvm_verify m "side_effect" [] false side_effect_spec z3;
+    llvm_verify m "foo" [ side_effect_ov ] false foo_spec z3;
+}

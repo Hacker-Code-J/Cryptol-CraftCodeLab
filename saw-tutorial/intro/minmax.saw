@@ -22,6 +22,9 @@ let minmax_ok = do {
 };
 
 // 5. Verify C function minmax using minmax_ok
-llvm_verify minmax_mod "minmax" [] minmax_ok;
-llvm_verify minmax_mod "minmax_xor" [] minmax_ok;
-llvm_verify minmax_mod "minmax_ternary" [] minmax_ok;
+// print "minmax:";
+time (do { llvm_verify minmax_mod "minmax" [] minmax_ok; });
+// print "minmax_xor:";
+time (do {llvm_verify minmax_mod "minmax_xor" [] minmax_ok; });
+// print "minmax_ternary";
+time (do {llvm_verify minmax_mod "minmax_ternary" [] minmax_ok; });

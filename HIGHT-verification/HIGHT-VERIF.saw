@@ -1,3 +1,12 @@
+/*
+  @Copyright (c) 2024 Crypto & Security Engineering Lab (CSE).
+  @author Ji, Yong-hyeon <hacker3740@kookmin.ac.kr>
+  https://sites.google.com/kookmin.ac.kr/cselab/club-activity?authuser=0
+  
+  Distributed under the terms of the BSD3 license (see LICENSE file)
+ */
+
+
 include "helpers.saw";
 import "HIGHT.cry";
 
@@ -22,7 +31,7 @@ let decKeySchedule_setup : CrucibleSetup () = do {
 
     llvm_execute_func [p_dec_WK, p_dec_SK, p_MK];
 
-    let result = {{ decKeySchedule (dec_WK, dec_SK, MK) }};
+    let result = {{ decKeySchedule MK }};
     llvm_points_to p_dec_WK (llvm_term {{ result.0 }});
     llvm_points_to p_dec_SK (llvm_term {{ result.1 }});
 };
@@ -71,33 +80,33 @@ let main : TopLevel () = do {
     time (do {
         llvm_verify m "encKeySchedule" [] true encKeySchedule_setup z3;
     });
-    // print "decKeySchedule:";
+    print "decKeySchedule:";
+    time (do {
+        llvm_verify m "decKeySchedule" [] true decKeySchedule_setup z3;
+    });
+
+    print "=========================================";
+    print "         Verification completed.";
+    print "=========================================";
+
+    // print_header "Starting Verification for HIGHT Encryption";
+    // print " ";
+    // print "[*] Module: hight_core.bc";
+    // print "[*] Specification: HIGHT_Encrypt_Spec / HIGHT_Decrypt_Spec";
+    // print " ";
+
+    // print "<--- Encrytion --->";
     // time (do {
-    //     llvm_verify m "decKeySchedule" [] true decKeySchedule_setup z3;
+    //     llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
+    // });
+    // print "<--- Decrytion --->";
+    // time (do {
+    //     llvm_verify m "HIGHT_Decrypt" [] true HIGHT_Decrypt_setup z3;
     // });
 
-    print "=========================================";
-    print "         Verification completed.";
-    print "=========================================";
-
-    print_header "Starting Verification for HIGHT Encryption";
-    print " ";
-    print "[*] Module: hight_core.bc";
-    print "[*] Specification: HIGHT_Encrypt_Spec / HIGHT_Decrypt_Spec";
-    print " ";
-
-    print "<--- Encrytion --->";
-    time (do {
-        llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
-    });
-    print "<--- Decrytion --->";
-    time (do {
-        llvm_verify m "HIGHT_Decrypt" [] true HIGHT_Decrypt_setup z3;
-    });
-
-    print "=========================================";
-    print "         Verification completed.";
-    print "=========================================";
+    // print "=========================================";
+    // print "         Verification completed.";
+    // print "=========================================";
 
 
     // encKeySchedule_verify <- llvm_verify m "encKeySchedule" [] true encKeySchedule_setup z3;

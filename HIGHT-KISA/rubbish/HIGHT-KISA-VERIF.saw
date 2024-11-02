@@ -1,8 +1,16 @@
+/*
+  @Copyright (c) 2024 Crypto & Security Engineering Lab (CSE).
+  @author Ji, Yong-hyeon <hacker3740@kookmin.ac.kr>
+  https://sites.google.com/kookmin.ac.kr/cselab/club-activity?authuser=0
+  
+  Distributed under the terms of the BSD3 license (see LICENSE file)
+ */
+
 include "helpers.saw";
 import "HIGHT-KISA.cry";
 
 // Define the setup for encKeySchedule
-let KeySched_setup : CrucibleSetup () = do {
+let KeySched_OK : CrucibleSetup () = do {
     (MK, p_mk) <- ptr_to_fresh_readonly "MK" (llvm_array 16 (llvm_int 8));
     (RK, p_rk) <- ptr_to_fresh "RK" (llvm_array 136 (llvm_int 8));
 
@@ -23,6 +31,7 @@ let HIGHT_Encrypt_setup : CrucibleSetup () = do {
     let result = {{ HIGHT_Encrypt_Cryptol (RK, src) }};
     llvm_points_to p_dst (llvm_term result);
 };
+
 
 // // Define the setup for HIGHT_Decrypt
 // let HIGHT_Decrypt_setup : CrucibleSetup () = do {
@@ -47,19 +56,34 @@ let HIGHT_Encrypt_setup : CrucibleSetup () = do {
 //     print KeySched_verify;
 // };
 
+let print_header msg = do {
+    print "======================================";
+    print msg;
+    print "======================================";
+};
+
 // Main function to run the verification
 let main : TopLevel () = do {
     m <- llvm_load_module "KISA_HIGHT_ECB.bc";
 
-    print "[ Start ==========================> ]";
-    KeySched_verify <- llvm_verify m "HIGHT_KeySched" [] true KeySched_setup z3;
-    print "[ ============================= End ]";
+    print_header "Verification for HIGHT KeySchedule";
+    print " ";
+    print "[*] Module: KISA_HIGHT_ECB.bc";
+    print "[*] Specification: HIGHT_KeySched_OK";
+    print " ";
 
-    print "[ Start ==========================> ]";
-    HIGHT_Encrypt_verify <- llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
-    print "[ ============================= End ]";
+    time (do {
+        llvm_verify m "HIGHT_KeySched" [] true KeySched_OK z3;
+    });
+
+    print "======================================";
+    print "Verification completed.";
+    print "======================================";
+    // print "[ Start ==========================> ]";
+    // HIGHT_Encrypt_verify <- llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
+    // print "[ ============================= End ]";
     
-    // Print the verification result
-    print KeySched_verify;
-    print HIGHT_Encrypt_verify;
+    // // Print the verification result
+    // print KeySched_verify;
+    // print HIGHT_Encrypt_verify;
 };

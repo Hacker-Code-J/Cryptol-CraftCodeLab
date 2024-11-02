@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/hacker-code-j/Desktop/Cryptol-CraftCodeLab/crux",
-      "program": "/home/hacker-code-j/Desktop/Cryptol-CraftCodeLab/crux/build/Debug/outDebug",
+      "cwd": "/home/hacker-code-j/Desktop/Cryptol-CraftCodeLab/HIGHT-KISA/rubbish/src",
+      "program": "/home/hacker-code-j/Desktop/Cryptol-CraftCodeLab/HIGHT-KISA/rubbish/src/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

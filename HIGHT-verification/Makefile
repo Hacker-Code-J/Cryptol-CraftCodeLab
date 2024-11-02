@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -Wall -std=c99 -g -O1 -Iinclude -MMD -MP
 LDFLAGS =
 LLVM_CC = clang
-LLVM_CFLAGS = -g -O1 -c -emit-llvm -I$(INCDIR)
+LLVM_CFLAGS = -g -O1 -fno-threadsafe-statics -fsanitize-trap=undefined -emit-llvm -c -I$(INCDIR)
 
 # Directories
 OBJDIR = obj

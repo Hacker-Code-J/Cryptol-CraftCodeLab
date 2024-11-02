@@ -1,0 +1,29 @@
+saw KISA_HIGHT_VERIFY.saw
+[08:48:07.021] Loading file "/home/hacker-code-j/Desktop/Cryptol-CraftCodeLab/HIGHT-KISA/KISA_HIGHT_VERIFY.saw"
+[08:48:07.023] Loading file "/home/hacker-code-j/Desktop/Cryptol-CraftCodeLab/HIGHT-KISA/helpers.saw"
+[08:48:07.336] Verifying HIGHT_KeySched ...
+[08:48:07.338] Simulating HIGHT_KeySched ...
+[08:48:07.342] LLVM bitcode translation warning @HIGHT_KeySched KISA_HIGHT_ECB.c:0:0 dbg intrinsic def/use violation for: %1
+[08:48:07.374] Checking proof obligations HIGHT_KeySched ...
+[08:48:07.456] Proof succeeded! HIGHT_KeySched
+[08:48:07.456] Time: 0.281097422s
+
+[08:48:07.505] Verifying HIGHT_Encrypt ...
+[08:48:07.506] Simulating HIGHT_Encrypt ...
+[08:48:11.720] Checking proof obligations HIGHT_Encrypt ...
+[08:55:20.638] Subgoal failed: HIGHT_Encrypt /home/hacker-code-j/Desktop/Cryptol-CraftCodeLab/HIGHT-KISA/KISA_HIGHT_VERIFY.saw:79:5: error: in llvm_points_to
+Literal equality postcondition
+
+[08:55:20.639] SolverStats {solverStatsSolvers = fromList ["SBV->Z3"], solverStatsGoalSize = 1304}
+[08:55:20.640] ----------Counterexample----------
+[08:55:20.641]   RK: [ 0, ]
+RK: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+[08:55:20.645]   src: [0, 0, 0, 0, 0, 0, 0, 0]
+[08:55:20.645]   dst: [255, 0, 0, 0, 0, 0, 0, 0]
+[08:55:20.645] ----------------------------------
+[08:55:20.645] Stack trace:
+"time" (/home/hacker-code-j/Desktop/Cryptol-CraftCodeLab/HIGHT-KISA/KISA_HIGHT_VERIFY.saw:79:5-79:9)
+"llvm_verify" (/home/hacker-code-j/Desktop/Cryptol-CraftCodeLab/HIGHT-KISA/KISA_HIGHT_VERIFY.saw:80:9-80:20)
+Proof failed.
+
+make: *** [Makefile:30: verify] Error 2

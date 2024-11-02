@@ -1,66 +1,31 @@
-# # Compiler
-# CC = clang
+CC = clang
+CFLAGS = -Wall -Wextra -g -O1
+LLVM_CFLAGS = -g -O1 -fno-threadsafe-statics -fsanitize-trap=undefined -emit-llvm -c
 
-# # Compiler flags
-# CFLAGS = -Wall -O2 -Iinclude
+TARGET = KISA_HIGHT_ECB
+SRC = KISA_HIGHT_ECB.c
+HEADERS = KISA_HIGHT_ECB.h
 
-# Compiler and flags
-CC = gcc
-CFLAGS = -Wall -std=c99 -g -O1 -I./include
-LDFLAGS =
-LLVM_CC = clang
-LLVM_CFLAGS = -g -O1 -c -emit-llvm -I$(INCDIR)
-
-# Directories
-SRCDIR = src
-INCDIR = include
-OBJDIR = obj
-BINDIR = bin
-
-# Target executable
-TARGET = $(BINDIR)/hight_ecb
-BC_FILES = KISA_HIGHT_ECB.bc
-SAW_SCRIPT = HIGHT-KISA-VERIF.saw
-CRYPTOL_FILE = HIGHT-KISA.cry
-
-# Source and object files
-SRCS = $(wildcard $(SRCDIR)/*.c)
-OBJS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
-
-# Default rule: build the executable
+# Default target
 all: $(TARGET)
 
-# Rule to link the object files into the final executable
-$(TARGET): $(OBJS) | $(BINDIR)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
-
-# Rule to compile .c files into .o files
-$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Create bin and obj directories if they don't exist
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
-
-$(BINDIR):
-	mkdir -p $(BINDIR)
-
-# Clean rule to remove the compiled files
+$(TARGET): $(SRC) $(HEADERS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(SRC)
+# Clean up build files
 clean:
-	rm -rf $(OBJDIR) $(BINDIR) *.bc
+	rm -f $(TARGET) *.o *.bc
 
-# Rebuild rule: clean and build again
 rebuild: clean all
 
-# Run rule: build and run the program
-run: $(TARGET)
+run: 
 	./$(TARGET)
 
-# Compile C code to LLVM bitcode
-%.bc: $(SRCDIR)/%.c
-	$(LLVM_CC) $(LLVM_CFLAGS) $< -o $@
+%.bc: $(SRC)
+	$(CC) $(LLVM_CFLAGS) $< -o $@
 
-# Run SAWScript
+BC_FILES = KISA_HIGHT_ECB.bc
+SAW_SCRIPT = KISA_HIGHT_VERIFY.saw
+CRYPTOL_FILE = KISA_HIGHT_SPEC.cry
 verify: $(BC_FILES) $(SAW_SCRIPT) $(CRYPTOL_FILE)
 	saw $(SAW_SCRIPT)
 
