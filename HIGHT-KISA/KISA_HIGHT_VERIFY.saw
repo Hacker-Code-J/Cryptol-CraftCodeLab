@@ -92,41 +92,29 @@ let print_header msg = do {
 let main : TopLevel () = do {
     m <- llvm_load_module "KISA_HIGHT_ECB.bc";
 
-    // print_header "Verification for HIGHT KeySchedule";
-    // print " ";
-    // print "[*] Module: KISA_HIGHT_ECB.bc";
-    // print "[*] Specification: HIGHT_KeySched_OK";
-    // print " ";
+    print_header "Verification for HIGHT KeySchedule";
+    print " ";
+    print "[*] Module: KISA_HIGHT_ECB.bc";
+    print "[*] Specification: HIGHT_KeySched_OK";
+    print " ";
 
     time (do {
         llvm_verify m "HIGHT_KeySched" [] true KeySched_OK z3;
     });
+    print "======================================";
+    print "Verification completed.";
+    print "======================================";
+
+    print_header "Verification for HIGHT Algorithm";
+    print " ";
+    print "[*] Module: KISA_HIGHT_ECB.bc";
+    print "[*] Specification: HIGHT_Encrypt_OK / HIGHT_Decrypt_OK";
+    print " ";
     time (do {
         llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_OK z3;
     });
-    // Define a function to run the verification
-    // Define a function to run the verification
-    // Define a function for the verification
-    // time do { llvm_verify m "HIGHT_KeySched" [] true KeySched_OK z3; };
-    // time do { llvm_verify m "HIGHT_KeySched" [] true KeySched_OK z3; };
-    // time do { llvm_verify m "HIGHT_KeySched" [] true KeySched_OK z3; };
-    // time do { llvm_verify m "HIGHT_KeySched" [] true KeySched_OK z3; };
-    // time do { llvm_verify m "HIGHT_KeySched" [] true KeySched_OK z3; };
-
-    // Define a recursive function to repeat llvm_verify n times
-    // Define a recursive function to repeat llvm_verify n times
-    
-    // Call the function with the desired number of repetitions
-    // repeat_verification 100;
     
     print "======================================";
-    // print "Verification completed.";
-    // print "======================================";
-    // print "[ Start ==========================> ]";
-    // HIGHT_Encrypt_verify <- llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_setup z3;
-    // print "[ ============================= End ]";
-    
-    // // Print the verification result
-    // print KeySched_verify;
-    // print HIGHT_Encrypt_verify;
+    print "Verification completed.";
+    print "======================================";
 };

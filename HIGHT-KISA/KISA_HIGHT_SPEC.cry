@@ -270,32 +270,6 @@ property HIGHT_KeySched_Cryptol_TESTVECTOR =
 
 // ======================== Encryption ========================
 
-// F0 : [8] -> [8]
-// F0 byte = (byte <<< 1) ^ (byte <<< 2) ^ (byte <<< 7)
-
-// F1 : [8] -> [8]
-// F1 byte = (byte <<< 3) ^ (byte <<< 4) ^ (byte <<< 6)
-
-// Function to perform a single round of HIGHT encryption
-// enc_round : [8][8] -> [136][8] -> [8] -> [8][8]
-// enc_round state SK i = [
-//     t0 ^ (F0 t1 + SK @ (8 + (i * 4 + 3))),
-//     state @ 0,
-//     state @ 1 + (F1 (state @ 0) ^ SK @ (8 + (i * 4 + 0))),
-//     state @ 2,
-//     state @ 3 ^ (F0 (state @ 2) + SK @ (8 + (i * 4 + 1))),
-//     state @ 4,
-//     state @ 5 + (F1 (state @ 4) ^ SK @ (8 + (i * 4 + 2))),
-//     state @ 6
-//   ]
-//   where
-//     t0 = state @ 7
-//     t1 = state @ 6
-
-// // Function to perform all 31 rounds of HIGHT encryption
-// enc_rounds : [8][8] -> [136][8] -> [8][8]
-// enc_rounds state SK = foldl (\s i -> enc_round s SK i) state [0..30]
-
 ByteToWord : [8] -> [32]
 ByteToWord b = zero # b  // Extends x from 8 bits to 32 bits
 
@@ -353,16 +327,6 @@ ENC_ROUND XX rk (i0, i1, i2, i3, i4, i5, i6, i7) =
     t6 = ByteToWord (WordToByte ((XX@i2) + (ByteToWord (F1 @ (WordToByte (XX@i3)) ^ (rk @ 2)))))
     t0 = ByteToWord (WordToByte ((XX@i0) ^ (ByteToWord (F0 @ (WordToByte (XX@i1)) + (rk @ 3)))))
   else [0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000]
-// XX[i0] = (XX[i0] ^ (HIGHT_F0[XX[i1]] + RoundKey[4*k+3])) & 0xFF; 
-// XX[i2] = (XX[i2] + (HIGHT_F1[XX[i3]] ^ RoundKey[4*k+2])) & 0xFF; 
-// XX[i4] = (XX[i4] ^ (HIGHT_F0[XX[i5]] + RoundKey[4*k+1])) & 0xFF; 
-// XX[i6] = (XX[i6] + (HIGHT_F1[XX[i7]] ^ RoundKey[4*k+0])) & 0xFF;  
-
-// ENC_ROUND XX3 (RK_SUB RK 4) (5,4,3,2,1,0,7,6)
-// XX[4] = (XX[4] ^ (HIGHT_F0[XX[3]] + RoundKey[4*k+3])) & 0xFF; 
-// XX[2] = (XX[2] + (HIGHT_F1[XX[1]] ^ RoundKey[4*k+2])) & 0xFF; 
-// XX[0] = (XX[0] ^ (HIGHT_F0[XX[7]] + RoundKey[4*k+1])) & 0xFF; 
-// XX[6] = (XX[6] + (HIGHT_F1[XX[5]] ^ RoundKey[4*k+0])) & 0xFF; 
 
 RK_SUB : [136][8] -> [8] -> [4][8]
 RK_SUB RK k = [ RK @ (4*k + 0),
@@ -412,48 +376,18 @@ HIGHT_Encrypt_Cryptol RK src = dst
     XX32 = ENC_ROUND XX31 (RK_SUB RK 32) (1,0,7,6,5,4,3,2)
     XX33 = ENC_ROUND XX32 (RK_SUB RK 33) (0,7,6,5,4,3,2,1)
 
-    XX_last = XX33
-
     XX_final = [ 
-      WordToByte (XX_last@1 + ByteToWord (RK@4)), WordToByte (XX_last@2),
-      WordToByte (XX_last@3 ^ ByteToWord (RK@5)), WordToByte (XX_last@4),
-      WordToByte (XX_last@5 + ByteToWord (RK@6)), WordToByte (XX_last@6),
-      WordToByte (XX_last@7 ^ ByteToWord (RK@7)), WordToByte (XX_last@0) ] : [8][8]
+      WordToByte (XX33@1 + ByteToWord (RK@4)), WordToByte (XX33@2),
+      WordToByte (XX33@3 ^ ByteToWord (RK@5)), WordToByte (XX33@4),
+      WordToByte (XX33@5 + ByteToWord (RK@6)), WordToByte (XX33@6),
+      WordToByte (XX33@7 ^ ByteToWord (RK@7)), WordToByte (XX33@0) ] : [8][8]
     dst = XX_final
 
-// HIGHT_Encrypt_Cryptol : ([136][8], [8][8]) -> [8][8]
-// HIGHT_Encrypt_Cryptol (RK, src) = dst
-//   where
-//     initialState = [ src @ 0 + RK @ 0,
-//                     src @ 1,
-//                     src @ 2 ^ RK @ 1,
-//                     src @ 3,
-//                     src @ 4 + RK @ 2,
-//                     src @ 5,
-//                     src @ 6 ^ RK @ 3,
-//                     src @ 7 ] : [8][8]
-    
-//     afterRounds : [8][8]
-//     afterRounds = enc_rounds initialState RK
-
-//     finalState = [
-//       afterRounds @ 0 + RK @ 4,
-//       afterRounds @ 1 + (F1 (afterRounds @ 0) ^ RK @ 132),
-//       afterRounds @ 2 ^ RK @ 5,
-//       afterRounds @ 3 ^ (F0 (afterRounds @ 2) + RK @ 133),
-//       afterRounds @ 4 + RK @ 6,
-//       afterRounds @ 5 + (F1 (afterRounds @ 4) ^ RK @ 134),
-//       afterRounds @ 6 ^ RK @ 7,
-//       afterRounds @ 7 ^ (F0 (afterRounds @ 6) + RK @ 135)
-//     ]
-
-//     dst = finalState
-
-// property HIGHT_Encrypt_Cryptol_TESTVECTOR =
-//   (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey1, TVPT1) == TVCT1) /\
-//   (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey2, TVPT2) == TVCT2) /\
-//   (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey3, TVPT3) == TVCT3) /\
-//   (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey4, TVPT4) == TVCT4)
+property HIGHT_Encrypt_Cryptol_TESTVECTOR =
+  (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey1) TVPT1 == TVCT1) /\
+  (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey2) TVPT2 == TVCT2) /\
+  (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey3) TVPT3 == TVCT3) /\
+  (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey4) TVPT4 == TVCT4)
 
 // TEST_RK = [
 //   0x02, 0x4B, 0x00, 0xA4, 0x62, 0x00, 0x78, 0x00,
@@ -479,70 +413,155 @@ HIGHT_Encrypt_Cryptol RK src = dst
 //   0x00, 0x30, 0x88, 0x81, 0x20, 0x06, 0xA8, 0xC5
 // ] : [8][8]
 
-// // ======================== Decryption ========================
+// ======================== Decryption ========================
 
-// // Function to perform a single round of HIGHT encryption
-// dec_round : [8][8] -> [128][8] -> [8] -> [8][8]
-// dec_round state SK i = [
-//     state @ 1,
-//     t2 - (F1(state @ 1) ^ (SK @ (i * 4 + 3))),
-//     state @ 3,
-//     t4 ^ F0(state @ 3) + (SK @ (i * 4 + 2)),
-//     state @ 5,
-//     t6 - (F1(state @ 5) ^ (SK @ (i * 4 + 1))),
-//     state @ 7,
-//     t0 ^ F0(state @ 7) + (SK @ (i * 4 + 0))
-//   ]
-//   where
-//     t0 = state @ 0
-//     t2 = state @ 2
-//     t4 = state @ 4
-//     t6 = state @ 6
+// XX[i1] = (XX[i1] - (HIGHT_F1[XX[i2]] ^ RoundKey[4*k+2])) & 0xFF;   
+// XX[i3] = (XX[i3] ^ (HIGHT_F0[XX[i4]] + RoundKey[4*k+1])) & 0xFF; 
+// XX[i5] = (XX[i5] - (HIGHT_F1[XX[i6]] ^ RoundKey[4*k+0])) & 0xFF; 
+// XX[i7] = (XX[i7] ^ (HIGHT_F0[XX[i0]] + RoundKey[4*k+3])) & 0xFF;
 
-// // Function to perform all 31 rounds of HIGHT decryption
-// dec_rounds : [8][8] -> [128][8] -> [8][8]
-// dec_rounds state SK = foldl (\s i -> dec_round s SK i) state [1..16]
+// XX[6] = (XX[6] - (HIGHT_F1[XX[5]] ^ RoundKey[4*k+2])) & 0xFF;   
+// XX[4] = (XX[4] ^ (HIGHT_F0[XX[3]] + RoundKey[4*k+1])) & 0xFF; 
+// XX[2] = (XX[2] - (HIGHT_F1[XX[1]] ^ RoundKey[4*k+0])) & 0xFF; 
+// XX[0] = (XX[0] ^ (HIGHT_F0[XX[7]] + RoundKey[4*k+3])) & 0xFF;
 
-// HIGHT_Decrypt : ([8][8], [8][8], [16][8]) -> [8][8]
-// HIGHT_Decrypt (_, src, MK) = dst
-//   where
-//     (WK, SK) = decKeySchedule(zero, zero, MK)
+// XX[0] = (XX[i1] - (HIGHT_F1[XX[i2]] ^ RoundKey[4*k+2])) & 0xFF;   
+// XX[6] = (XX[i3] ^ (HIGHT_F0[XX[i4]] + RoundKey[4*k+1])) & 0xFF; 
+// XX[4] = (XX[i5] - (HIGHT_F1[XX[i6]] ^ RoundKey[4*k+0])) & 0xFF; 
+// XX[2] = (XX[i7] ^ (HIGHT_F0[XX[1]] + RoundKey[4*k+3])) & 0xFF;
 
-//     initialState : [8][8]
-//     initialState = [
-//       t0,
-//       src @ 1 - ((F1 t0) ^ (SK @ 3)),
-//       t2,
-//       src @ 3 ^ ((F0 t2) + (SK @ 2)),
-//       t4,
-//       src @ 5 - ((F1 t4) ^ (SK @ 1)),
-//       t6,
-//       src @ 7 ^ ((F0 t6) + (SK @ 0))
-//     ] where
-//       t0 = src @ 0 - WK @ 4
-//       t2 = src @ 2 ^ WK @ 5
-//       t4 = src @ 4 - WK @ 6
-//       t6 = src @ 6 ^ WK @ 7
+// XX[7] = (XX[7] - (HIGHT_F1[XX[6]] ^ RoundKey[4*k+2])) & 0xFF;   
+// XX[5] = (XX[5] ^ (HIGHT_F0[XX[4]] + RoundKey[4*k+1])) & 0xFF; 
+// XX[3] = (XX[3] - (HIGHT_F1[XX[2]] ^ RoundKey[4*k+0])) & 0xFF; 
+// XX[1] = (XX[1] ^ (HIGHT_F0[XX[0]] + RoundKey[4*k+3])) & 0xFF;
 
-//     afterRounds : [8][8]
-//     afterRounds = dec_rounds initialState SK
+// XX[1] = (XX[i1] - (HIGHT_F1[XX[i2]] ^ RoundKey[4*k+2])) & 0xFF;   
+// XX[7] = (XX[i3] ^ (HIGHT_F0[XX[i4]] + RoundKey[4*k+1])) & 0xFF; 
+// XX[5] = (XX[i5] - (HIGHT_F1[XX[i6]] ^ RoundKey[4*k+0])) & 0xFF; 
+// XX[3] = (XX[i7] ^ (HIGHT_F0[XX[i0]] + RoundKey[4*k+3])) & 0xFF;
 
-//     finalState = [ afterRounds @ 0 - WK @ 0,
-//                     afterRounds @ 1,
-//                     afterRounds @ 2 ^ WK @ 1,
-//                     afterRounds @ 3,
-//                     afterRounds @ 4 - WK @ 2,
-//                     afterRounds @ 5,
-//                     afterRounds @ 6 ^ WK @ 3,
-//                     afterRounds @ 7 ] : [8][8]
-    
-//     dst = finalState
+// XX[i1] = (XX[i1] - (HIGHT_F1[XX[i2]] ^ RoundKey[4*k+2])) & 0xFF;   
+// XX[i3] = (XX[i3] ^ (HIGHT_F0[XX[i4]] + RoundKey[4*k+1])) & 0xFF; 
+// XX[i5] = (XX[i5] - (HIGHT_F1[XX[i6]] ^ RoundKey[4*k+0])) & 0xFF; 
+// XX[i7] = (XX[i7] ^ (HIGHT_F0[XX[i0]] + RoundKey[4*k+3])) & 0xFF;
 
-// property HIGHT_TESTVECTOR =
-//   HIGHT_Decrypt (zero, HIGHT_Encrypt (zero, TVPT1, TVKey1), TVKey1) == TVPT1 /\
-//   HIGHT_Decrypt (zero, HIGHT_Encrypt (zero, TVPT2, TVKey2), TVKey2) == TVPT2 /\
-//   HIGHT_Decrypt (zero, HIGHT_Encrypt (zero, TVPT3, TVKey3), TVKey3) == TVPT3 /\
-//   HIGHT_Decrypt (zero, HIGHT_Encrypt (zero, TVPT4, TVKey4), TVKey4) == TVPT4
+DEC_ROUND : [8][32] -> [4][8] -> ([8], [8], [8], [8], [8], [8], [8], [8]) -> [8][32]
+DEC_ROUND XX rk (i0, i1, i2, i3, i4, i5, i6, i7) = 
+  if i0 == 7
+  // XX[6] = (XX[6] - (HIGHT_F1[XX[5]] ^ RoundKey[4*k+2])) & 0xFF;   
+  // XX[4] = (XX[4] ^ (HIGHT_F0[XX[3]] + RoundKey[4*k+1])) & 0xFF; 
+  // XX[2] = (XX[2] - (HIGHT_F1[XX[1]] ^ RoundKey[4*k+0])) & 0xFF; 
+  // XX[0] = (XX[0] ^ (HIGHT_F0[XX[7]] + RoundKey[4*k+3])) & 0xFF;
+  then [ t0, XX@1, t2, XX@3, t4, XX@5, t6, XX@7] where
+    t0 = ByteToWord (WordToByte ((XX@i7) ^ (ByteToWord (F0 @ (WordToByte (XX@i0)) + (rk @ 3)))))
+    t2 = ByteToWord (WordToByte ((XX@i5) - (ByteToWord (F1 @ (WordToByte (XX@i6)) ^ (rk @ 0)))))
+    t4 = ByteToWord (WordToByte ((XX@i3) ^ (ByteToWord (F0 @ (WordToByte (XX@i4)) + (rk @ 1)))))
+    t6 = ByteToWord (WordToByte ((XX@i1) - (ByteToWord (F1 @ (WordToByte (XX@i2)) ^ (rk @ 2)))))
+  else if i0 == 0
+  then [ XX@0, t1, XX@2, t3, XX@4, t5, XX@6, t7] where
+    t1 = ByteToWord (WordToByte ((XX@i7) - (ByteToWord (F0 @ (WordToByte (XX@i0)) ^ (rk @ 3)))))
+    t3 = ByteToWord (WordToByte ((XX@i5) ^ (ByteToWord (F1 @ (WordToByte (XX@i6)) - (rk @ 0)))))
+    t5 = ByteToWord (WordToByte ((XX@i3) - (ByteToWord (F0 @ (WordToByte (XX@i4)) ^ (rk @ 1)))))
+    t7 = ByteToWord (WordToByte ((XX@i1) ^ (ByteToWord (F1 @ (WordToByte (XX@i2)) - (rk @ 2)))))
+  else if i0 == 1
+  then [ t0, XX@1, t2, XX@3, t4, XX@5, t6, XX@7] where
+    t2 = ByteToWord (WordToByte ((XX@i7) - (ByteToWord (F0 @ (WordToByte (XX@i0)) ^ (rk @ 3)))))
+    t4 = ByteToWord (WordToByte ((XX@i5) ^ (ByteToWord (F1 @ (WordToByte (XX@i6)) - (rk @ 0)))))
+    t6 = ByteToWord (WordToByte ((XX@i3) - (ByteToWord (F0 @ (WordToByte (XX@i4)) ^ (rk @ 1)))))
+    t0 = ByteToWord (WordToByte ((XX@i1) ^ (ByteToWord (F1 @ (WordToByte (XX@i2)) - (rk @ 2)))))
+  else if i0 == 2
+  then [ XX@0, t1, XX@2, t3, XX@4, t5, XX@6, t7] where
+    t3 = ByteToWord (WordToByte ((XX@i7) - (ByteToWord (F0 @ (WordToByte (XX@i0)) ^ (rk @ 3)))))
+    t5 = ByteToWord (WordToByte ((XX@i5) ^ (ByteToWord (F1 @ (WordToByte (XX@i6)) - (rk @ 0)))))
+    t7 = ByteToWord (WordToByte ((XX@i3) - (ByteToWord (F0 @ (WordToByte (XX@i4)) ^ (rk @ 1)))))
+    t1 = ByteToWord (WordToByte ((XX@i1) ^ (ByteToWord (F1 @ (WordToByte (XX@i2)) - (rk @ 2)))))
+  else if i0 == 3
+  then [ t0, XX@1, t2, XX@3, t4, XX@5, t6, XX@7] where
+    t4 = ByteToWord (WordToByte ((XX@i7) - (ByteToWord (F0 @ (WordToByte (XX@i0)) ^ (rk @ 3)))))
+    t6 = ByteToWord (WordToByte ((XX@i5) ^ (ByteToWord (F1 @ (WordToByte (XX@i6)) - (rk @ 0)))))
+    t0 = ByteToWord (WordToByte ((XX@i3) - (ByteToWord (F0 @ (WordToByte (XX@i4)) ^ (rk @ 1)))))
+    t2 = ByteToWord (WordToByte ((XX@i1) ^ (ByteToWord (F1 @ (WordToByte (XX@i2)) - (rk @ 2)))))
+  else if i0 == 4
+  then [ XX@0, t1, XX@2, t3, XX@4, t5, XX@6, t7] where
+    t5 = ByteToWord (WordToByte ((XX@i7) - (ByteToWord (F0 @ (WordToByte (XX@i0)) ^ (rk @ 3)))))
+    t7 = ByteToWord (WordToByte ((XX@i5) ^ (ByteToWord (F1 @ (WordToByte (XX@i6)) - (rk @ 0)))))
+    t1 = ByteToWord (WordToByte ((XX@i3) - (ByteToWord (F0 @ (WordToByte (XX@i4)) ^ (rk @ 1)))))
+    t3 = ByteToWord (WordToByte ((XX@i1) ^ (ByteToWord (F1 @ (WordToByte (XX@i2)) - (rk @ 2)))))
+  else if i0 == 5
+  then [ t0, XX@1, t2, XX@3, t4, XX@5, t6, XX@7] where
+    t6 = ByteToWord (WordToByte ((XX@i7) - (ByteToWord (F0 @ (WordToByte (XX@i0)) ^ (rk @ 3)))))
+    t0 = ByteToWord (WordToByte ((XX@i5) ^ (ByteToWord (F1 @ (WordToByte (XX@i6)) - (rk @ 0)))))
+    t2 = ByteToWord (WordToByte ((XX@i3) - (ByteToWord (F0 @ (WordToByte (XX@i4)) ^ (rk @ 1)))))
+    t4 = ByteToWord (WordToByte ((XX@i1) ^ (ByteToWord (F1 @ (WordToByte (XX@i2)) - (rk @ 2)))))
+  else if i0 == 6
+  then [ XX@0, t1, XX@2, t3, XX@4, t5, XX@6, t7] where
+    t7 = ByteToWord (WordToByte ((XX@i7) - (ByteToWord (F0 @ (WordToByte (XX@i0)) ^ (rk @ 3)))))
+    t1 = ByteToWord (WordToByte ((XX@i5) ^ (ByteToWord (F1 @ (WordToByte (XX@i6)) - (rk @ 0)))))
+    t3 = ByteToWord (WordToByte ((XX@i3) - (ByteToWord (F0 @ (WordToByte (XX@i4)) ^ (rk @ 1)))))
+    t5 = ByteToWord (WordToByte ((XX@i1) ^ (ByteToWord (F1 @ (WordToByte (XX@i2)) - (rk @ 2)))))
+  else [0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000]
+
+RK_SUB_INV : [136][8] -> [8] -> [4][8]
+RK_SUB_INV RK k = [ RK @ (4*k + 3),
+                RK @ (4*k + 2),
+                RK @ (4*k + 1),
+                RK @ (4*k + 0) ]
+
+HIGHT_Decrypt_Cryptol : [136][8] -> [8][8] -> [8][8]
+HIGHT_Decrypt_Cryptol RK src = dst
+  where
+    XX_init = [ 
+      ByteToWord (src@7), ByteToWord (src@0 - RK@4),
+      ByteToWord (src@1), ByteToWord (src@2 ^ RK@5),
+      ByteToWord (src@3), ByteToWord (src@4 - RK@6),
+      ByteToWord (src@5), ByteToWord (src@6 ^ RK@7) ] : [8][32]
+
+    XX33 = ENC_ROUND XX_init (RK_SUB RK 33) (7,6,5,4,3,2,1,0)
+    XX32 = ENC_ROUND XX33 (RK_SUB RK 32) (0,7,6,5,4,3,2,1)
+    XX31 = ENC_ROUND XX32 (RK_SUB RK 31) (1,0,7,6,5,4,3,2)
+    XX30 = ENC_ROUND XX31 (RK_SUB RK 30) (2,1,0,7,6,5,4,3)
+    XX29 = ENC_ROUND XX30 (RK_SUB RK 29) (3,2,1,0,7,6,5,4)
+    XX28 = ENC_ROUND XX29 (RK_SUB RK 28) (4,3,2,1,0,7,6,5)
+    XX27 = ENC_ROUND XX28 (RK_SUB RK 27) (5,4,3,2,1,0,7,6)
+    XX26 = ENC_ROUND XX27 (RK_SUB RK 26) (6,5,4,3,2,1,0,7)
+    XX25 = ENC_ROUND XX26 (RK_SUB RK 25) (7,6,5,4,3,2,1,0)
+    XX24 = ENC_ROUND XX25 (RK_SUB RK 24) (0,7,6,5,4,3,2,1)
+    XX23 = ENC_ROUND XX24 (RK_SUB RK 23) (1,0,7,6,5,4,3,2)
+    XX22 = ENC_ROUND XX23 (RK_SUB RK 22) (2,1,0,7,6,5,4,3)
+    XX21 = ENC_ROUND XX22 (RK_SUB RK 21) (3,2,1,0,7,6,5,4)
+    XX20 = ENC_ROUND XX21 (RK_SUB RK 20) (4,3,2,1,0,7,6,5)
+    XX19 = ENC_ROUND XX20 (RK_SUB RK 19) (5,4,3,2,1,0,7,6)
+    XX18 = ENC_ROUND XX19 (RK_SUB RK 18) (6,5,4,3,2,1,0,7)
+    XX17 = ENC_ROUND XX18 (RK_SUB RK 17) (7,6,5,4,3,2,1,0)
+    XX16 = ENC_ROUND XX17 (RK_SUB RK 16) (0,7,6,5,4,3,2,1)
+    XX15 = ENC_ROUND XX16 (RK_SUB RK 15) (1,0,7,6,5,4,3,2)
+    XX14 = ENC_ROUND XX15 (RK_SUB RK 14) (2,1,0,7,6,5,4,3)
+    XX13 = ENC_ROUND XX14 (RK_SUB RK 13) (3,2,1,0,7,6,5,4)
+    XX12 = ENC_ROUND XX13 (RK_SUB RK 12) (4,3,2,1,0,7,6,5)
+    XX11 = ENC_ROUND XX12 (RK_SUB RK 11) (5,4,3,2,1,0,7,6)
+    XX10 = ENC_ROUND XX11 (RK_SUB RK 10) (6,5,4,3,2,1,0,7)
+    XX9 = ENC_ROUND XX10 (RK_SUB RK 9) (7,6,5,4,3,2,1,0)
+    XX8 = ENC_ROUND XX9 (RK_SUB RK 8) (0,7,6,5,4,3,2,1)
+    XX7 = ENC_ROUND XX8 (RK_SUB RK 7) (1,0,7,6,5,4,3,2)
+    XX6 = ENC_ROUND XX7 (RK_SUB RK 6) (2,1,0,7,6,5,4,3)
+    XX5 = ENC_ROUND XX6 (RK_SUB RK 5) (3,2,1,0,7,6,5,4)
+    XX4 = ENC_ROUND XX5 (RK_SUB RK 4) (4,3,2,1,0,7,6,5)
+    XX3 = ENC_ROUND XX4 (RK_SUB RK 3) (5,4,3,2,1,0,7,6)
+    XX2 = ENC_ROUND XX3 (RK_SUB RK 2) (6,5,4,3,2,1,0,7)
+
+    XX_L=XX33
+    XX_final = [ 
+      WordToByte (XX_L@0 - ByteToWord (RK@0)), WordToByte (XX_L@1),
+      WordToByte (XX_L@2 ^ ByteToWord (RK@1)), WordToByte (XX_L@3),
+      WordToByte (XX_L@4 - ByteToWord (RK@2)), WordToByte (XX_L@5),
+      WordToByte (XX_L@6 ^ ByteToWord (RK@3)), WordToByte (XX_L@7) ] : [8][8]
+    dst = XX_final
+
+property HIGHT_TESTVECTOR =
+  HIGHT_Decrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey1) (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey1) TVPT1) == TVPT1 /\
+  HIGHT_Decrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey2) (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey2) TVPT2) == TVPT2 /\
+  HIGHT_Decrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey3) (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey3) TVPT3) == TVPT3 /\
+  HIGHT_Decrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey4) (HIGHT_Encrypt_Cryptol (HIGHT_KeySched_Cryptol TVKey4) TVPT4) == TVPT4
 
 // property HIGHT_Correctness ` (src : [8][8]) (key : [16][8]) = 
 //     HIGHT_Decrypt (zero, HIGHT_Encrypt (zero, src, key), key) == src
