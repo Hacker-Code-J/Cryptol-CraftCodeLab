@@ -1,33 +1,49 @@
 CC = clang
 CFLAGS = -Wall -Wextra -g -O1
-LLVM_CFLAGS = -g -O1 -fno-threadsafe-statics -fsanitize-trap=undefined -emit-llvm -c
+LLVM_CC = clang
+LLVM_CFLAGS = -g -O1 -fno-threadsafe-statics -c -emit-llvm -Iinclude
 
-TARGET = KISA_HIGHT_ECB
-SRC = KISA_HIGHT_ECB.c
-HEADERS = KISA_HIGHT_ECB.h
+# Directories
+SRCDIR = src
+INCDIR = include
+OBJDIR = obj
+BINDIR = bin
 
-# Default target
-all: $(TARGET)
-
-$(TARGET): $(SRC) $(HEADERS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(SRC)
-# Clean up build files
-clean:
-	rm -f $(TARGET) *.o *.bc
-
-rebuild: clean all
-
-run: 
-	./$(TARGET)
-
-%.bc: $(SRC)
-	$(CC) $(LLVM_CFLAGS) $< -o $@
-
+TARGET = $(BINDIR)/KISA_HIGHT_ECB
 BC_FILES = KISA_HIGHT_ECB.bc
 SAW_SCRIPT = KISA_HIGHT_VERIFY.saw
 CRYPTOL_FILE = KISA_HIGHT_SPEC.cry
+
+SRCS = $(wildcard $(SRCDIR)/*.c)
+OBJS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
+
+all: dir $(TARGET)
+
+dir:
+	@mkdir -p $(OBJDIR) $(BINDIR)
+
+$(TARGET): $(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $^
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+-include $(OBJS:.o=.d)
+
+run: $(TARGET)
+	./$(TARGET)
+
+clean:
+	rm -rf $(OBJDIR) $(BINDIR) $(BC_FILES)
+
+rebuild: clean all
+
+# Compile C code to LLVM bitcode
+%.bc: $(SRCDIR)/%.c
+	$(LLVM_CC) $(LLVM_CFLAGS) $< -o $@
+
+# Run SAWScript
 verify: $(BC_FILES) $(SAW_SCRIPT) $(CRYPTOL_FILE)
 	saw $(SAW_SCRIPT)
 
-# Phony targets to prevent conflicts with file names
-.PHONY: all clean rebuild run
+.PHONY: all clean dir rebuild verify
