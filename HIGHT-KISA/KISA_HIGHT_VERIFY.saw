@@ -9,54 +9,54 @@
   Using the Software Analysis Workbench (SAW)
  */
 
-include "helpers.saw";
+// include "helpers.saw";
 import "KISA_HIGHT_SPEC.cry";
 
-// let alloc_init ty v = do {
-//   p <- llvm_alloc ty;
-//   llvm_points_to p v;
-//   return p;
-// };
+let alloc_init ty v = do {
+  p <- llvm_alloc ty;
+  llvm_points_to p v;
+  return p;
+};
 
-// let alloc_init_readonly ty v = do {
-//   p <- llvm_alloc_readonly ty;
-//   llvm_points_to p v;
-//   return p;
-// };
+let alloc_init_readonly ty v = do {
+  p <- llvm_alloc_readonly ty;
+  llvm_points_to p v;
+  return p;
+};
 
-// let ptr_to_fresh n ty = do {
-//   x <- llvm_fresh_var n ty;
-//   p <- alloc_init ty (llvm_term x);
-//   return (x, p);
-// };
+let ptr_to_fresh n ty = do {
+  x <- llvm_fresh_var n ty;
+  p <- alloc_init ty (llvm_term x);
+  return (x, p);
+};
 
-// let ptr_to_fresh_readonly n ty = do {
-//   x <- llvm_fresh_var n ty;
-//   p <- alloc_init_readonly ty (llvm_term x);
-//   return (x, p);
-// };
+let ptr_to_fresh_readonly n ty = do {
+  x <- llvm_fresh_var n ty;
+  p <- alloc_init_readonly ty (llvm_term x);
+  return (x, p);
+};
 
 // Define the setup for encKeySchedule
-let KeySched_OK : CrucibleSetup () = do {
-    (MK, p_mk) <- ptr_to_fresh_readonly "MK" (llvm_array 16 (llvm_int 8));
-    (RK, p_rk) <- ptr_to_fresh "RK" (llvm_array 136 (llvm_int 8));
+let KeySched_OK : LLVMSetup () = do {
+    (MK, pMK) <- ptr_to_fresh_readonly "MK" (llvm_array 16 (llvm_int 8));
+    (RK, pRK) <- ptr_to_fresh "RK" (llvm_array 136 (llvm_int 8));
 
-    llvm_execute_func [p_mk, llvm_term {{ 0 : [32] }}, p_rk];
+    llvm_execute_func [ pMK,
+                        llvm_term {{ 0 : [32] }},
+                        pRK ];
 
-    let result = {{ HIGHT_KeySched_Cryptol MK }};
-    llvm_points_to p_rk (llvm_term result);
+    llvm_points_to pRK (llvm_term {{ HIGHT_KeySched_Cryptol MK }});
 };
 
 // Define the setup for HIGHT_Encrypt
-let HIGHT_Encrypt_OK : CrucibleSetup () = do {
-    (RK, p_rk) <- ptr_to_fresh_readonly "RK" (llvm_array 136 (llvm_int 8));
-    (src, p_src) <- ptr_to_fresh "src" (llvm_array 8 (llvm_int 8));
-    (dst, p_dst) <- ptr_to_fresh "dst" (llvm_array 8 (llvm_int 8));
+let HIGHT_Encrypt_OK : LLVMSetup () = do {
+    (RK, pRK) <- ptr_to_fresh_readonly "RK" (llvm_array 136 (llvm_int 8));
+    (src, pSRC) <- ptr_to_fresh "src" (llvm_array 8 (llvm_int 8));
     
-    llvm_execute_func [p_rk, p_src, p_dst];
+    llvm_execute_func [ pRK,
+                        pSRC ];
 
-    let result = {{ HIGHT_Encrypt_Cryptol RK src }};
-    llvm_points_to p_dst (llvm_term result);
+    llvm_points_to pSRC (llvm_term {{ HIGHT_Encrypt_Cryptol RK src }});
 };
 
 

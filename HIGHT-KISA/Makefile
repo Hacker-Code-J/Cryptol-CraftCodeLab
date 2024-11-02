@@ -1,7 +1,7 @@
 CC = clang
 CFLAGS = -Wall -Wextra -g -O1
 LLVM_CC = clang
-LLVM_CFLAGS = -g -O1 -fno-threadsafe-statics -c -emit-llvm -Iinclude
+LLVM_CFLAGS = -g -O1 -c -emit-llvm -Iinclude
 
 # Directories
 SRCDIR = src

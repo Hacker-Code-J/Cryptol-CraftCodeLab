@@ -39,16 +39,6 @@ void    HIGHT_KeySched(
 
 /*************** Encryption*************************************************/
 
-// void HIGHT_ENC(BYTE k,
-//                BYTE i0, BYTE i1, BYTE i2, BYTE i3,
-//                BYTE i4, BYTE i5, BYTE i6, BYTE i7,
-//                DWORD* XX, BYTE* RoundKey) {
-//     XX[i0] = (XX[i0] ^ (HIGHT_F0[XX[i1]] + RoundKey[4 * k + 3])) & 0xFF;
-//     XX[i2] = (XX[i2] + (HIGHT_F1[XX[i3]] ^ RoundKey[4 * k + 2])) & 0xFF;
-//     XX[i4] = (XX[i4] ^ (HIGHT_F0[XX[i5]] + RoundKey[4 * k + 1])) & 0xFF;
-//     XX[i6] = (XX[i6] + (HIGHT_F1[XX[i7]] ^ RoundKey[4 * k + 0])) & 0xFF;
-// }
-
 void    HIGHT_Encrypt(
             BYTE    *RoundKey,      
             BYTE    *Data)
@@ -74,40 +64,38 @@ void    HIGHT_Encrypt(
         XX[i6] = (XX[i6] + (HIGHT_F1[XX[i7]] ^ RoundKey[4*k+0])) & 0xFF;    \
     }
 
-    // HIGHT_ENC( 2,   7, 6, 5, 4, 3, 2, 1, 0, XX, RoundKey);
-    // HIGHT_ENC( 3,   6, 5, 4, 3, 2, 1, 0, 7, XX, RoundKey);
 	HIGHT_ENC( 2,  7,6,5,4,3,2,1,0);
     HIGHT_ENC( 3,  6,5,4,3,2,1,0,7);
-    // HIGHT_ENC( 4,  5,4,3,2,1,0,7,6);
-    // HIGHT_ENC( 5,  4,3,2,1,0,7,6,5);
-    // HIGHT_ENC( 6,  3,2,1,0,7,6,5,4);
-    // HIGHT_ENC( 7,  2,1,0,7,6,5,4,3);
-    // HIGHT_ENC( 8,  1,0,7,6,5,4,3,2);
-    // HIGHT_ENC( 9,  0,7,6,5,4,3,2,1);
-    // HIGHT_ENC(10,  7,6,5,4,3,2,1,0);
-    // HIGHT_ENC(11,  6,5,4,3,2,1,0,7);
-    // HIGHT_ENC(12,  5,4,3,2,1,0,7,6);
-    // HIGHT_ENC(13,  4,3,2,1,0,7,6,5);
-    // HIGHT_ENC(14,  3,2,1,0,7,6,5,4);
-    // HIGHT_ENC(15,  2,1,0,7,6,5,4,3);
-    // HIGHT_ENC(16,  1,0,7,6,5,4,3,2);
-    // HIGHT_ENC(17,  0,7,6,5,4,3,2,1);
-    // HIGHT_ENC(18,  7,6,5,4,3,2,1,0);
-    // HIGHT_ENC(19,  6,5,4,3,2,1,0,7);
-    // HIGHT_ENC(20,  5,4,3,2,1,0,7,6);
-    // HIGHT_ENC(21,  4,3,2,1,0,7,6,5);
-    // HIGHT_ENC(22,  3,2,1,0,7,6,5,4);
-    // HIGHT_ENC(23,  2,1,0,7,6,5,4,3);
-    // HIGHT_ENC(24,  1,0,7,6,5,4,3,2);
-    // HIGHT_ENC(25,  0,7,6,5,4,3,2,1);
-    // HIGHT_ENC(26,  7,6,5,4,3,2,1,0);
-    // HIGHT_ENC(27,  6,5,4,3,2,1,0,7);
-    // HIGHT_ENC(28,  5,4,3,2,1,0,7,6);
-    // HIGHT_ENC(29,  4,3,2,1,0,7,6,5);
-    // HIGHT_ENC(30,  3,2,1,0,7,6,5,4);
-    // HIGHT_ENC(31,  2,1,0,7,6,5,4,3);
-    // HIGHT_ENC(32,  1,0,7,6,5,4,3,2);
-    // HIGHT_ENC(33,  0,7,6,5,4,3,2,1);
+    HIGHT_ENC( 4,  5,4,3,2,1,0,7,6);
+    HIGHT_ENC( 5,  4,3,2,1,0,7,6,5);
+    HIGHT_ENC( 6,  3,2,1,0,7,6,5,4);
+    HIGHT_ENC( 7,  2,1,0,7,6,5,4,3);
+    HIGHT_ENC( 8,  1,0,7,6,5,4,3,2);
+    HIGHT_ENC( 9,  0,7,6,5,4,3,2,1);
+    HIGHT_ENC(10,  7,6,5,4,3,2,1,0);
+    HIGHT_ENC(11,  6,5,4,3,2,1,0,7);
+    HIGHT_ENC(12,  5,4,3,2,1,0,7,6);
+    HIGHT_ENC(13,  4,3,2,1,0,7,6,5);
+    HIGHT_ENC(14,  3,2,1,0,7,6,5,4);
+    HIGHT_ENC(15,  2,1,0,7,6,5,4,3);
+    HIGHT_ENC(16,  1,0,7,6,5,4,3,2);
+    HIGHT_ENC(17,  0,7,6,5,4,3,2,1);
+    HIGHT_ENC(18,  7,6,5,4,3,2,1,0);
+    HIGHT_ENC(19,  6,5,4,3,2,1,0,7);
+    HIGHT_ENC(20,  5,4,3,2,1,0,7,6);
+    HIGHT_ENC(21,  4,3,2,1,0,7,6,5);
+    HIGHT_ENC(22,  3,2,1,0,7,6,5,4);
+    HIGHT_ENC(23,  2,1,0,7,6,5,4,3);
+    HIGHT_ENC(24,  1,0,7,6,5,4,3,2);
+    HIGHT_ENC(25,  0,7,6,5,4,3,2,1);
+    HIGHT_ENC(26,  7,6,5,4,3,2,1,0);
+    HIGHT_ENC(27,  6,5,4,3,2,1,0,7);
+    HIGHT_ENC(28,  5,4,3,2,1,0,7,6);
+    HIGHT_ENC(29,  4,3,2,1,0,7,6,5);
+    HIGHT_ENC(30,  3,2,1,0,7,6,5,4);
+    HIGHT_ENC(31,  2,1,0,7,6,5,4,3);
+    HIGHT_ENC(32,  1,0,7,6,5,4,3,2);
+    HIGHT_ENC(33,  0,7,6,5,4,3,2,1);
 
     // Final Round
     Data[1] = (BYTE) XX[2];

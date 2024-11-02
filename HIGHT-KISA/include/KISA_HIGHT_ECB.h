@@ -16,10 +16,7 @@ void    HIGHT_KeySched(
             BYTE    *UserKey,       
             DWORD   UserKeyLen,     
             BYTE    *RoundKey);     
-// void    HIGHT_ENC(BYTE k,
-//                BYTE i0, BYTE i1, BYTE i2, BYTE i3,
-//                BYTE i4, BYTE i5, BYTE i6, BYTE i7,
-//                DWORD* XX, BYTE* RoundKey);
+
 void    HIGHT_Encrypt(
             BYTE    *RoundKey,      
             BYTE    *Data);         
