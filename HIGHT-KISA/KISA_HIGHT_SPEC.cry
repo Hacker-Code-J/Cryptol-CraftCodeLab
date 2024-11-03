@@ -1,9 +1,13 @@
 /*
- * Copyright (c) 2024 Crypto & Security Engineering Lab (CSE).
- * https://sites.google.com/kookmin.ac.kr/cselab/club-activity?authuser=0
- * Distributed under the terms of the BSD3 license (see LICENSE file)
- */
+  * Copyright (c) 2024 Crypto & Security Engineering Lab (CSE).
+  * author Ji, Yong-hyeon <hacker3740@kookmin.ac.kr>.
+  * https://sites.google.com/kookmin.ac.kr/cselab/club-activity?authuser=0
 
+  * Distributed under the terms of the BSD3 license (see LICENSE file)
+  
+  * References
+  * https://seed.kisa.or.kr/kisa/algorithm/EgovHightInfo.do
+ */
 module HIGHT_KISA where
 
 // Test Vectors
@@ -493,7 +497,16 @@ DEC_ROUND XX rk (i0, i1, i2, i3, i4, i5, i6, i7) =
   then [ XX@0, t1, XX@2, t3, XX@4, t5, XX@6, t7] where
     t7 = ByteToWord (WordToByte ((XX@i7) ^ (ByteToWord (F0 @ (WordToByte (XX@i0)) + (rk @ 3)))))
     t1 = ByteToWord (WordToByte ((XX@i5) - (ByteToWord (F1 @ (WordToByte (XX@i6)) ^ (rk @ 0)))))
-    t3 = ByteToWord (WordToByte ((XX@i3) ^ (ByteToWord (F0 @ (WordToByte (XX@i4)) + (rk @ 1)))))
+    t3 = ByteToWor/*
+  @Copyright (c) 2024 Crypto & Security Engineering Lab (CSE).
+  @author Ji, Yong-hyeon <hacker3740@kookmin.ac.kr>
+  https://sites.google.com/kookmin.ac.kr/cselab/club-activity?authuser=0
+  
+  Distributed under the terms of the BSD3 license (see LICENSE file)
+
+  References
+  Using the Software Analysis Workbench (SAW)
+ */d (WordToByte ((XX@i3) ^ (ByteToWord (F0 @ (WordToByte (XX@i4)) + (rk @ 1)))))
     t5 = ByteToWord (WordToByte ((XX@i1) - (ByteToWord (F1 @ (WordToByte (XX@i2)) ^ (rk @ 2)))))
   else [0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000]
 

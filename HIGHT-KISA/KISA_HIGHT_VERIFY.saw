@@ -1,12 +1,12 @@
 /*
-  @Copyright (c) 2024 Crypto & Security Engineering Lab (CSE).
-  @author Ji, Yong-hyeon <hacker3740@kookmin.ac.kr>
-  https://sites.google.com/kookmin.ac.kr/cselab/club-activity?authuser=0
-  
-  Distributed under the terms of the BSD3 license (see LICENSE file)
+  * Copyright (c) 2024 Crypto & Security Engineering Lab (CSE).
+  * author Ji, Yong-hyeon <hacker3740@kookmin.ac.kr>
+  * https://sites.google.com/kookmin.ac.kr/cselab/club-activity?authuser=0
 
-  References
-  Using the Software Analysis Workbench (SAW)
+  * Distributed under the terms of the BSD3 license (see LICENSE file)
+
+  * References
+  * Using the Software Analysis Workbench (SAW)
  */
 
 // include "helpers.saw";
