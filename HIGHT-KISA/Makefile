@@ -46,4 +46,9 @@ rebuild: clean all
 verify: $(BC_FILES) $(SAW_SCRIPT) $(CRYPTOL_FILE)
 	saw $(SAW_SCRIPT)
 
+measure:
+	(saw KISA_HIGHT_VERIFY.saw > KeySchedTime.txt)
+	(python3 KeySchedTime.py > TimeMeasure.txt)
+	(python3 TimeMeasure.py)
+
 .PHONY: all clean dir rebuild verify

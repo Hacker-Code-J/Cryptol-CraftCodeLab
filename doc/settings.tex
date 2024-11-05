@@ -157,6 +157,17 @@
 
 % Listings
 \usepackage{listings}
+\lstset{
+	%	numbers=left, % Line numbers location
+	%	numbersep=6pt, % Whitespace to the right of line numbers
+	%	numberstyle=\tiny\it, % Line numbers font style
+	linewidth=\textwidth,  % Sets the listing width to match the text width
+	frame=single, % Border
+	basicstyle=\tt\scriptsize, % Code font style
+	breaklines=true, % Break long lines into multiple lines automatically
+	aboveskip=1.5\baselineskip, % Vertical whitespace before the listing
+	tabsize=1, % How many space to a tab
+}
 \renewcommand{\lstlistingname}{Code}%
 % Define the style for Haskell
 \lstdefinestyle{haskell}{

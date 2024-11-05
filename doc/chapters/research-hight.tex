@@ -1,48 +1,75 @@
 \chapter{Research (HIGHT)}
 
-\begin{tikzpicture}
-	% Title Labels
-	\node at (-2,4) {Stack Memory (minmax)};
-	\node at (6,4) {Heap Memory (or Caller Scope)};
-	
-	% Stack Frame for minmax function
-	\draw[thick] (-4, 3.5) rectangle (2, 0);
-	
-	% Stack Frame Contents
-	% Return Address
-	\node at (-1, 3.2) {Return Address};
-	\draw[thick] (-4, 3.0) -- (2, 3.0);
-	
-	% x parameter
-	\node at (-1, 2.7) {x (int64\_t*)};
-	\draw[thick] (-4, 2.5) -- (2, 2.5);
-	\node at (-3.5, 2.6) {\footnotesize Stack Addr: 0x...};
-	\draw[->] (0, 2.6) -- (3, 2.6); % Pointer arrow to heap x
-	
-	% y parameter
-	\node at (-1, 2.2) {y (int64\_t*)};
-	\draw[thick] (-4, 2.0) -- (2, 2.0);
-	\node at (-3.5, 2.1) {\footnotesize Stack Addr: 0x...};
-	\draw[->] (0, 2.1) -- (3, 1.1); % Pointer arrow to heap y
-	
-	% tmp local variable
-	\node at (-1, 1.7) {tmp (int64\_t)};
-	\draw[thick] (-4, 1.5) -- (2, 1.5);
-	\node at (-3.5, 1.6) {\footnotesize Stack Addr: 0x...};
-	
-	% Heap Memory Visualization
-	% Memory block for *x
-	\draw[thick] (3, 2.5) rectangle (9, 2.0);
-	\node at (6, 2.25) {*x (value of int64\_t pointed by x)};
-	\node at (3.5, 2.35) {\footnotesize Heap Addr: 0x...};
-	
-	% Memory block for *y
-	\draw[thick] (3, 1.5) rectangle (9, 1.0);
-	\node at (6, 1.25) {*y (value of int64\_t pointed by y)};
-	\node at (3.5, 1.35) {\footnotesize Heap Addr: 0x...};
-	
-	% Additional Notes
-	\node at (-5, -0.5) [align=left] {\footnotesize Note: Actual stack and heap addresses will vary\\
-		\footnotesize based on system memory layout and usage.};
-	
-\end{tikzpicture}
+\begin{lstlisting}
+#define BYTE    unsigned char       //  1-byte data type
+#define WORD    unsigned short int  //  2-byte data type
+#define DWORD   unsigned int        //  4-byte data type	
+
+void HIGHT_KeySched(
+BYTE    *UserKey,       
+DWORD   UserKeyLen,     
+BYTE    *RoundKey);     
+
+void HIGHT_Encrypt(
+BYTE    *RoundKey,      
+BYTE    *Data);         
+
+void HIGHT_Decrypt(
+BYTE    *RoundKey,      
+BYTE    *Data); 
+\end{lstlisting}
+
+\newpage
+\begin{lstlisting}
+rotateLeft8 : [8][8] -> [8][8]
+rotateLeft8 block = drop`{1} block # take`{1} block
+
+rotateRight8 : [8][8] -> [8][8]
+rotateRight8 block = drop`{7} block # take`{7} block
+
+right_update_MK : [16][8] -> [16][8]
+right_update_MK mk = rotatedMK
+where
+(firstHalf, secondHalf) = splitAt`{8} mk
+rotatedFirstHalf = rotateRight8 firstHalf
+rotatedSecondHalf = rotateRight8 secondHalf
+rotatedMK = rotatedFirstHalf # rotatedSecondHalf
+
+left_update_MK : [16][8] -> [16][8]
+left_update_MK mk = rotatedMK
+where
+(firstHalf, secondHalf) = splitAt`{8} mk
+rotatedFirstHalf = rotateLeft8 firstHalf
+rotatedSecondHalf = rotateLeft8 secondHalf
+rotatedMK = rotatedFirstHalf # rotatedSecondHalf
+
+HIGHT_KeySched_Cryptol : [16][8] -> [136][8]
+HIGHT_KeySched_Cryptol MK = RK
+where
+RK = [ subkey i | i:[8] <- [0..135] ]
+where
+subkey i = 
+if i < 4
+then MK @ (12 + i)
+else if i < 8
+then MK @ (i - 4)
+else if i < 24
+then MK @ (i - 8) + delta_table @ (i - 8)
+else if i < 40
+then (right_update_MK MK) @ (i - 24) + delta_table @ (i - 8)
+else if i < 56
+then (right_update_MK (right_update_MK MK)) @ ((i - 40)) + delta_table @ (i - 8)
+else if i < 72
+then (right_update_MK (right_update_MK (right_update_MK MK))) @ (i - 56)
++ delta_table @ (i - 8)
+else if i < 88
+then (right_update_MK (right_update_MK (right_update_MK (right_update_MK MK)))) @ (i - 72)
++ delta_table @ (i - 8)
+else if i < 104
+then (left_update_MK (left_update_MK (left_update_MK MK))) @ (i - 88) 
++ delta_table @ (i - 8)
+else if i < 120
+then (left_update_MK (left_update_MK MK)) @ (i - 104) + delta_table @ (i - 8)
+else
+(left_update_MK MK) @ (i - 120) + delta_table @ (i - 8)
+\end{lstlisting}

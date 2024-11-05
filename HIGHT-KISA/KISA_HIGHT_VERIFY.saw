@@ -76,6 +76,7 @@ let print_header msg = do {
     print msg;
     print "======================================";
 };
+
 // Main function to run the verification
 let main : TopLevel () = do {
     m <- llvm_load_module "KISA_HIGHT_ECB.bc";
@@ -86,23 +87,21 @@ let main : TopLevel () = do {
     print "[*] Specification: HIGHT_KeySched_OK";
     print " ";
 
-    time (do {
-        llvm_verify m "HIGHT_KeySched" [] true KeySched_OK z3;
-    });
+    time (do { llvm_verify m "HIGHT_KeySched" [] true KeySched_OK z3; });
+
     print "======================================";
     print "Verification completed.";
     print "======================================";
-
     print_header "Verification for HIGHT Algorithm";
     print " ";
     print "[*] Module: KISA_HIGHT_ECB.bc";
     print "[*] Specification: HIGHT_Encrypt_OK / HIGHT_Decrypt_OK";
     print " ";
     time (do {
-        llvm_verify m "HIGHT_Decrypt" [] true HIGHT_Decrypt_OK z3;
+        llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_OK z3;
     });
     time (do {
-        llvm_verify m "HIGHT_Encrypt" [] true HIGHT_Encrypt_OK z3;
+        llvm_verify m "HIGHT_Decrypt" [] true HIGHT_Decrypt_OK z3;
     });
     
     print "======================================";

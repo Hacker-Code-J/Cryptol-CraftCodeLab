@@ -214,16 +214,16 @@ rotateLeft8 block = drop`{1} block # take`{1} block
 rotateRight8 : [8][8] -> [8][8]
 rotateRight8 block = drop`{7} block # take`{7} block
 
-right_update_MK : [16][8] -> [16][8]
-right_update_MK mk = rotatedMK
+rightMK : [16][8] -> [16][8]
+rightMK mk = rotatedMK
     where
     (firstHalf, secondHalf) = splitAt`{8} mk
     rotatedFirstHalf = rotateRight8 firstHalf
     rotatedSecondHalf = rotateRight8 secondHalf
     rotatedMK = rotatedFirstHalf # rotatedSecondHalf
 
-left_update_MK : [16][8] -> [16][8]
-left_update_MK mk = rotatedMK
+leftMK : [16][8] -> [16][8]
+leftMK mk = rotatedMK
     where
     (firstHalf, secondHalf) = splitAt`{8} mk
     rotatedFirstHalf = rotateLeft8 firstHalf
@@ -245,22 +245,22 @@ HIGHT_KeySched_Cryptol MK = RK
           else if i < 24
           then MK @ (i - 8) + delta_table @ (i - 8)
           else if i < 40
-          then (right_update_MK MK) @ (i - 24) + delta_table @ (i - 8)
+          then (rightMK MK) @ (i - 24) + delta_table @ (i - 8)
           else if i < 56
-          then (right_update_MK (right_update_MK MK)) @ ((i - 40)) + delta_table @ (i - 8)
+          then (rightMK (rightMK MK)) @ ((i - 40)) + delta_table @ (i - 8)
           else if i < 72
-          then (right_update_MK (right_update_MK (right_update_MK MK))) @ (i - 56)
+          then (rightMK (rightMK (rightMK MK))) @ (i - 56)
                 + delta_table @ (i - 8)
           else if i < 88
-          then (right_update_MK (right_update_MK (right_update_MK (right_update_MK MK)))) @ (i - 72)
+          then (rightMK (rightMK (rightMK (rightMK MK)))) @ (i - 72)
                 + delta_table @ (i - 8)
           else if i < 104
-          then (left_update_MK (left_update_MK (left_update_MK MK))) @ (i - 88) 
+          then (leftMK (leftMK (leftMK MK))) @ (i - 88) 
                 + delta_table @ (i - 8)
           else if i < 120
-          then (left_update_MK (left_update_MK MK)) @ (i - 104) + delta_table @ (i - 8)
+          then (leftMK (leftMK MK)) @ (i - 104) + delta_table @ (i - 8)
           else
-              (left_update_MK MK) @ (i - 120) + delta_table @ (i - 8)
+              (leftMK MK) @ (i - 120) + delta_table @ (i - 8)
 
 property HIGHT_KeySched_Cryptol_TESTVECTOR =
   (HIGHT_KeySched_Cryptol TVKey1 == 
@@ -279,6 +279,12 @@ ByteToWord b = zero # b  // Extends x from 8 bits to 32 bits
 
 WordToByte : [32] -> [8]
 WordToByte w = drop`{0x18} w // Takes the least significant 8 bits
+
+RK_SUB : [136][8] -> [8] -> [4][8]
+RK_SUB RK k = [ RK @ (4 * k + 0),
+                RK @ (4 * k + 1),
+                RK @ (4 * k + 2),
+                RK @ (4 * k + 3) ]
 
 ENC_ROUND : [8][32] -> [4][8] -> ([8], [8], [8], [8], [8], [8], [8], [8]) -> [8][32]
 ENC_ROUND XX rk (i0, i1, i2, i3, i4, i5, i6, i7) = 
@@ -331,12 +337,6 @@ ENC_ROUND XX rk (i0, i1, i2, i3, i4, i5, i6, i7) =
     t6 = ByteToWord (WordToByte ((XX@i2) + (ByteToWord (F1 @ (WordToByte (XX@i3)) ^ (rk @ 2)))))
     t0 = ByteToWord (WordToByte ((XX@i0) ^ (ByteToWord (F0 @ (WordToByte (XX@i1)) + (rk @ 3)))))
   else [0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000]
-
-RK_SUB : [136][8] -> [8] -> [4][8]
-RK_SUB RK k = [ RK @ (4 * k + 0),
-                RK @ (4 * k + 1),
-                RK @ (4 * k + 2),
-                RK @ (4 * k + 3) ]
 
 HIGHT_Encrypt_Cryptol : [136][8] -> [8][8] -> [8][8]
 HIGHT_Encrypt_Cryptol RK src = dst
@@ -497,16 +497,7 @@ DEC_ROUND XX rk (i0, i1, i2, i3, i4, i5, i6, i7) =
   then [ XX@0, t1, XX@2, t3, XX@4, t5, XX@6, t7] where
     t7 = ByteToWord (WordToByte ((XX@i7) ^ (ByteToWord (F0 @ (WordToByte (XX@i0)) + (rk @ 3)))))
     t1 = ByteToWord (WordToByte ((XX@i5) - (ByteToWord (F1 @ (WordToByte (XX@i6)) ^ (rk @ 0)))))
-    t3 = ByteToWor/*
-  @Copyright (c) 2024 Crypto & Security Engineering Lab (CSE).
-  @author Ji, Yong-hyeon <hacker3740@kookmin.ac.kr>
-  https://sites.google.com/kookmin.ac.kr/cselab/club-activity?authuser=0
-  
-  Distributed under the terms of the BSD3 license (see LICENSE file)
-
-  References
-  Using the Software Analysis Workbench (SAW)
- */d (WordToByte ((XX@i3) ^ (ByteToWord (F0 @ (WordToByte (XX@i4)) + (rk @ 1)))))
+    t3 = ByteToWord (WordToByte ((XX@i3) ^ (ByteToWord (F0 @ (WordToByte (XX@i4)) + (rk @ 1)))))
     t5 = ByteToWord (WordToByte ((XX@i1) - (ByteToWord (F1 @ (WordToByte (XX@i2)) ^ (rk @ 2)))))
   else [0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000]
 
